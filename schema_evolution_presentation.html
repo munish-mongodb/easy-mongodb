@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Evolution: MongoDB vs Relational Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .side {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+        }
+
+        .side.relational::before {
+            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+        }
+
+        .side h2 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .side.relational h2 {
+            color: #D32F2F;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo.relational {
+            background: #FF6B6B;
+        }
+
+        .scenario {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .scenario.relational {
+            border-left-color: #FF6B6B;
+        }
+
+        .scenario h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .scenario.relational h3 {
+            color: #D32F2F;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .code-block.before {
+            background: #1a202c;
+            border-left: 4px solid #4299e1;
+        }
+
+        .code-block.after {
+            background: #1a202c;
+            border-left: 4px solid #48bb78;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            background: #4CAF50;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-number.relational {
+            background: #FF6B6B;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .highlight.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .highlight.warning {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .process-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 1.5em;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .benefits {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .benefits.relational {
+            background: #fde8e8;
+        }
+
+        .benefits h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .benefits.relational h4 {
+            color: #D32F2F;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .simulation-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .data-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 200px;
+            overflow-y: auto;
+            max-height: 400px;
+            white-space: pre-wrap;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-migrating {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .log-entry.error {
+            border-left-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .log-entry.warning {
+            border-left-color: #FFC107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #FF6B6B, #ff5252);
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .side {
+                padding: 20px;
+            }
+            
+            .simulation-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Schema Evolution Without Migration</h1>
+            <p>A Visual Comparison: MongoDB vs Relational Databases</p>
+        </div>
+
+        <div class="comparison">
+            <!-- MongoDB Side -->
+            <div class="side mongodb">
+                <h2>
+                    <div class="logo">M</div>
+                    MongoDB Approach
+                </h2>
+
+                <div class="scenario">
+                    <h3>📊 Scenario: Adding User Preferences</h3>
+                    <p>We need to add email preferences and notification settings to our user collection.</p>
+                </div>
+
+                <div class="process-flow">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Current Document Structure</strong>
+                            <div class="code-block before">
+{
+  "_id": ObjectId("..."),
+  "name": "John Doe",
+  "email": "john@example.com",
+  "created_at": ISODate("2024-01-01")
+}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow">↓</div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Simply Insert New Documents</strong>
+                            <div class="code-block after">
+// New users automatically get the new fields
+db.users.insertOne({
+  "name": "Jane Smith",
+  "email": "jane@example.com",
+  "preferences": {
+    "email_notifications": true,
+    "theme": "dark"
+  },
+  "created_at": new Date()
+})
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow">↓</div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Handle Missing Fields in Application</strong>
+                            <div class="code-block after">
+// Query handles both old and new documents
+const user = db.users.findOne({email: "john@example.com"});
+const emailNotifications = user.preferences?.email_notifications ?? true;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight success">
+                    <strong>🎉 Result:</strong> Zero downtime, no migration scripts, instant deployment!
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Simulation</h4>
+                    <div class="simulation-controls">
+                        <button class="btn btn-primary" onclick="mongoAddUser()">Add New User</button>
+                        <button class="btn btn-primary" onclick="mongoAddUserWithPrefs()">Add User with Preferences</button>
+                        <button class="btn btn-secondary" onclick="mongoReset()">Reset Data</button>
+                    </div>
+                    <div class="status-indicator status-online">🟢 Application Online</div>
+                    <div class="timer">Downtime: <span id="mongoDowntime">0 seconds</span></div>
+                    <div class="data-display" id="mongoData"></div>
+                    <div id="mongoLog"></div>
+                </div>
+
+                <div class="benefits">
+                    <h4>✅ Benefits</h4>
+                    <ul>
+                        <li><span class="icon">⚡</span> Zero downtime deployment</li>
+                        <li><span class="icon">🔄</span> Gradual data evolution</li>
+                        <li><span class="icon">🛡️</span> Backward compatibility</li>
+                        <li><span class="icon">🚀</span> Instant feature rollout</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Relational Database Side -->
+            <div class="side relational">
+                <h2>
+                    <div class="logo relational">SQL</div>
+                    Relational Database Approach
+                </h2>
+
+                <div class="scenario relational">
+                    <h3>📊 Same Scenario: Adding User Preferences</h3>
+                    <p>We need to add email preferences and notification settings to our users table.</p>
+                </div>
+
+                <div class="process-flow">
+                    <div class="step">
+                        <div class="step-number relational">1</div>
+                        <div>
+                            <strong>Current Table Structure</strong>
+                            <div class="code-block before">
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    created_at TIMESTAMP
+);
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow">↓</div>
+
+                    <div class="step">
+                        <div class="step-number relational">2</div>
+                        <div>
+                            <strong>Create Migration Script</strong>
+                            <div class="code-block after">
+-- Migration file: 001_add_user_preferences.sql
+ALTER TABLE users 
+ADD COLUMN email_notifications BOOLEAN DEFAULT TRUE,
+ADD COLUMN theme VARCHAR(50) DEFAULT 'light';
+
+-- May require table lock for large tables!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow">↓</div>
+
+                    <div class="step">
+                        <div class="step-number relational">3</div>
+                        <div>
+                            <strong>Deploy with Downtime</strong>
+                            <div class="code-block after">
+-- 1. Stop application
+-- 2. Run migration
+-- 3. Update application code
+-- 4. Restart application
+
+-- For complex changes, might need:
+CREATE TABLE user_preferences (
+    user_id INTEGER REFERENCES users(id),
+    preference_key VARCHAR(255),
+    preference_value TEXT
+);
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight warning">
+                    <strong>⚠️ Result:</strong> Requires maintenance window, potential data locks, coordinated deployment
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Simulation</h4>
+                    <div class="simulation-controls">
+                        <button class="btn btn-danger" onclick="sqlAddColumn()" id="sqlMigrateBtn">Add Preferences Column</button>
+                        <button class="btn btn-danger" onclick="sqlAddUser()" id="sqlAddUserBtn">Add New User</button>
+                        <button class="btn btn-secondary" onclick="sqlReset()">Reset Data</button>
+                    </div>
+                    <div class="status-indicator status-online" id="sqlStatus">🟢 Application Online</div>
+                    <div class="timer">Downtime: <span id="sqlDowntime">0 seconds</span></div>
+                    <div class="progress-bar" id="sqlProgressBar" style="display: none;">
+                        <div class="progress-fill danger" id="sqlProgress"></div>
+                    </div>
+                    <div class="data-display" id="sqlData"></div>
+                    <div id="sqlLog"></div>
+                </div>
+
+                <div class="benefits relational">
+                    <h4>⚠️ Challenges</h4>
+                    <ul>
+                        <li><span class="icon">🔒</span> Table locks during migration</li>
+                        <li><span class="icon">⏰</span> Requires maintenance windows</li>
+                        <li><span class="icon">🔄</span> Rollback complexity</li>
+                        <li><span class="icon">📝</span> Migration script management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Key Takeaways</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: #2E7D32; margin-bottom: 15px;">🍃 MongoDB Advantages</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Flexible Schema:</strong> Documents can evolve independently
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Zero Downtime:</strong> Changes deployed instantly
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Gradual Evolution:</strong> Old and new data coexist seamlessly
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #D32F2F; margin-bottom: 15px;">🗄️ Relational Database Considerations</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Structured Approach:</strong> Requires careful migration planning
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Data Integrity:</strong> Strong consistency but less flexibility
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Coordination Required:</strong> Database and application changes must align
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MongoDB Simulation State
+        let mongoUsers = [
+            { _id: 1, name: "John Doe", email: "john@example.com", created_at: "2024-01-01" },
+            { _id: 2, name: "Alice Smith", email: "alice@example.com", created_at: "2024-01-02" }
+        ];
+        let mongoNextId = 3;
+
+        // SQL Simulation State
+        let sqlUsers = [
+            { id: 1, name: "John Doe", email: "john@example.com", created_at: "2024-01-01" },
+            { id: 2, name: "Alice Smith", email: "alice@example.com", created_at: "2024-01-02" }
+        ];
+        let sqlNextId = 3;
+        let sqlMigrated = false;
+        let sqlDowntime = 0;
+        let sqlDowntimeTimer = null;
+
+        // Initialize displays
+        function init() {
+            updateMongoDisplay();
+            updateSqlDisplay();
+        }
+
+        // MongoDB Functions
+        function mongoAddUser() {
+            const newUser = {
+                _id: mongoNextId++,
+                name: `User ${mongoNextId - 1}`,
+                email: `user${mongoNextId - 1}@example.com`,
+                created_at: new Date().toISOString().split('T')[0]
+            };
+            mongoUsers.push(newUser);
+            updateMongoDisplay();
+            mongoLog(`✅ Added user without preferences (backward compatible)`);
+        }
+
+        function mongoAddUserWithPrefs() {
+            const newUser = {
+                _id: mongoNextId++,
+                name: `User ${mongoNextId - 1}`,
+                email: `user${mongoNextId - 1}@example.com`,
+                preferences: {
+                    email_notifications: true,
+                    theme: "dark"
+                },
+                created_at: new Date().toISOString().split('T')[0]
+            };
+            mongoUsers.push(newUser);
+            updateMongoDisplay();
+            mongoLog(`✅ Added user with new preferences schema`);
+        }
+
+        function mongoReset() {
+            mongoUsers = [
+                { _id: 1, name: "John Doe", email: "john@example.com", created_at: "2024-01-01" },
+                { _id: 2, name: "Alice Smith", email: "alice@example.com", created_at: "2024-01-02" }
+            ];
+            mongoNextId = 3;
+            updateMongoDisplay();
+            document.getElementById('mongoLog').innerHTML = '';
+            mongoLog(`🔄 Reset to initial state`);
+        }
+
+        function updateMongoDisplay() {
+            const display = document.getElementById('mongoData');
+            display.textContent = JSON.stringify(mongoUsers, null, 2);
+        }
+
+        function mongoLog(message) {
+            const log = document.getElementById('mongoLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // SQL Functions
+        function sqlAddColumn() {
+            const btn = document.getElementById('sqlMigrateBtn');
+            const status = document.getElementById('sqlStatus');
+            const progressBar = document.getElementById('sqlProgressBar');
+            const progress = document.getElementById('sqlProgress');
+            
+            btn.disabled = true;
+            status.className = 'status-indicator status-migrating';
+            status.textContent = '🟡 Migration in Progress';
+            progressBar.style.display = 'block';
+            
+            sqlLog('⚠️ Starting migration - Application going offline');
+            sqlLog('🔒 Acquiring table lock...');
+            
+            // Start downtime timer
+            sqlDowntime = 0;
+            sqlDowntimeTimer = setInterval(() => {
+                sqlDowntime++;
+                document.getElementById('sqlDowntime').textContent = `${sqlDowntime} seconds`;
+            }, 1000);
+            
+            // Simulate migration progress
+            let progressValue = 0;
+            const progressInterval = setInterval(() => {
+                progressValue += 10;
+                progress.style.width = `${progressValue}%`;
+                
+                if (progressValue === 30) {
+                    sqlLog('📝 ALTER TABLE users ADD COLUMN email_notifications BOOLEAN DEFAULT TRUE');
+                } else if (progressValue === 60) {
+                    sqlLog('📝 ALTER TABLE users ADD COLUMN theme VARCHAR(50) DEFAULT \'light\'');
+                } else if (progressValue === 90) {
+                    sqlLog('🔄 Updating existing rows with default values...');
+                }
+                
+                if (progressValue >= 100) {
+                    clearInterval(progressInterval);
+                    clearInterval(sqlDowntimeTimer);
+                    
+                    // Add columns to existing users
+                    sqlUsers = sqlUsers.map(user => ({
+                        ...user,
+                        email_notifications: true,
+                        theme: 'light'
+                    }));
+                    
+                    sqlMigrated = true;
+                    updateSqlDisplay();
+                    
+                    status.className = 'status-indicator status-online';
+                    status.textContent = '🟢 Application Online';
+                    progressBar.style.display = 'none';
+                    
+                    sqlLog('✅ Migration completed successfully');
+                    sqlLog('🚀 Application back online');
+                    
+                    btn.textContent = 'Migration Complete';
+                    document.getElementById('sqlAddUserBtn').disabled = false;
+                }
+            }, 500);
+        }
+
+        function sqlAddUser() {
+            if (!sqlMigrated) {
+                sqlLog('❌ Cannot add user - schema not migrated yet!', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: sqlNextId++,
+                name: `User ${sqlNextId - 1}`,
+                email: `user${sqlNextId - 1}@example.com`,
+                email_notifications: true,
+                theme: 'light',
+                created_at: new Date().toISOString().split('T')[0]
+            };
+            sqlUsers.push(newUser);
+            updateSqlDisplay();
+            sqlLog(`✅ Added user with new schema`);
+        }
+
+        function sqlReset() {
+            sqlUsers = [
+                { id: 1, name: "John Doe", email: "john@example.com", created_at: "2024-01-01" },
+                { id: 2, name: "Alice Smith", email: "alice@example.com", created_at: "2024-01-02" }
+            ];
+            sqlNextId = 3;
+            sqlMigrated = false;
+            sqlDowntime = 0;
+            
+            if (sqlDowntimeTimer) {
+                clearInterval(sqlDowntimeTimer);
+            }
+            
+            document.getElementById('sqlDowntime').textContent = '0 seconds';
+            document.getElementById('sqlMigrateBtn').disabled = false;
+            document.getElementById('sqlMigrateBtn').textContent = 'Add Preferences Column';
+            document.getElementById('sqlAddUserBtn').disabled = true;
+            document.getElementById('sqlStatus').className = 'status-indicator status-online';
+            document.getElementById('sqlStatus').textContent = '🟢 Application Online';
+            document.getElementById('sqlProgressBar').style.display = 'none';
+            
+            updateSqlDisplay();
+            document.getElementById('sqlLog').innerHTML = '';
+            sqlLog(`🔄 Reset to initial state`);
+        }
+
+        function updateSqlDisplay() {
+            const display = document.getElementById('sqlData');
+            const tableHtml = generateSqlTable(sqlUsers);
+            display.innerHTML = tableHtml;
+        }
+
+        function generateSqlTable(users) {
+            if (users.length === 0) return 'No data';
+            
+            const columns = Object.keys(users[0]);
+            let html = `TABLE: users\n\n`;
+            
+            // Header
+            html += columns.join(' | ') + '\n';
+            html += columns.map(() => '---').join(' | ') + '\n';
+            
+            // Rows
+            users.forEach(user => {
+                html += columns.map(col => user[col] || 'NULL').join(' | ') + '\n';
+            });
+            
+            return html;
+        }
+
+        function sqlLog(message, type = 'info') {
+            const log = document.getElementById('sqlLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : ''}`;
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

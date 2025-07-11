@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Scaling: MongoDB Sharding vs SQL Partitioning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .control-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #FF6B6B, #ff5252);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid #4CAF50;
+        }
+
+        .stat-card.sql {
+            border-top-color: #FF6B6B;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-number.sql {
+            color: #FF6B6B;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .architecture-view {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .architecture-view::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+        }
+
+        .architecture-view.sql::before {
+            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+        }
+
+        .arch-title {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: #2E7D32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .arch-title.sql {
+            color: #D32F2F;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: #4CAF50;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .logo.sql {
+            background: #FF6B6B;
+        }
+
+        .architecture-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .client-layer {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .router-layer {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .router-layer.sql {
+            background: linear-gradient(135deg, #FF6B6B, #D32F2F);
+        }
+
+        .connection-line {
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, #4CAF50, #2E7D32);
+            margin: 0 auto;
+        }
+
+        .connection-line.sql {
+            background: linear-gradient(to bottom, #FF6B6B, #D32F2F);
+        }
+
+        .shards-container {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            min-height: 200px;
+            max-width: 100%;
+            overflow: visible;
+            padding: 10px;
+        }
+
+        .shard {
+            background: white;
+            border: 3px solid #4CAF50;
+            border-radius: 15px;
+            padding: 15px;
+            min-width: 160px;
+            max-width: 180px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            flex: 0 0 auto;
+        }
+
+        .shard.sql {
+            border-color: #FF6B6B;
+        }
+
+        .shard:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .shard-title {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .shard-title.sql {
+            background: #FF6B6B;
+        }
+
+        .shard-data {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 120px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            background: #e8f5e8;
+            margin: 3px 0;
+            padding: 5px 8px;
+            border-radius: 4px;
+            border-left: 3px solid #4CAF50;
+            animation: slideIn 0.5s ease;
+        }
+
+        .data-item.sql {
+            background: #fde8e8;
+            border-left-color: #FF6B6B;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .log-container {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 8px;
+            border-left: 3px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 4px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .log-entry.sql {
+            border-left-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .log-entry.warning {
+            border-left-color: #FFC107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .feature-comparison {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .feature-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-title.mongo {
+            color: #2E7D32;
+        }
+
+        .feature-title.sql {
+            color: #D32F2F;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li.pro {
+            background: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .feature-list li.con {
+            background: #fde8e8;
+            border-left: 4px solid #FF6B6B;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .shards-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .simulation-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Horizontal Scaling Showdown</h1>
+            <p>MongoDB Automatic Sharding vs SQL Manual Partitioning</p>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="control-title">
+                🎮 Scaling Simulation Controls
+            </div>
+            <div class="simulation-controls">
+                <button class="btn btn-primary" onclick="handleAddData()">📈 Add 1000 Records</button>
+                <button class="btn btn-primary" onclick="handleAddShard()">🔧 Add New Shard</button>
+                <button class="btn btn-danger" onclick="handleSimulateLoad()">⚡ Simulate Heavy Load</button>
+                <button class="btn btn-secondary" onclick="handleResetDemo()">🔄 Reset Demo</button>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRecords">0</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="mongoShards">3</div>
+                    <div class="stat-label">MongoDB Shards</div>
+                </div>
+                <div class="stat-card sql">
+                    <div class="stat-number" id="sqlPartitions">1</div>
+                    <div class="stat-label">SQL Partitions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="balanceScore">100%</div>
+                    <div class="stat-label">Load Balance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Comparison -->
+        <div class="comparison-grid">
+            <!-- MongoDB Sharding Architecture -->
+            <div class="architecture-view">
+                <div class="arch-title">
+                    <div class="logo">M</div>
+                    MongoDB Automatic Sharding
+                </div>
+                
+                <div class="architecture-diagram">
+                    <div class="client-layer">📱 Application Layer</div>
+                    <div class="connection-line"></div>
+                    <div class="router-layer">
+                        🎯 Query Router (mongos)
+                        <div style="font-size: 0.8em; opacity: 0.9; margin-top: 5px;">
+                            Automatic query routing & load balancing
+                        </div>
+                    </div>
+                    <div class="connection-line"></div>
+                    
+                    <div class="shards-container" id="mongoShards">
+                        <div class="shard" id="mongoShard1">
+                            <div class="shard-title">Shard 1 (US-East)</div>
+                            <div class="shard-data" id="shard1Data">
+                                <div class="data-item">Range: user_id: 0-333</div>
+                                <div class="data-item">Records: 0</div>
+                            </div>
+                        </div>
+                        <div class="shard" id="mongoShard2">
+                            <div class="shard-title">Shard 2 (US-West)</div>
+                            <div class="shard-data" id="shard2Data">
+                                <div class="data-item">Range: user_id: 334-666</div>
+                                <div class="data-item">Records: 0</div>
+                            </div>
+                        </div>
+                        <div class="shard" id="mongoShard3">
+                            <div class="shard-title">Shard 3 (EU)</div>
+                            <div class="shard-data" id="shard3Data">
+                                <div class="data-item">Range: user_id: 667-999</div>
+                                <div class="data-item">Records: 0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL Partitioning Architecture -->
+            <div class="architecture-view sql">
+                <div class="arch-title sql">
+                    <div class="logo sql">SQL</div>
+                    Manual SQL Partitioning
+                </div>
+                
+                <div class="architecture-diagram">
+                    <div class="client-layer">📱 Application Layer</div>
+                    <div class="connection-line sql"></div>
+                    <div class="router-layer sql">
+                        ⚙️ Manual Partition Logic
+                        <div style="font-size: 0.8em; opacity: 0.9; margin-top: 5px;">
+                            Application-level routing & complex setup
+                        </div>
+                    </div>
+                    <div class="connection-line sql"></div>
+                    
+                    <div class="shards-container" id="sqlShards">
+                        <div class="shard sql" id="sqlShard1">
+                            <div class="shard-title sql">Partition 1</div>
+                            <div class="shard-data" id="sqlShard1Data">
+                                <div class="data-item sql">Records: 0</div>
+                                <div class="data-item sql">All data in one partition</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Activity Log -->
+        <div class="controls-panel">
+            <div class="control-title">📊 Live Scaling Activity</div>
+            <div class="log-container" id="activityLog"></div>
+        </div>
+
+        <!-- Feature Comparison -->
+        <div class="comparison-grid">
+            <div class="feature-comparison">
+                <div class="feature-title mongo">
+                    <div class="logo">M</div>
+                    MongoDB Sharding Benefits
+                </div>
+                <ul class="feature-list">
+                    <li class="pro">✅ Easy shard addition (admin decision)</li>
+                    <li class="pro">✅ Automatic data rebalancing</li>
+                    <li class="pro">✅ Zero-downtime data migration</li>
+                    <li class="pro">✅ Built-in load balancing</li>
+                    <li class="pro">✅ Transparent to applications</li>
+                    <li class="pro">✅ Range and hash-based sharding</li>
+                    <li class="pro">✅ Geographic distribution support</li>
+                </ul>
+            </div>
+
+            <div class="feature-comparison">
+                <div class="feature-title sql">
+                    <div class="logo sql">SQL</div>
+                    SQL Partitioning Challenges
+                </div>
+                <ul class="feature-list">
+                    <li class="con">❌ Manual partition management</li>
+                    <li class="con">❌ Application-level routing logic</li>
+                    <li class="con">❌ Complex cross-partition queries</li>
+                    <li class="con">❌ Downtime for repartitioning</li>
+                    <li class="con">❌ Expensive commercial solutions</li>
+                    <li class="con">❌ Limited auto-balancing</li>
+                    <li class="con">❌ Vendor-specific implementations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables - defined at the top
+        var totalRecords = 0;
+        var mongoShardCount = 3;
+        var sqlPartitionCount = 1;
+        var loadSimulationActive = false;
+        
+        var shardData = {
+            shard1: 0,
+            shard2: 0,
+            shard3: 0
+        };
+        
+        var sqlData = {
+            partition1: 0
+        };
+
+        // Function definitions
+        function rebuildMongoShards() {
+            var shardsContainer = document.getElementById('mongoShards');
+            
+            addLog('🔍 Debug: Starting rebuild. Current mongoShardCount = ' + mongoShardCount);
+            addLog('🔍 Debug: Container element found: ' + (shardsContainer ? 'YES' : 'NO'));
+            
+            // Clear all existing shards
+            shardsContainer.innerHTML = '';
+            addLog('🔍 Debug: Container cleared');
+            
+            // Rebuild all shards from scratch
+            for (var i = 1; i <= mongoShardCount; i++) {
+                addLog('🔍 Debug: Creating shard ' + i);
+                
+                var shard = document.createElement('div');
+                shard.className = 'shard';
+                shard.id = 'mongoShard' + i;
+                
+                // Make ALL shards very visible for debugging
+                shard.style.border = '5px solid #FF0000';
+                shard.style.backgroundColor = '#FFFF00';
+                shard.style.minHeight = '150px';
+                shard.style.width = '150px';
+                shard.style.margin = '10px';
+                shard.style.display = 'block';
+                shard.style.position = 'relative';
+                
+                var locations = ['US-East', 'US-West', 'EU', 'Asia-Pacific', 'Canada', 'Australia'];
+                var location = locations[i - 1] || 'Region-' + i;
+                
+                shard.innerHTML = 
+                    '<div style="background: #000; color: #FFF; padding: 10px; font-weight: bold;">SHARD ' + i + '</div>' +
+                    '<div style="padding: 10px; color: #000; font-weight: bold;">(' + location + ')</div>' +
+                    '<div>Records: ' + (shardData['shard' + i] || 0) + '</div>';
+                
+                shardsContainer.appendChild(shard);
+                addLog('🔍 Debug: Shard ' + i + ' added to DOM');
+            }
+            
+            // Force layout refresh
+            shardsContainer.style.display = 'none';
+            shardsContainer.offsetHeight; // Force reflow
+            shardsContainer.style.display = 'flex';
+            
+            addLog('🔍 Debug: Final container child count: ' + shardsContainer.children.length);
+            addLog('🔍 Debug: Container HTML length: ' + shardsContainer.innerHTML.length);
+            
+            // Log each child element
+            for (var j = 0; j < shardsContainer.children.length; j++) {
+                var child = shardsContainer.children[j];
+                addLog('🔍 Debug: Child ' + j + ' ID: ' + child.id + ', visible: ' + (child.offsetWidth > 0 && child.offsetHeight > 0));
+            }
+        }
+
+        function handleAddData() {
+            var newRecords = 1000;
+            totalRecords += newRecords;
+            
+            distributeMongoData(newRecords);
+            distributeSqlData(newRecords);
+            
+            updateStats();
+            updateVisuals();
+            
+            addLog('📈 Added ' + newRecords + ' new records (Total: ' + totalRecords.toLocaleString() + ')');
+            addLog('✅ MongoDB: Automatically distributed across shards');
+            addLog('⚠️ SQL: Added to existing partition (potential bottleneck)', 'sql');
+            
+            if (totalRecords > 5000 && sqlPartitionCount === 1) {
+                setTimeout(function() {
+                    addLog('🚨 SQL: Performance degrading! Manual partitioning recommended', 'sql warning');
+                    suggestSqlPartitioning();
+                }, 1000);
+            }
+        }
+
+        function distributeMongoData(records) {
+            var recordsPerShard = Math.floor(records / mongoShardCount);
+            var remainder = records % mongoShardCount;
+            
+            var shardKeys = Object.keys(shardData);
+            for (var i = 0; i < shardKeys.length; i++) {
+                var additional = recordsPerShard + (i < remainder ? 1 : 0);
+                shardData[shardKeys[i]] += additional;
+            }
+        }
+
+        function distributeSqlData(records) {
+            sqlData.partition1 += records;
+        }
+
+        function handleAddShard() {
+            mongoShardCount++;
+            var newShardId = 'shard' + mongoShardCount;
+            shardData[newShardId] = 0;
+            
+            var shardsContainer = document.getElementById('mongoShards');
+            var newShard = document.createElement('div');
+            newShard.className = 'shard';
+            newShard.id = 'mongoShard' + mongoShardCount;
+            newShard.style.transform = 'scale(0)';
+            newShard.style.transition = 'all 0.5s ease';
+            
+            newShard.innerHTML = 
+                '<div class="shard-title">Shard ' + mongoShardCount + ' (Auto-Added)</div>' +
+                '<div class="shard-data" id="shard' + mongoShardCount + 'Data">' +
+                '<div class="data-item">🔄 Initializing shard...</div>' +
+                '<div class="data-item">⚖️ Balancing data...</div>' +
+                '</div>';
+            
+            shardsContainer.appendChild(newShard);
+            
+            // Animate the new shard appearance
+            setTimeout(function() {
+                newShard.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Rebalance data after a short delay to show the process
+            setTimeout(function() {
+                rebalanceMongoShards();
+                updateStats();
+                updateVisuals();
+                
+                addLog('🔧 MongoDB: New shard added automatically');
+                addLog('⚖️ MongoDB: Rebalancing data across ' + mongoShardCount + ' shards');
+                addLog('✅ MongoDB: Data migration completed seamlessly');
+            }, 1000);
+            
+            addLog('🔧 MongoDB: Administrator adds new shard ' + mongoShardCount);
+            addLog('👀 Debug: New shard element created with ID: mongoShard' + mongoShardCount);
+            addLog('📍 Debug: Shard container now has ' + shardsContainer.children.length + ' children');
+            addLog('⚖️ MongoDB: Automatic data rebalancing initiated');
+            addLog('⚠️ SQL: Would require complex manual partitioning setup', 'sql');
+        }
+
+        function rebalanceMongoShards() {
+            var totalData = 0;
+            var shardKeys = Object.keys(shardData);
+            for (var i = 0; i < shardKeys.length; i++) {
+                totalData += shardData[shardKeys[i]];
+            }
+            
+            var dataPerShard = Math.floor(totalData / mongoShardCount);
+            var remainder = totalData % mongoShardCount;
+            
+            for (var i = 0; i < shardKeys.length; i++) {
+                shardData[shardKeys[i]] = dataPerShard + (i < remainder ? 1 : 0);
+            }
+        }
+
+        function handleSimulateLoad() {
+            if (loadSimulationActive) return;
+            
+            loadSimulationActive = true;
+            addLog('⚡ Simulating heavy traffic load...');
+            
+            var loadCounter = 0;
+            var loadInterval = setInterval(function() {
+                handleAddData();
+                loadCounter++;
+                
+                if (loadCounter >= 5) {
+                    clearInterval(loadInterval);
+                    loadSimulationActive = false;
+                    addLog('🏁 Load simulation completed');
+                    addLog('✅ MongoDB: Handled load seamlessly with auto-scaling');
+                    addLog('❌ SQL: Would require manual intervention and downtime', 'sql warning');
+                }
+            }, 800);
+        }
+
+        function suggestSqlPartitioning() {
+            addLog('💡 SQL: Creating manual partitions...', 'sql');
+            
+            setTimeout(function() {
+                sqlPartitionCount = 3;
+                var totalSqlData = sqlData.partition1;
+                sqlData = {
+                    partition1: Math.floor(totalSqlData / 3),
+                    partition2: Math.floor(totalSqlData / 3),
+                    partition3: Math.floor(totalSqlData / 3)
+                };
+                
+                updateSqlPartitions();
+                updateStats();
+                
+                addLog('🔧 SQL: Manual partitioning completed (required downtime)', 'sql');
+                addLog('⚠️ SQL: Application code updated for partition routing', 'sql');
+            }, 2000);
+        }
+
+        function updateSqlPartitions() {
+            var sqlContainer = document.getElementById('sqlShards');
+            sqlContainer.innerHTML = '';
+            
+            for (var i = 1; i <= sqlPartitionCount; i++) {
+                var partition = document.createElement('div');
+                partition.className = 'shard sql';
+                var records = sqlData['partition' + i] || 0;
+                partition.innerHTML = '<div class="shard-title sql">Partition ' + i + '</div>' +
+                                   '<div class="shard-data">' +
+                                   '<div class="data-item sql">Records: ' + records.toLocaleString() + '</div>' +
+                                   '<div class="data-item sql">Manual management</div></div>';
+                sqlContainer.appendChild(partition);
+            }
+        }
+
+        function handleResetDemo() {
+            totalRecords = 0;
+            mongoShardCount = 3;
+            sqlPartitionCount = 1;
+            loadSimulationActive = false;
+            
+            shardData = {
+                shard1: 0,
+                shard2: 0,
+                shard3: 0
+            };
+            
+            sqlData = {
+                partition1: 0
+            };
+            
+            // Rebuild MongoDB shards using the new method
+            rebuildMongoShards();
+            
+            // Reset SQL partitions
+            updateSqlPartitions();
+            
+            updateStats();
+            document.getElementById('activityLog').innerHTML = '';
+            
+            addLog('🔄 Demo reset to initial state');
+            addLog('📊 MongoDB: 3 shards ready for automatic scaling');
+            addLog('🗄️ SQL: 1 partition, manual scaling required', 'sql');
+        }
+
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = totalRecords.toLocaleString();
+            document.getElementById('mongoShards').textContent = mongoShardCount;
+            document.getElementById('sqlPartitions').textContent = sqlPartitionCount;
+            
+            var shardValues = Object.values(shardData);
+            var maxMongo = Math.max.apply(Math, shardValues);
+            var minMongo = Math.min.apply(Math, shardValues);
+            var mongoBalance = maxMongo > 0 ? Math.round((minMongo / maxMongo) * 100) : 100;
+            
+            document.getElementById('balanceScore').textContent = mongoBalance + '%';
+        }
+
+        function updateVisuals() {
+            // Update ALL MongoDB shards (not just the first 3)
+            for (var i = 1; i <= mongoShardCount; i++) {
+                var dataElement = document.getElementById('shard' + i + 'Data');
+                if (dataElement) {
+                    var shardKey = 'shard' + i;
+                    var records = shardData[shardKey] || 0;
+                    var rangeStart = Math.floor(((i-1) * 1000) / mongoShardCount);
+                    var rangeEnd = Math.floor((i * 1000) / mongoShardCount) - 1;
+                    
+                    dataElement.innerHTML = 
+                        '<div class="data-item">Range: user_id: ' + rangeStart + '-' + rangeEnd + '</div>' +
+                        '<div class="data-item">Records: ' + records.toLocaleString() + '</div>' +
+                        '<div class="data-item">Auto-balanced ✅</div>';
+                }
+            }
+            
+            // Update SQL partitions if they exist
+            if (sqlPartitionCount === 1) {
+                var sqlElement = document.getElementById('sqlShard1Data');
+                if (sqlElement) {
+                    var bottleneckWarning = sqlData.partition1 > 3000 ? 
+                        '<div class="data-item sql">⚠️ Performance bottleneck!</div>' : '';
+                    
+                    sqlElement.innerHTML = 
+                        '<div class="data-item sql">Records: ' + sqlData.partition1.toLocaleString() + '</div>' +
+                        '<div class="data-item sql">All data in one partition</div>' + bottleneckWarning;
+                }
+            }
+        }
+
+        function addLog(message, type) {
+            var logContainer = document.getElementById('activityLog');
+            var entry = document.createElement('div');
+            entry.className = 'log-entry ' + (type || '');
+            
+            var timestamp = new Date().toLocaleTimeString();
+            entry.textContent = '[' + timestamp + '] ' + message;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Initialize when page loads
+        function initDemo() {
+            handleResetDemo();
+            addLog('🚀 Horizontal scaling demo initialized');
+            addLog('📊 MongoDB: 3 shards ready for automatic distribution');
+            addLog('🗄️ SQL: 1 partition, manual management required', 'sql');
+        }
+
+        // Start the demo when page loads
+        window.onload = function() {
+            initDemo();
+        };
+    </script>
+</body>
+</html>

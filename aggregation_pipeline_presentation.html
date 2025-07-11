@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggregation Pipeline vs Complex SQL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .side {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+        }
+
+        .side.relational::before {
+            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+        }
+
+        .side h2 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .side.relational h2 {
+            color: #D32F2F;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo.relational {
+            background: #FF6B6B;
+        }
+
+        .pipeline-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .pipeline-section.relational {
+            border-left-color: #FF6B6B;
+        }
+
+        .pipeline-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pipeline-title.relational {
+            color: #D32F2F;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .pipeline-step {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .pipeline-step.relational {
+            background: #fde8e8;
+            border-color: #FF6B6B;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #4CAF50;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .step-number.relational {
+            background: #FF6B6B;
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 8px;
+            margin-left: 20px;
+        }
+
+        .step-title.relational {
+            color: #D32F2F;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 20px;
+        }
+
+        .simulation-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .query-selector {
+            margin-bottom: 20px;
+        }
+
+        .query-selector select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: white;
+            min-width: 200px;
+        }
+
+        .data-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 250px;
+            overflow-y: auto;
+            max-height: 500px;
+            white-space: pre-wrap;
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-title.mongo {
+            color: #2E7D32;
+        }
+
+        .result-title.sql {
+            color: #D32F2F;
+        }
+
+        .pipeline-visual {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pipeline-box {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .pipeline-arrow {
+            color: #4CAF50;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .complexity-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .complexity-indicator.low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .complexity-indicator.high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            font-size: 0.9em;
+        }
+
+        .log-entry.sql {
+            border-left-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .benefits {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .benefits.relational {
+            background: #fde8e8;
+        }
+
+        .benefits h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .benefits.relational h4 {
+            color: #D32F2F;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .side {
+                padding: 20px;
+            }
+            
+            .simulation-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .pipeline-visual {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .pipeline-arrow {
+                transform: rotate(90deg);
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Aggregation Pipeline vs Complex SQL</h1>
+            <p>Intuitive Data Processing vs Nested Query Complexity</p>
+        </div>
+
+        <!-- Sample Data Section -->
+        <div style="background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h3 style="color: #333; margin-bottom: 20px; text-align: center;">📊 Sample E-commerce Data</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4 style="color: #4CAF50; margin-bottom: 10px;">MongoDB Collections</h4>
+                    <div class="code-block">
+// orders collection
+{
+  "_id": ObjectId("..."),
+  "order_id": "ORD-001",
+  "customer": {
+    "name": "John Doe",
+    "city": "San Francisco",
+    "segment": "Premium"
+  },
+  "items": [
+    {"product": "Laptop", "category": "Electronics", "price": 999, "qty": 1},
+    {"product": "Mouse", "category": "Electronics", "price": 29, "qty": 2}
+  ],
+  "total": 1057,
+  "order_date": "2024-03-15",
+  "status": "shipped"
+}
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color: #FF6B6B; margin-bottom: 10px;">SQL Tables</h4>
+                    <div class="code-block">
+-- orders table
+id | order_id | customer_id | total | order_date | status
+
+-- customers table  
+id | name | city | segment
+
+-- order_items table
+order_id | product | category | price | quantity
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison">
+            <!-- MongoDB Side -->
+            <div class="side mongodb">
+                <h2>
+                    <div class="logo">M</div>
+                    MongoDB Aggregation Pipeline
+                </h2>
+
+                <div class="pipeline-section">
+                    <div class="pipeline-title">🔄 Step-by-Step Data Processing</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-number">1</div>
+                        <div class="step-title">$match - Filter Data</div>
+                        <div class="step-description">Filter documents like WHERE clause</div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">$unwind - Flatten Arrays</div>
+                        <div class="step-description">Deconstruct array fields into separate documents</div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-number">3</div>
+                        <div class="step-title">$group - Aggregate Data</div>
+                        <div class="step-description">Group by fields and calculate aggregations</div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">$sort - Order Results</div>
+                        <div class="step-description">Sort the aggregated results</div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-number">5</div>
+                        <div class="step-title">$project - Shape Output</div>
+                        <div class="step-description">Select and format fields for final output</div>
+                    </div>
+
+                    <div class="complexity-indicator low">
+                        <span>📈 Complexity Level: Low - Readable & Intuitive</span>
+                    </div>
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Pipeline Builder</h4>
+                    <div class="query-selector">
+                        <label for="mongoQuerySelect">Choose Analysis:</label>
+                        <select id="mongoQuerySelect" onchange="updateMongoQuery()">
+                            <option value="sales_by_category">Sales by Category</option>
+                            <option value="top_customers">Top Customers by Revenue</option>
+                            <option value="monthly_trends">Monthly Sales Trends</option>
+                            <option value="city_analysis">Sales by City</option>
+                        </select>
+                    </div>
+                    <div class="simulation-controls">
+                        <button class="btn btn-primary" onclick="executeMongoQuery()">Run Pipeline</button>
+                        <button class="btn btn-primary" onclick="stepThroughPipeline()">Step Through</button>
+                        <button class="btn btn-secondary" onclick="mongoReset()">Reset</button>
+                    </div>
+                    
+                    <div id="mongoPipelineVisual"></div>
+                    <div class="data-display" id="mongoQuery"></div>
+                    <div id="mongoLog"></div>
+                </div>
+
+                <div class="benefits">
+                    <h4>✅ Pipeline Benefits</h4>
+                    <ul>
+                        <li><span class="icon">🔄</span> Sequential, easy-to-follow steps</li>
+                        <li><span class="icon">🧩</span> Composable and reusable stages</li>
+                        <li><span class="icon">🎯</span> Self-documenting data flow</li>
+                        <li><span class="icon">⚡</span> Optimized execution planning</li>
+                        <li><span class="icon">🔧</span> Rich set of operators and functions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SQL Side -->
+            <div class="side relational">
+                <h2>
+                    <div class="logo relational">SQL</div>
+                    Complex SQL Queries
+                </h2>
+
+                <div class="pipeline-section relational">
+                    <div class="pipeline-title relational">🕸️ Nested Query Structure</div>
+                    
+                    <div class="pipeline-step relational">
+                        <div class="step-number relational">1</div>
+                        <div class="step-title relational">FROM & JOINs - Combine Tables</div>
+                        <div class="step-description">Multiple table joins to reconstruct data</div>
+                    </div>
+
+                    <div class="pipeline-step relational">
+                        <div class="step-number relational">2</div>
+                        <div class="step-title relational">WHERE - Apply Filters</div>
+                        <div class="step-description">Complex filtering across joined tables</div>
+                    </div>
+
+                    <div class="pipeline-step relational">
+                        <div class="step-number relational">3</div>
+                        <div class="step-title relational">GROUP BY - Aggregate</div>
+                        <div class="step-description">Group and aggregate with complex expressions</div>
+                    </div>
+
+                    <div class="pipeline-step relational">
+                        <div class="step-number relational">4</div>
+                        <div class="step-title relational">HAVING - Filter Groups</div>
+                        <div class="step-description">Post-aggregation filtering</div>
+                    </div>
+
+                    <div class="pipeline-step relational">
+                        <div class="step-number relational">5</div>
+                        <div class="step-title relational">ORDER BY - Sort Results</div>
+                        <div class="step-description">Final result ordering</div>
+                    </div>
+
+                    <div class="complexity-indicator high">
+                        <span>📈 Complexity Level: High - Nested & Complex</span>
+                    </div>
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 SQL Query Generator</h4>
+                    <div class="query-selector">
+                        <label for="sqlQuery">Choose Analysis:</label>
+                        <select id="sqlQuery" onchange="updateSqlQuery()">
+                            <option value="sales_by_category">Sales by Category</option>
+                            <option value="top_customers">Top Customers by Revenue</option>
+                            <option value="monthly_trends">Monthly Sales Trends</option>
+                            <option value="city_analysis">Sales by City</option>
+                        </select>
+                    </div>
+                    <div class="simulation-controls">
+                        <button class="btn btn-danger" onclick="executeSqlQuery()">Execute SQL</button>
+                        <button class="btn btn-danger" onclick="explainSqlQuery()">Explain Query</button>
+                        <button class="btn btn-secondary" onclick="sqlReset()">Reset</button>
+                    </div>
+                    
+                    <div class="data-display" id="sqlQueryDisplay"></div>
+                    <div id="sqlLog"></div>
+                </div>
+
+                <div class="benefits relational">
+                    <h4>⚠️ SQL Complexity</h4>
+                    <ul>
+                        <li><span class="icon">🕸️</span> Nested subqueries and CTEs</li>
+                        <li><span class="icon">🔗</span> Complex multi-table JOINs</li>
+                        <li><span class="icon">🧠</span> Requires deep SQL knowledge</li>
+                        <li><span class="icon">🐛</span> Harder to debug and maintain</li>
+                        <li><span class="icon">⚡</span> Performance issues with complex joins</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Comparison -->
+        <div class="results-container">
+            <div class="result-section">
+                <div class="result-title mongo">
+                    <div class="logo">M</div>
+                    MongoDB Pipeline Results
+                </div>
+                <div class="data-display" id="mongoResults"></div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-title sql">
+                    <div class="logo relational">SQL</div>
+                    SQL Query Results
+                </div>
+                <div class="data-display" id="sqlResults"></div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-top: 30px;">
+            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Key Differences: Pipeline vs SQL</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: #2E7D32; margin-bottom: 15px;">🍃 MongoDB Aggregation Pipeline</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Sequential Processing:</strong> Clear step-by-step data transformation
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Readable Syntax:</strong> Self-documenting pipeline stages
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Rich Operators:</strong> 100+ operators for complex transformations
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Easy Debugging:</strong> Test each stage independently
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #D32F2F; margin-bottom: 15px;">🗄️ Complex SQL Queries</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Nested Structure:</strong> Complex subqueries and CTEs
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>JOIN Complexity:</strong> Multiple table relationships to manage
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Learning Curve:</strong> Requires advanced SQL knowledge
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Maintenance Issues:</strong> Difficult to modify and debug
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const sampleOrders = [
+            {
+                _id: 1,
+                order_id: "ORD-001",
+                customer: {name: "John Doe", city: "San Francisco", segment: "Premium"},
+                items: [
+                    {product: "Laptop", category: "Electronics", price: 999, qty: 1},
+                    {product: "Mouse", category: "Electronics", price: 29, qty: 2}
+                ],
+                total: 1057,
+                order_date: "2024-03-15",
+                status: "shipped"
+            },
+            {
+                _id: 2,
+                order_id: "ORD-002", 
+                customer: {name: "Jane Smith", city: "New York", segment: "Standard"},
+                items: [
+                    {product: "Book", category: "Books", price: 25, qty: 3},
+                    {product: "Pen", category: "Office", price: 5, qty: 10}
+                ],
+                total: 125,
+                order_date: "2024-03-16",
+                status: "delivered"
+            },
+            {
+                _id: 3,
+                order_id: "ORD-003",
+                customer: {name: "Bob Wilson", city: "San Francisco", segment: "Premium"},
+                items: [
+                    {product: "Phone", category: "Electronics", price: 799, qty: 1},
+                    {product: "Case", category: "Electronics", price: 39, qty: 1}
+                ],
+                total: 838,
+                order_date: "2024-04-01",
+                status: "shipped"
+            }
+        ];
+
+        let currentPipelineStep = 0;
+        let currentQuery = 'sales_by_category';
+
+        // MongoDB Pipeline Queries
+        const mongoPipelines = {
+            sales_by_category: [
+                {stage: "$unwind", description: "Flatten items array", code: '{"$unwind": "$items"}'},
+                {stage: "$group", description: "Group by category and sum", code: '{"$group": {"_id": "$items.category", "total_sales": {"$sum": {"$multiply": ["$items.price", "$items.qty"]}}}}'},
+                {stage: "$sort", description: "Sort by total sales descending", code: '{"$sort": {"total_sales": -1}}'},
+                {stage: "$project", description: "Format output", code: '{"$project": {"category": "$_id", "total_sales": 1, "_id": 0}}'}
+            ],
+            top_customers: [
+                {stage: "$group", description: "Group by customer and sum totals", code: '{"$group": {"_id": "$customer.name", "total_spent": {"$sum": "$total"}, "orders": {"$sum": 1}}}'},
+                {stage: "$sort", description: "Sort by total spent descending", code: '{"$sort": {"total_spent": -1}}'},
+                {stage: "$limit", description: "Get top 5 customers", code: '{"$limit": 5}'},
+                {stage: "$project", description: "Format customer data", code: '{"$project": {"customer": "$_id", "total_spent": 1, "orders": 1, "_id": 0}}'}
+            ],
+            monthly_trends: [
+                {stage: "$addFields", description: "Extract month from date", code: '{"$addFields": {"month": {"$dateToString": {"format": "%Y-%m", "date": {"$dateFromString": {"dateString": "$order_date"}}}}}}'},
+                {stage: "$group", description: "Group by month and sum", code: '{"$group": {"_id": "$month", "total_sales": {"$sum": "$total"}, "order_count": {"$sum": 1}}}'},
+                {stage: "$sort", description: "Sort by month", code: '{"$sort": {"_id": 1}}'},
+                {stage: "$project", description: "Format monthly data", code: '{"$project": {"month": "$_id", "total_sales": 1, "order_count": 1, "_id": 0}}'}
+            ],
+            city_analysis: [
+                {stage: "$group", description: "Group by city", code: '{"$group": {"_id": "$customer.city", "total_sales": {"$sum": "$total"}, "customers": {"$addToSet": "$customer.name"}}}'},
+                {stage: "$addFields", description: "Count unique customers", code: '{"$addFields": {"customer_count": {"$size": "$customers"}}}'},
+                {stage: "$project", description: "Format city data", code: '{"$project": {"city": "$_id", "total_sales": 1, "customer_count": 1, "_id": 0}}'},
+                {stage: "$sort", description: "Sort by total sales", code: '{"$sort": {"total_sales": -1}}'}
+            ]
+        };
+
+        // SQL Queries
+        const sqlQueries = {
+            sales_by_category: `
+SELECT 
+    oi.category,
+    SUM(oi.price * oi.quantity) as total_sales
+FROM orders o
+JOIN order_items oi ON o.id = oi.order_id
+GROUP BY oi.category
+ORDER BY total_sales DESC;`,
+
+            top_customers: `
+SELECT 
+    c.name as customer,
+    SUM(o.total) as total_spent,
+    COUNT(o.id) as orders
+FROM customers c
+JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name
+ORDER BY total_spent DESC
+LIMIT 5;`,
+
+            monthly_trends: `
+SELECT 
+    DATE_FORMAT(o.order_date, '%Y-%m') as month,
+    SUM(o.total) as total_sales,
+    COUNT(o.id) as order_count
+FROM orders o
+GROUP BY DATE_FORMAT(o.order_date, '%Y-%m')
+ORDER BY month;`,
+
+            city_analysis: `
+SELECT 
+    c.city,
+    SUM(o.total) as total_sales,
+    COUNT(DISTINCT c.id) as customer_count
+FROM customers c
+JOIN orders o ON c.id = o.customer_id
+GROUP BY c.city
+ORDER BY total_sales DESC;`
+        };
+
+        // Initialize
+        function init() {
+            updateMongoQuery();
+            updateSqlQuery();
+            mongoReset();
+            sqlReset();
+        }
+
+        // MongoDB Functions
+        function updateMongoQuery() {
+            currentQuery = document.getElementById('mongoQuerySelect').value;
+            currentPipelineStep = 0;
+            displayMongoPipeline();
+        }
+
+        function displayMongoPipeline() {
+            const pipeline = mongoPipelines[currentQuery];
+            const queryDisplay = document.getElementById('mongoQuery');
+            
+            let pipelineText = `// MongoDB Aggregation Pipeline: ${currentQuery.replace('_', ' ')}\n`;
+            pipelineText += `db.orders.aggregate([\n`;
+            
+            pipeline.forEach((step, index) => {
+                pipelineText += `  // Step ${index + 1}: ${step.description}\n`;
+                pipelineText += `  ${step.code}${index < pipeline.length - 1 ? ',' : ''}\n\n`;
+            });
+            
+            pipelineText += `])`;
+            queryDisplay.textContent = pipelineText;
+            
+            // Update visual pipeline
+            updatePipelineVisual(pipeline);
+        }
+
+        function updatePipelineVisual(pipeline) {
+            const visual = document.getElementById('mongoPipelineVisual');
+            visual.innerHTML = '<div style="font-weight: bold; margin-bottom: 10px;">Pipeline Flow:</div>';
+            
+            const flowDiv = document.createElement('div');
+            flowDiv.className = 'pipeline-visual';
+            
+            pipeline.forEach((step, index) => {
+                const box = document.createElement('div');
+                box.className = 'pipeline-box';
+                box.textContent = step.stage;
+                flowDiv.appendChild(box);
+                
+                if (index < pipeline.length - 1) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'pipeline-arrow';
+                    arrow.textContent = '→';
+                    flowDiv.appendChild(arrow);
+                }
+            });
+            
+            visual.appendChild(flowDiv);
+        }
+
+        function executeMongoQuery() {
+            const pipeline = mongoPipelines[currentQuery];
+            mongoLog(`🚀 Executing aggregation pipeline for ${currentQuery.replace('_', ' ')}`);
+            
+            // Simulate pipeline execution
+            let results = [];
+            
+            switch(currentQuery) {
+                case 'sales_by_category':
+                    results = [
+                        {category: "Electronics", total_sales: 1866},
+                        {category: "Books", total_sales: 75},
+                        {category: "Office", total_sales: 50}
+                    ];
+                    break;
+                case 'top_customers':
+                    results = [
+                        {customer: "John Doe", total_spent: 1057, orders: 1},
+                        {customer: "Bob Wilson", total_spent: 838, orders: 1},
+                        {customer: "Jane Smith", total_spent: 125, orders: 1}
+                    ];
+                    break;
+                case 'monthly_trends':
+                    results = [
+                        {month: "2024-03", total_sales: 1182, order_count: 2},
+                        {month: "2024-04", total_sales: 838, order_count: 1}
+                    ];
+                    break;
+                case 'city_analysis':
+                    results = [
+                        {city: "San Francisco", total_sales: 1895, customer_count: 2},
+                        {city: "New York", total_sales: 125, customer_count: 1}
+                    ];
+                    break;
+            }
+            
+            document.getElementById('mongoResults').textContent = JSON.stringify(results, null, 2);
+            
+            pipeline.forEach((step, index) => {
+                setTimeout(() => {
+                    mongoLog(`✅ Step ${index + 1}: ${step.stage} - ${step.description}`);
+                }, index * 500);
+            });
+            
+            setTimeout(() => {
+                mongoLog(`🎯 Pipeline completed! ${results.length} results returned`);
+            }, pipeline.length * 500);
+        }
+
+        function stepThroughPipeline() {
+            const pipeline = mongoPipelines[currentQuery];
+            
+            if (currentPipelineStep >= pipeline.length) {
+                mongoLog('✅ Pipeline completed! Click "Run Pipeline" to see final results');
+                currentPipelineStep = 0;
+                return;
+            }
+            
+            const step = pipeline[currentPipelineStep];
+            mongoLog(`📍 Step ${currentPipelineStep + 1}: ${step.stage} - ${step.description}`);
+            mongoLog(`   Code: ${step.code}`);
+            
+            currentPipelineStep++;
+            
+            if (currentPipelineStep >= pipeline.length) {
+                mongoLog('🏁 All steps completed! Click "Run Pipeline" for results');
+            }
+        }
+
+        function mongoReset() {
+            currentPipelineStep = 0;
+            document.getElementById('mongoResults').textContent = 'Click "Run Pipeline" to see results';
+            document.getElementById('mongoLog').innerHTML = '';
+            mongoLog('🔄 MongoDB pipeline reset');
+            displayMongoPipeline();
+        }
+
+        function mongoLog(message) {
+            const log = document.getElementById('mongoLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // SQL Functions
+        function updateSqlQuery() {
+            const selectedQuery = document.getElementById('sqlQuery').value;
+            const queryDisplay = document.getElementById('sqlQueryDisplay');
+            const query = sqlQueries[selectedQuery];
+            
+            queryDisplay.textContent = `-- SQL Query: ${selectedQuery.replace('_', ' ')}\n${query}`;
+        }
+
+        function executeSqlQuery() {
+            const selectedQuery = document.getElementById('sqlQuery').value;
+            sqlLog(`🚀 Executing SQL query for ${selectedQuery.replace('_', ' ')}`);
+            sqlLog(`🔗 Performing table JOINs...`);
+            
+            // Simulate SQL execution
+            let results = [];
+            
+            switch(selectedQuery) {
+                case 'sales_by_category':
+                    results = [
+                        ["Electronics", 1866],
+                        ["Books", 75],
+                        ["Office", 50]
+                    ];
+                    break;
+                case 'top_customers':
+                    results = [
+                        ["John Doe", 1057, 1],
+                        ["Bob Wilson", 838, 1],
+                        ["Jane Smith", 125, 1]
+                    ];
+                    break;
+                case 'monthly_trends':
+                    results = [
+                        ["2024-03", 1182, 2],
+                        ["2024-04", 838, 1]
+                    ];
+                    break;
+                case 'city_analysis':
+                    results = [
+                        ["San Francisco", 1895, 2],
+                        ["New York", 125, 1]
+                    ];
+                    break;
+            }
+            
+            // Format results as table
+            let resultText = "Results:\n";
+            results.forEach(row => {
+                resultText += row.join(" | ") + "\n";
+            });
+            
+            document.getElementById('sqlResults').textContent = resultText;
+            
+            setTimeout(() => {
+                sqlLog(`⚠️ Query executed with multiple table JOINs`);
+                sqlLog(`📊 ${results.length} rows returned`);
+                sqlLog(`🔄 Result set processed and formatted`);
+            }, 1000);
+        }
+
+        function explainSqlQuery() {
+            const selectedQuery = document.getElementById('sqlQuery').value;
+            sqlLog(`🔍 Explaining SQL query execution plan...`);
+            
+            setTimeout(() => {
+                sqlLog(`📋 Query involves ${selectedQuery === 'top_customers' || selectedQuery === 'city_analysis' ? '2-3' : '2'} table JOINs`);
+                sqlLog(`🔗 JOIN operations require index lookups`);
+                sqlLog(`📊 GROUP BY requires sorting and aggregation`);
+                sqlLog(`⚠️ Complex nested structure increases execution time`);
+            }, 500);
+        }
+
+        function sqlReset() {
+            document.getElementById('sqlResults').textContent = 'Click "Execute SQL" to see results';
+            document.getElementById('sqlLog').innerHTML = '';
+            sqlLog('🔄 SQL query reset');
+        }
+
+        function sqlLog(message) {
+            const log = document.getElementById('sqlLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry sql';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

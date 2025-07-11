@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB vs SQL Presentations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .nav-menu {
+            width: 280px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .nav-menu h2 {
+            margin-bottom: 20px;
+            color: #764ba2;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 15px;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background-color: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            transform: translateX(5px);
+        }
+
+        .content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .welcome {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: #667eea;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-body p {
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #764ba2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-menu">
+        <h2>MongoDB vs SQL</h2>
+        <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="horizontal_scaling_presentation.html">Horizontal Scaling</a></li>
+            <li><a href="schema_evolution_presentation.html">Schema Evolution</a></li>
+            <li><a href="arrays_embedded_docs_presentation.html">Arrays & Embedded Docs</a></li>
+            <li><a href="aggregation_pipeline_presentation.html">Aggregation Pipeline</a></li>
+            <li><a href="final_scaling_demo_working.html">Final Scaling Demo</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="welcome">
+            <h1>MongoDB vs SQL Presentations</h1>
+            <p>Welcome to the interactive presentations comparing MongoDB and SQL databases. These presentations demonstrate key differences and advantages of each database system through visual examples and interactive demos.</p>
+            <p>Select a presentation from the menu on the left or from the cards below.</p>
+        </div>
+
+        <div class="card-container">
+            <div class="card">
+                <div class="card-header">Horizontal Scaling</div>
+                <div class="card-body">
+                    <p>Compare MongoDB's automatic sharding with SQL manual partitioning through an interactive simulation.</p>
+                    <a href="horizontal_scaling_presentation.html" class="btn">View Presentation</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Schema Evolution</div>
+                <div class="card-body">
+                    <p>See how MongoDB handles schema changes without migrations compared to traditional SQL databases.</p>
+                    <a href="schema_evolution_presentation.html" class="btn">View Presentation</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Arrays & Embedded Documents</div>
+                <div class="card-body">
+                    <p>Explore MongoDB's native support for arrays and embedded documents versus SQL's normalized approach.</p>
+                    <a href="arrays_embedded_docs_presentation.html" class="btn">View Presentation</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Aggregation Pipeline</div>
+                <div class="card-body">
+                    <p>Compare MongoDB's aggregation pipeline with SQL's complex JOIN queries for data analysis.</p>
+                    <a href="aggregation_pipeline_presentation.html" class="btn">View Presentation</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Final Scaling Demo</div>
+                <div class="card-body">
+                    <p>A comprehensive demonstration of horizontal scaling differences between MongoDB and SQL.</p>
+                    <a href="final_scaling_demo_working.html" class="btn">View Presentation</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

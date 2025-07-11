@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORM Complexity vs Natural Object Storage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .side {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+        }
+
+        .side.relational::before {
+            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+        }
+
+        .side h2 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .side.relational h2 {
+            color: #D32F2F;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo.relational {
+            background: #FF6B6B;
+        }
+
+        .layer-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .layer-section.relational {
+            border-left-color: #FF6B6B;
+        }
+
+        .layer-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .layer-title.relational {
+            color: #D32F2F;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-label {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: #4a5568;
+            color: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+        }
+
+        .simulation-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .data-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 200px;
+            overflow-y: auto;
+            max-height: 400px;
+            white-space: pre-wrap;
+        }
+
+        .impedance-mismatch {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .impedance-mismatch.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .impedance-mismatch.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            font-size: 0.9em;
+        }
+
+        .log-entry.error {
+            border-left-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .log-entry.warning {
+            border-left-color: #FFC107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .benefits {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .benefits.relational {
+            background: #fde8e8;
+        }
+
+        .benefits h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .benefits.relational h4 {
+            color: #D32F2F;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .complexity-meter {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+
+        .meter-bar {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .meter-fill.low {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+
+        .meter-fill.high {
+            background: linear-gradient(90deg, #FF6B6B, #ff5252);
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .flow-step {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+        }
+
+        .flow-arrow {
+            font-size: 1.5em;
+            color: #666;
+            margin: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .side {
+                padding: 20px;
+            }
+            
+            .simulation-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .flow-diagram {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ORM Complexity vs Natural Object Storage</h1>
+            <p>Object-Relational Impedance Mismatch vs Document-Native Approach</p>
+        </div>
+
+        <div class="comparison">
+            <!-- MongoDB Side -->
+            <div class="side mongodb">
+                <h2>
+                    <div class="logo">M</div>
+                    MongoDB: Objects Stored As-Is
+                </h2>
+
+                <div class="layer-section">
+                    <div class="layer-title">🎯 Direct Object Storage</div>
+                    
+                    <div class="code-block">
+<span class="code-label">JavaScript Object</span>
+// Your application object
+class User {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+    this.profile = {
+      avatar: "avatar.jpg",
+      bio: "Software developer",
+      preferences: {
+        theme: "dark",
+        notifications: true
+      }
+    };
+    this.skills = [
+      {name: "JavaScript", level: "expert"},
+      {name: "MongoDB", level: "advanced"}
+    ];
+    this.projects = [
+      {id: 1, name: "E-commerce App", status: "active"},
+      {id: 2, name: "Blog Platform", status: "completed"}
+    ];
+  }
+}
+                    </div>
+
+                    <div class="flow-diagram">
+                        <div class="flow-step">
+                            <strong>🎯 Application Object</strong><br>
+                            <small>Complex nested structure</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <strong>📦 MongoDB Document</strong><br>
+                            <small>Exact same structure</small>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+<span class="code-label">MongoDB Storage</span>
+// Stored exactly as-is in MongoDB
+{
+  "_id": ObjectId("..."),
+  "name": "John Doe",
+  "email": "john@example.com",
+  "profile": {
+    "avatar": "avatar.jpg",
+    "bio": "Software developer",
+    "preferences": {
+      "theme": "dark",
+      "notifications": true
+    }
+  },
+  "skills": [
+    {"name": "JavaScript", "level": "expert"},
+    {"name": "MongoDB", "level": "advanced"}
+  ],
+  "projects": [
+    {"id": 1, "name": "E-commerce App", "status": "active"},
+    {"id": 2, "name": "Blog Platform", "status": "completed"}
+  ]
+}
+                    </div>
+
+                    <div class="impedance-mismatch success">
+                        <strong>✅ Zero Impedance Mismatch:</strong> Objects map directly to documents with no transformation required.
+                    </div>
+                </div>
+
+                <div class="layer-section">
+                    <div class="layer-title">⚡ Simple Operations</div>
+                    
+                    <div class="code-block">
+<span class="code-label">Direct Operations</span>
+// Create user - direct object insertion
+const user = new User("John", "john@example.com");
+await db.users.insertOne(user);
+
+// Update nested field - no mapping needed
+await db.users.updateOne(
+  {_id: userId},
+  {$set: {"profile.preferences.theme": "light"}}
+);
+
+// Add to array - native array operations
+await db.users.updateOne(
+  {_id: userId},
+  {$push: {skills: {name: "Python", level: "intermediate"}}}
+);
+
+// Query nested data - natural syntax
+const darkThemeUsers = await db.users.find({
+  "profile.preferences.theme": "dark"
+}).toArray();
+                    </div>
+                </div>
+
+                <div class="complexity-meter">
+                    <span>Code Complexity:</span>
+                    <div class="meter-bar">
+                        <div class="meter-fill low" style="width: 25%"></div>
+                    </div>
+                    <span>Low</span>
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Demo</h4>
+                    <div class="simulation-controls">
+                        <button class="btn btn-primary" onclick="mongoCreateUser()">Create User Object</button>
+                        <button class="btn btn-primary" onclick="mongoUpdateNested()">Update Nested Field</button>
+                        <button class="btn btn-primary" onclick="mongoAddSkill()">Add Skill to Array</button>
+                        <button class="btn btn-secondary" onclick="mongoReset()">Reset</button>
+                    </div>
+                    <div class="data-display" id="mongoData"></div>
+                    <div id="mongoLog"></div>
+                </div>
+
+                <div class="benefits">
+                    <h4>✅ Advantages</h4>
+                    <ul>
+                        <li><span class="icon">🎯</span> Objects map directly to documents</li>
+                        <li><span class="icon">⚡</span> No ORM layer complexity</li>
+                        <li><span class="icon">🔧</span> No object-relational mapping configuration</li>
+                        <li><span class="icon">🚀</span> Instant development productivity</li>
+                        <li><span class="icon">📦</span> Natural data access patterns</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Relational Database Side -->
+            <div class="side relational">
+                <h2>
+                    <div class="logo relational">ORM</div>
+                    SQL + ORM: Complex Mapping Layer
+                </h2>
+
+                <div class="layer-section relational">
+                    <div class="layer-title relational">🗄️ Normalized Table Structure</div>
+                    
+                    <div class="code-block">
+<span class="code-label">SQL Schema</span>
+-- Users table
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    avatar VARCHAR(255),
+    bio TEXT,
+    theme VARCHAR(50),
+    notifications BOOLEAN
+);
+
+-- User skills table
+CREATE TABLE user_skills (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    skill_name VARCHAR(100),
+    skill_level VARCHAR(50)
+);
+
+-- User projects table  
+CREATE TABLE user_projects (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    project_id INTEGER,
+    project_name VARCHAR(255),
+    status VARCHAR(50)
+);
+                    </div>
+
+                    <div class="flow-diagram">
+                        <div class="flow-step">
+                            <strong>🎯 Application Object</strong><br>
+                            <small>Complex nested structure</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <strong>🔧 ORM Mapping</strong><br>
+                            <small>Complex transformation</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <strong>🗄️ Multiple Tables</strong><br>
+                            <small>Normalized relations</small>
+                        </div>
+                    </div>
+
+                    <div class="impedance-mismatch error">
+                        <strong>⚠️ Object-Relational Impedance Mismatch:</strong> Complex objects must be decomposed into multiple tables with extensive ORM configuration.
+                    </div>
+                </div>
+
+                <div class="layer-section relational">
+                    <div class="layer-title relational">🔧 ORM Configuration</div>
+                    
+                    <div class="code-block">
+<span class="code-label">ORM Models (e.g., Hibernate/JPA)</span>
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String name;
+    private String email;
+    private String avatar;
+    private String bio;
+    private String theme;
+    private Boolean notifications;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set&lt;UserSkill&gt; skills;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set&lt;UserProject&gt; projects;
+    
+    // Getters, setters, constructors...
+}
+
+@Entity
+@Table(name = "user_skills")
+public class UserSkill {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    private String skillName;
+    private String skillLevel;
+    
+    // More boilerplate...
+}
+                    </div>
+                </div>
+
+                <div class="layer-section relational">
+                    <div class="layer-title relational">💔 Complex Operations</div>
+                    
+                    <div class="code-block">
+<span class="code-label">ORM Operations</span>
+// Create user - requires multiple inserts
+User user = new User("John", "john@example.com");
+user.setTheme("dark");
+user.setNotifications(true);
+
+UserSkill skill1 = new UserSkill("JavaScript", "expert");
+skill1.setUser(user);
+user.getSkills().add(skill1);
+
+UserProject project = new UserProject(1, "E-commerce App", "active");
+project.setUser(user);
+user.getProjects().add(project);
+
+entityManager.persist(user); // Cascades to related tables
+
+// Update nested preference - requires object loading
+User user = entityManager.find(User.class, userId);
+user.setTheme("light");
+entityManager.merge(user);
+
+// Add skill - requires creating new object and managing relationships
+User user = entityManager.find(User.class, userId);
+UserSkill newSkill = new UserSkill("Python", "intermediate");
+newSkill.setUser(user);
+user.getSkills().add(newSkill);
+entityManager.merge(user);
+                    </div>
+                </div>
+
+                <div class="complexity-meter">
+                    <span>Code Complexity:</span>
+                    <div class="meter-bar">
+                        <div class="meter-fill high" style="width: 85%"></div>
+                    </div>
+                    <span>High</span>
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Demo</h4>
+                    <div class="simulation-controls">
+                        <button class="btn btn-danger" onclick="sqlCreateUser()">Create User (ORM)</button>
+                        <button class="btn btn-danger" onclick="sqlUpdateNested()">Update Field (Load+Save)</button>
+                        <button class="btn btn-danger" onclick="sqlAddSkill()">Add Skill (Relationship)</button>
+                        <button class="btn btn-secondary" onclick="sqlReset()">Reset</button>
+                    </div>
+                    <div class="data-display" id="sqlData"></div>
+                    <div id="sqlLog"></div>
+                </div>
+
+                <div class="benefits relational">
+                    <h4>⚠️ Complexity & Overhead</h4>
+                    <ul>
+                        <li><span class="icon">🔧</span> Extensive ORM configuration required</li>
+                        <li><span class="icon">🗄️</span> Objects split across multiple tables</li>
+                        <li><span class="icon">🔄</span> Complex relationship management</li>
+                        <li><span class="icon">⚡</span> Performance overhead from joins</li>
+                        <li><span class="icon">📚</span> Steep learning curve for ORM tools</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Object-Relational Impedance Mismatch</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: #2E7D32; margin-bottom: 15px;">🍃 MongoDB: Natural Object Storage</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Direct Mapping:</strong> Application objects stored as-is
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>No ORM Layer:</strong> Direct database operations
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Native Operations:</strong> Work with objects naturally
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Rapid Development:</strong> Less boilerplate, more productivity
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #D32F2F; margin-bottom: 15px;">🗄️ SQL + ORM: Complex Mapping</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>ORM Configuration:</strong> Extensive mapping definitions
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Multiple Tables:</strong> Objects decomposed across relations
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Relationship Management:</strong> Complex foreign key handling
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Performance Overhead:</strong> JOINs and lazy loading issues
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h4 style="color: #333; margin-bottom: 10px;">💡 Key Insight</h4>
+                <p style="font-size: 1.1em; color: #666;">
+                    MongoDB eliminates the object-relational impedance mismatch by storing objects as documents, 
+                    while SQL databases require complex ORM layers to bridge the gap between objects and relational tables.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MongoDB Simulation State
+        let mongoUsers = [];
+        let mongoUserId = 1;
+
+        // SQL Simulation State  
+        let sqlUsers = [];
+        let sqlUserSkills = [];
+        let sqlUserProjects = [];
+        let sqlUserId = 1;
+        let sqlSkillId = 1;
+        let sqlProjectId = 1;
+
+        // Initialize displays
+        function init() {
+            mongoReset();
+            sqlReset();
+        }
+
+        // MongoDB Functions
+        function mongoCreateUser() {
+            const newUser = {
+                _id: mongoUserId++,
+                name: `User ${mongoUserId - 1}`,
+                email: `user${mongoUserId - 1}@example.com`,
+                profile: {
+                    avatar: "avatar.jpg",
+                    bio: "Software developer",
+                    preferences: {
+                        theme: "dark",
+                        notifications: true
+                    }
+                },
+                skills: [
+                    {name: "JavaScript", level: "expert"},
+                    {name: "MongoDB", level: "advanced"}
+                ],
+                projects: [
+                    {id: 1, name: "E-commerce App", status: "active"},
+                    {id: 2, name: "Blog Platform", status: "completed"}
+                ],
+                created_at: new Date().toISOString()
+            };
+            
+            mongoUsers.push(newUser);
+            updateMongoDisplay();
+            mongoLog(`✅ Created user object - stored directly as single document`);
+            mongoLog(`📦 Complete object with nested data and arrays`);
+        }
+
+        function mongoUpdateNested() {
+            if (mongoUsers.length === 0) {
+                mongoLog('❌ No users to update. Create a user first!');
+                return;
+            }
+            
+            const user = mongoUsers[mongoUsers.length - 1];
+            const newTheme = user.profile.preferences.theme === "dark" ? "light" : "dark";
+            user.profile.preferences.theme = newTheme;
+            
+            updateMongoDisplay();
+            mongoLog(`✅ Updated nested preference: theme = "${newTheme}"`);
+            mongoLog(`⚡ Direct path update: profile.preferences.theme`);
+        }
+
+        function mongoAddSkill() {
+            if (mongoUsers.length === 0) {
+                mongoLog('❌ No users to update. Create a user first!');
+                return;
+            }
+            
+            const skills = ["Python", "React", "Node.js", "Docker", "AWS"];
+            const levels = ["beginner", "intermediate", "advanced", "expert"];
+            const randomSkill = skills[Math.floor(Math.random() * skills.length)];
+            const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+            
+            const user = mongoUsers[mongoUsers.length - 1];
+            
+            // Check if skill already exists
+            const existingSkill = user.skills.find(s => s.name === randomSkill);
+            if (existingSkill) {
+                existingSkill.level = randomLevel;
+                mongoLog(`✅ Updated existing skill: ${randomSkill} → ${randomLevel}`);
+            } else {
+                user.skills.push({name: randomSkill, level: randomLevel});
+                mongoLog(`✅ Added new skill: ${randomSkill} (${randomLevel})`);
+            }
+            
+            updateMongoDisplay();
+            mongoLog(`📝 Native array operation - no relationship management needed`);
+        }
+
+        function mongoReset() {
+            mongoUsers = [];
+            mongoUserId = 1;
+            updateMongoDisplay();
+            document.getElementById('mongoLog').innerHTML = '';
+            mongoLog('🔄 Reset MongoDB data');
+        }
+
+        function updateMongoDisplay() {
+            const display = document.getElementById('mongoData');
+            if (mongoUsers.length === 0) {
+                display.textContent = 'No users created yet. Click "Create User Object" to see direct object storage.';
+            } else {
+                display.textContent = JSON.stringify({users: mongoUsers}, null, 2);
+            }
+        }
+
+        function mongoLog(message) {
+            const log = document.getElementById('mongoLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // SQL + ORM Functions
+        function sqlCreateUser() {
+            // Simulate ORM entity creation with relationship management
+            const newUser = {
+                id: sqlUserId++,
+                name: `User ${sqlUserId - 1}`,
+                email: `user${sqlUserId - 1}@example.com`,
+                avatar: "avatar.jpg",
+                bio: "Software developer",
+                theme: "dark",
+                notifications: true
+            };
+            sqlUsers.push(newUser);
+            
+            // Create related skills (separate table)
+            const skills = [
+                {id: sqlSkillId++, user_id: newUser.id, skill_name: "JavaScript", skill_level: "expert"},
+                {id: sqlSkillId++, user_id: newUser.id, skill_name: "MongoDB", skill_level: "advanced"}
+            ];
+            sqlUserSkills.push(...skills);
+            
+            // Create related projects (separate table)
+            const projects = [
+                {id: sqlProjectId++, user_id: newUser.id, project_id: 1, project_name: "E-commerce App", status: "active"},
+                {id: sqlProjectId++, user_id: newUser.id, project_id: 2, project_name: "Blog Platform", status: "completed"}
+            ];
+            sqlUserProjects.push(...projects);
+            
+            updateSqlDisplay();
+            sqlLog(`🔧 ORM: Created User entity with cascade operations`);
+            sqlLog(`📊 Inserted into 3 tables: users, user_skills, user_projects`);
+            sqlLog(`🔗 Managed foreign key relationships automatically`);
+            sqlLog(`⚠️ Required extensive ORM configuration and annotations`);
+        }
+
+        function sqlUpdateNested() {
+            if (sqlUsers.length === 0) {
+                sqlLog('❌ No users to update. Create a user first!');
+                return;
+            }
+            
+            // Simulate ORM load-update-save cycle
+            sqlLog(`🔍 ORM: Loading user entity from database...`);
+            sqlLog(`🔄 ORM: Executing SELECT with JOIN operations...`);
+            
+            const user = sqlUsers[sqlUsers.length - 1];
+            const newTheme = user.theme === "dark" ? "light" : "dark";
+            user.theme = newTheme;
+            
+            updateSqlDisplay();
+            sqlLog(`✅ ORM: Updated user.theme = "${newTheme}"`);
+            sqlLog(`💾 ORM: Executing UPDATE statement...`);
+            sqlLog(`⚠️ Simple nested field update requires full entity loading`);
+        }
+
+        function sqlAddSkill() {
+            if (sqlUsers.length === 0) {
+                sqlLog('❌ No users to update. Create a user first!');
+                return;
+            }
+            
+            const skills = ["Python", "React", "Node.js", "Docker", "AWS"];
+            const levels = ["beginner", "intermediate", "advanced", "expert"];
+            const randomSkill = skills[Math.floor(Math.random() * skills.length)];
+            const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+            
+            const userId = sqlUsers[sqlUsers.length - 1].id;
+            
+            // Check if skill already exists
+            const existingSkill = sqlUserSkills.find(s => s.user_id === userId && s.skill_name === randomSkill);
+            if (existingSkill) {
+                existingSkill.skill_level = randomLevel;
+                sqlLog(`🔧 ORM: Updated existing UserSkill entity`);
+                sqlLog(`📝 Executed UPDATE on user_skills table`);
+            } else {
+                const newSkill = {
+                    id: sqlSkillId++,
+                    user_id: userId,
+                    skill_name: randomSkill,
+                    skill_level: randomLevel
+                };
+                sqlUserSkills.push(newSkill);
+                sqlLog(`🔧 ORM: Created new UserSkill entity`);
+                sqlLog(`📝 Executed INSERT into user_skills table`);
+            }
+            
+            updateSqlDisplay();
+            sqlLog(`🔗 ORM: Managed foreign key relationship user_id = ${userId}`);
+            sqlLog(`⚠️ Simple array operation requires separate entity and table`);
+        }
+
+        function sqlReset() {
+            sqlUsers = [];
+            sqlUserSkills = [];
+            sqlUserProjects = [];
+            sqlUserId = 1;
+            sqlSkillId = 1;
+            sqlProjectId = 1;
+            updateSqlDisplay();
+            document.getElementById('sqlLog').innerHTML = '';
+            sqlLog('🔄 Reset SQL + ORM data');
+        }
+
+        function updateSqlDisplay() {
+            const display = document.getElementById('sqlData');
+            
+            if (sqlUsers.length === 0) {
+                display.innerHTML = 'No users created yet. Click "Create User (ORM)" to see normalized table structure.';
+                return;
+            }
+            
+            let html = '';
+            
+            // Users table
+            html += '<div class="table-section">';
+            html += '<div class="table-title">👤 USERS TABLE</div>';
+            html += 'id | name | email | avatar | bio | theme | notifications\n';
+            html += '---|------|-------|--------|-----|-------|-------------\n';
+            sqlUsers.forEach(user => {
+                html += `${user.id} | ${user.name} | ${user.email} | ${user.avatar} | ${user.bio.substring(0, 10)}... | ${user.theme} | ${user.notifications}\n`;
+            });
+            html += '</div>';
+            
+            // User Skills table
+            if (sqlUserSkills.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">💻 USER_SKILLS TABLE</div>';
+                html += 'id | user_id | skill_name | skill_level\n';
+                html += '---|---------|------------|------------\n';
+                sqlUserSkills.forEach(skill => {
+                    html += `${skill.id} | ${skill.user_id} | ${skill.skill_name} | ${skill.skill_level}\n`;
+                });
+                html += '</div>';
+            }
+            
+            // User Projects table
+            if (sqlUserProjects.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">📋 USER_PROJECTS TABLE</div>';
+                html += 'id | user_id | project_id | project_name | status\n';
+                html += '---|---------|------------|--------------|-------\n';
+                sqlUserProjects.forEach(project => {
+                    html += `${project.id} | ${project.user_id} | ${project.project_id} | ${project.project_name} | ${project.status}\n`;
+                });
+                html += '</div>';
+            }
+            
+            // Show the complexity
+            html += '<div class="table-section" style="color: #ff6b6b;">';
+            html += '<div class="table-title">⚠️ ORM COMPLEXITY</div>';
+            html += `Total Tables: ${3}\n`;
+            html += `Total Records: ${sqlUsers.length + sqlUserSkills.length + sqlUserProjects.length}\n`;
+            html += `Foreign Key Relationships: ${sqlUserSkills.length + sqlUserProjects.length}\n`;
+            html += 'ORM Configuration: @Entity, @OneToMany, @ManyToOne, @JoinColumn...\n';
+            html += '</div>';
+            
+            display.innerHTML = html;
+        }
+
+        function sqlLog(message) {
+            const log = document.getElementById('sqlLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

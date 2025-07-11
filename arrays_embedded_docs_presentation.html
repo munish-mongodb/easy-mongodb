@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrays & Embedded Documents: MongoDB vs Relational</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .side {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+        }
+
+        .side.relational::before {
+            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+        }
+
+        .side h2 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .side.relational h2 {
+            color: #D32F2F;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo.relational {
+            background: #FF6B6B;
+        }
+
+        .feature-section {
+            margin-bottom: 30px;
+        }
+
+        .feature-title {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .feature-title.relational {
+            border-left-color: #FF6B6B;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .simulation-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .data-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 200px;
+            overflow-y: auto;
+            max-height: 400px;
+            white-space: pre-wrap;
+        }
+
+        .query-demo {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .query-demo.relational {
+            background: #fde8e8;
+            border-left-color: #FF6B6B;
+        }
+
+        .query-demo h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .query-demo.relational h4 {
+            color: #D32F2F;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            font-size: 0.9em;
+        }
+
+        .log-entry.error {
+            border-left-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .benefits {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .benefits.relational {
+            background: #fde8e8;
+        }
+
+        .benefits h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .benefits.relational h4 {
+            color: #D32F2F;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .table-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .table-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .table-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .table-title {
+            color: #81c784;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .side {
+                padding: 20px;
+            }
+            
+            .simulation-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Arrays & Embedded Documents</h1>
+            <p>MongoDB's Native Support vs Relational Database Approach</p>
+        </div>
+
+        <div class="comparison">
+            <!-- MongoDB Side -->
+            <div class="side mongodb">
+                <h2>
+                    <div class="logo">M</div>
+                    MongoDB Approach
+                </h2>
+
+                <!-- Arrays Section -->
+                <div class="feature-section">
+                    <div class="feature-title">📊 Native Array Support</div>
+                    
+                    <div class="code-block">
+// Blog post with tags (array of strings)
+{
+  "_id": ObjectId("..."),
+  "title": "MongoDB Best Practices",
+  "tags": ["mongodb", "database", "nosql", "performance"],
+  "categories": ["tech", "tutorial"]
+}
+
+// User with multiple skills (array of objects)
+{
+  "_id": ObjectId("..."),
+  "name": "Jane Developer",
+  "skills": [
+    {"name": "JavaScript", "level": "expert"},
+    {"name": "Python", "level": "intermediate"},
+    {"name": "MongoDB", "level": "advanced"}
+  ]
+}
+                    </div>
+
+                    <div class="query-demo">
+                        <h4>🔍 Querying Arrays</h4>
+                        <div class="code-block">
+// Find posts with specific tag
+db.posts.find({"tags": "mongodb"})
+
+// Find users with JavaScript skills
+db.users.find({"skills.name": "JavaScript"})
+
+// Find expert level skills
+db.users.find({"skills.level": "expert"})
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Documents Section -->
+                <div class="feature-section">
+                    <div class="feature-title">🗂️ Embedded Documents</div>
+                    
+                    <div class="code-block">
+// E-commerce order with embedded data
+{
+  "_id": ObjectId("..."),
+  "order_id": "ORD-001",
+  "customer": {
+    "name": "John Smith",
+    "email": "john@example.com",
+    "address": {
+      "street": "123 Main St",
+      "city": "San Francisco",
+      "zip": "94105"
+    }
+  },
+  "items": [
+    {
+      "product_id": "PROD-1",
+      "name": "Laptop",
+      "price": 999.99,
+      "quantity": 1
+    },
+    {
+      "product_id": "PROD-2", 
+      "name": "Mouse",
+      "price": 29.99,
+      "quantity": 2
+    }
+  ],
+  "total": 1059.97,
+  "status": "shipped"
+}
+                    </div>
+
+                    <div class="query-demo">
+                        <h4>🔍 Querying Embedded Documents</h4>
+                        <div class="code-block">
+// Find orders by customer city
+db.orders.find({"customer.address.city": "San Francisco"})
+
+// Find orders with specific product
+db.orders.find({"items.product_id": "PROD-1"})
+
+// Find high-value orders
+db.orders.find({"total": {$gt: 1000}})
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Demo</h4>
+                    <div class="simulation-controls">
+                        <button class="btn btn-primary" onclick="mongoAddBlogPost()">Add Blog Post</button>
+                        <button class="btn btn-primary" onclick="mongoAddOrder()">Add Order</button>
+                        <button class="btn btn-primary" onclick="mongoQueryData()">Query Data</button>
+                        <button class="btn btn-secondary" onclick="mongoReset()">Reset</button>
+                    </div>
+                    <div class="data-display" id="mongoData"></div>
+                    <div id="mongoLog"></div>
+                </div>
+
+                <div class="benefits">
+                    <h4>✅ Benefits</h4>
+                    <ul>
+                        <li><span class="icon">⚡</span> Single query retrieves complete objects</li>
+                        <li><span class="icon">🎯</span> Natural array operations ($push, $pull, $addToSet)</li>
+                        <li><span class="icon">🔍</span> Rich query operators for arrays and nested docs</li>
+                        <li><span class="icon">📦</span> Data locality improves performance</li>
+                        <li><span class="icon">🚀</span> No complex JOINs required</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Relational Database Side -->
+            <div class="side relational">
+                <h2>
+                    <div class="logo relational">SQL</div>
+                    Relational Database Approach
+                </h2>
+
+                <!-- Junction Tables Section -->
+                <div class="feature-section">
+                    <div class="feature-title relational">🔗 Junction Tables for Arrays</div>
+                    
+                    <div class="code-block">
+-- Posts table
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    content TEXT
+);
+
+-- Tags table  
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE
+);
+
+-- Junction table for many-to-many
+CREATE TABLE post_tags (
+    post_id INTEGER REFERENCES posts(id),
+    tag_id INTEGER REFERENCES tags(id),
+    PRIMARY KEY (post_id, tag_id)
+);
+
+-- User skills require separate table
+CREATE TABLE user_skills (
+    user_id INTEGER REFERENCES users(id),
+    skill_name VARCHAR(100),
+    skill_level VARCHAR(50),
+    PRIMARY KEY (user_id, skill_name)
+);
+                    </div>
+
+                    <div class="query-demo relational">
+                        <h4>🔍 Complex JOINs Required</h4>
+                        <div class="code-block">
+-- Find posts with specific tag
+SELECT p.* FROM posts p
+JOIN post_tags pt ON p.id = pt.post_id
+JOIN tags t ON pt.tag_id = t.id
+WHERE t.name = 'mongodb';
+
+-- Find users with JavaScript skills
+SELECT u.* FROM users u
+JOIN user_skills us ON u.id = us.user_id
+WHERE us.skill_name = 'JavaScript';
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Normalized Tables Section -->
+                <div class="feature-section">
+                    <div class="feature-title relational">📋 Normalized Tables</div>
+                    
+                    <div class="code-block">
+-- Orders table
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    order_id VARCHAR(50),
+    customer_id INTEGER REFERENCES customers(id),
+    total DECIMAL(10,2),
+    status VARCHAR(50)
+);
+
+-- Customers table
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255)
+);
+
+-- Addresses table
+CREATE TABLE addresses (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customers(id),
+    street VARCHAR(255),
+    city VARCHAR(100),
+    zip VARCHAR(20)
+);
+
+-- Order items table
+CREATE TABLE order_items (
+    order_id INTEGER REFERENCES orders(id),
+    product_id VARCHAR(50),
+    name VARCHAR(255),
+    price DECIMAL(8,2),
+    quantity INTEGER
+);
+                    </div>
+
+                    <div class="query-demo relational">
+                        <h4>🔍 Multi-table JOINs</h4>
+                        <div class="code-block">
+-- Get complete order information
+SELECT o.order_id, c.name, a.city, 
+       oi.name as item_name, oi.quantity
+FROM orders o
+JOIN customers c ON o.customer_id = c.id
+JOIN addresses a ON c.id = a.customer_id
+JOIN order_items oi ON o.id = oi.order_id
+WHERE o.order_id = 'ORD-001';
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-container">
+                    <h4>🎮 Interactive Demo</h4>
+                    <div class="simulation-controls">
+                        <button class="btn btn-danger" onclick="sqlAddBlogPost()">Add Blog Post</button>
+                        <button class="btn btn-danger" onclick="sqlAddOrder()">Add Order</button>
+                        <button class="btn btn-danger" onclick="sqlQueryData()">Query Data</button>
+                        <button class="btn btn-secondary" onclick="sqlReset()">Reset</button>
+                    </div>
+                    <div class="table-display" id="sqlData"></div>
+                    <div id="sqlLog"></div>
+                </div>
+
+                <div class="benefits relational">
+                    <h4>⚠️ Complexity</h4>
+                    <ul>
+                        <li><span class="icon">🔗</span> Multiple tables for simple relationships</li>
+                        <li><span class="icon">🔄</span> Complex JOINs for data retrieval</li>
+                        <li><span class="icon">📊</span> Additional foreign key management</li>
+                        <li><span class="icon">⚡</span> Potential performance overhead</li>
+                        <li><span class="icon">🔧</span> More maintenance and schema complexity</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Performance & Complexity Comparison</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: #2E7D32; margin-bottom: 15px;">🍃 MongoDB: Atomic Operations</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Single Query:</strong> Retrieve complete nested objects
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Array Operations:</strong> $push, $pull, $addToSet directly on arrays
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                            <strong>Data Locality:</strong> Related data stored together
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #D32F2F; margin-bottom: 15px;">🗄️ SQL: Normalized Approach</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Multiple Queries:</strong> JOINs across several tables
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Junction Tables:</strong> Extra tables for simple arrays
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                            <strong>Referential Integrity:</strong> Strong consistency guarantees
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MongoDB Simulation State
+        let mongoBlogPosts = [];
+        let mongoOrders = [];
+        let mongoPostId = 1;
+        let mongoOrderId = 1;
+
+        // SQL Simulation State
+        let sqlPosts = [];
+        let sqlTags = [];
+        let sqlPostTags = [];
+        let sqlOrders = [];
+        let sqlCustomers = [];
+        let sqlAddresses = [];
+        let sqlOrderItems = [];
+        let sqlPostId = 1;
+        let sqlTagId = 1;
+        let sqlOrderId = 1;
+        let sqlCustomerId = 1;
+
+        // Initialize displays
+        function init() {
+            mongoReset();
+            sqlReset();
+        }
+
+        // MongoDB Functions
+        function mongoAddBlogPost() {
+            const tags = ['mongodb', 'nosql', 'database', 'javascript', 'tutorial'];
+            const selectedTags = tags.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 2);
+            
+            const newPost = {
+                _id: mongoPostId++,
+                title: `MongoDB Tutorial ${mongoPostId - 1}`,
+                content: "Learn about MongoDB's flexible document model...",
+                tags: selectedTags,
+                author: {
+                    name: "John Doe",
+                    email: "john@example.com",
+                    bio: "Database expert"
+                },
+                metadata: {
+                    views: Math.floor(Math.random() * 1000),
+                    likes: Math.floor(Math.random() * 100),
+                    created_at: new Date().toISOString()
+                }
+            };
+            
+            mongoBlogPosts.push(newPost);
+            updateMongoDisplay();
+            mongoLog(`✅ Added blog post with ${selectedTags.length} tags and embedded author info`);
+        }
+
+        function mongoAddOrder() {
+            const items = [
+                {product_id: "PROD-1", name: "Laptop", price: 999.99, quantity: 1},
+                {product_id: "PROD-2", name: "Mouse", price: 29.99, quantity: 2},
+                {product_id: "PROD-3", name: "Keyboard", price: 79.99, quantity: 1}
+            ];
+            const selectedItems = items.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 2) + 1);
+            const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const newOrder = {
+                _id: mongoOrderId++,
+                order_id: `ORD-${String(mongoOrderId - 1).padStart(3, '0')}`,
+                customer: {
+                    name: `Customer ${mongoOrderId - 1}`,
+                    email: `customer${mongoOrderId - 1}@example.com`,
+                    address: {
+                        street: "123 Main St",
+                        city: "San Francisco",
+                        zip: "94105"
+                    }
+                },
+                items: selectedItems,
+                total: Math.round(total * 100) / 100,
+                status: "pending",
+                created_at: new Date().toISOString()
+            };
+            
+            mongoOrders.push(newOrder);
+            updateMongoDisplay();
+            mongoLog(`✅ Added order with ${selectedItems.length} items and embedded customer data`);
+        }
+
+        function mongoQueryData() {
+            if (mongoBlogPosts.length === 0 && mongoOrders.length === 0) {
+                mongoLog('❌ No data to query. Add some posts or orders first!');
+                return;
+            }
+            
+            const queries = [];
+            
+            if (mongoBlogPosts.length > 0) {
+                const randomPost = mongoBlogPosts[Math.floor(Math.random() * mongoBlogPosts.length)];
+                const randomTag = randomPost.tags[0];
+                queries.push(`Posts with tag "${randomTag}": ${mongoBlogPosts.filter(p => p.tags.includes(randomTag)).length} found`);
+            }
+            
+            if (mongoOrders.length > 0) {
+                const highValueOrders = mongoOrders.filter(o => o.total > 500);
+                queries.push(`High-value orders (>$500): ${highValueOrders.length} found`);
+                
+                const sfOrders = mongoOrders.filter(o => o.customer.address.city === "San Francisco");
+                queries.push(`Orders from San Francisco: ${sfOrders.length} found`);
+            }
+            
+            queries.forEach(query => mongoLog(`🔍 ${query}`));
+        }
+
+        function mongoReset() {
+            mongoBlogPosts = [];
+            mongoOrders = [];
+            mongoPostId = 1;
+            mongoOrderId = 1;
+            updateMongoDisplay();
+            document.getElementById('mongoLog').innerHTML = '';
+            mongoLog('🔄 Reset MongoDB data');
+        }
+
+        function updateMongoDisplay() {
+            const display = document.getElementById('mongoData');
+            const data = {
+                blog_posts: mongoBlogPosts,
+                orders: mongoOrders
+            };
+            display.textContent = JSON.stringify(data, null, 2);
+        }
+
+        function mongoLog(message) {
+            const log = document.getElementById('mongoLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // SQL Functions
+        function sqlAddBlogPost() {
+            const tags = ['mongodb', 'nosql', 'database', 'javascript', 'tutorial'];
+            const selectedTags = tags.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 2);
+            
+            // Add post
+            const newPost = {
+                id: sqlPostId++,
+                title: `SQL Tutorial ${sqlPostId - 1}`,
+                content: "Learn about relational databases..."
+            };
+            sqlPosts.push(newPost);
+            
+            // Add tags and junction records
+            selectedTags.forEach(tagName => {
+                let tag = sqlTags.find(t => t.name === tagName);
+                if (!tag) {
+                    tag = { id: sqlTagId++, name: tagName };
+                    sqlTags.push(tag);
+                }
+                
+                sqlPostTags.push({
+                    post_id: newPost.id,
+                    tag_id: tag.id
+                });
+            });
+            
+            updateSqlDisplay();
+            sqlLog(`✅ Added blog post requiring ${selectedTags.length + 1} table insertions`);
+        }
+
+        function sqlAddOrder() {
+            const items = [
+                {product_id: "PROD-1", name: "Laptop", price: 999.99, quantity: 1},
+                {product_id: "PROD-2", name: "Mouse", price: 29.99, quantity: 2}
+            ];
+            const selectedItems = items.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 2) + 1);
+            const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // Add customer
+            const newCustomer = {
+                id: sqlCustomerId++,
+                name: `Customer ${sqlCustomerId - 1}`,
+                email: `customer${sqlCustomerId - 1}@example.com`
+            };
+            sqlCustomers.push(newCustomer);
+            
+            // Add address
+            const newAddress = {
+                id: sqlCustomerId,
+                customer_id: newCustomer.id,
+                street: "123 Main St",
+                city: "San Francisco",
+                zip: "94105"
+            };
+            sqlAddresses.push(newAddress);
+            
+            // Add order
+            const newOrder = {
+                id: sqlOrderId++,
+                order_id: `ORD-${String(sqlOrderId - 1).padStart(3, '0')}`,
+                customer_id: newCustomer.id,
+                total: Math.round(total * 100) / 100,
+                status: "pending"
+            };
+            sqlOrders.push(newOrder);
+            
+            // Add order items
+            selectedItems.forEach(item => {
+                sqlOrderItems.push({
+                    order_id: newOrder.id,
+                    product_id: item.product_id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                });
+            });
+            
+            updateSqlDisplay();
+            sqlLog(`✅ Added order requiring ${3 + selectedItems.length} table insertions`);
+        }
+
+        function sqlQueryData() {
+            if (sqlPosts.length === 0 && sqlOrders.length === 0) {
+                sqlLog('❌ No data to query. Add some posts or orders first!');
+                return;
+            }
+            
+            const queries = [];
+            
+            if (sqlPosts.length > 0 && sqlTags.length > 0) {
+                const randomTag = sqlTags[Math.floor(Math.random() * sqlTags.length)];
+                const postCount = sqlPostTags.filter(pt => pt.tag_id === randomTag.id).length;
+                queries.push(`Posts with tag "${randomTag.name}": ${postCount} (requires 3-table JOIN)`);
+            }
+            
+            if (sqlOrders.length > 0) {
+                const highValueOrders = sqlOrders.filter(o => o.total > 500);
+                queries.push(`High-value orders: ${highValueOrders.length} (single table query)`);
+                
+                const sfCustomers = sqlAddresses.filter(a => a.city === "San Francisco");
+                const sfOrders = sqlOrders.filter(o => 
+                    sfCustomers.some(addr => addr.customer_id === o.customer_id)
+                );
+                queries.push(`SF orders: ${sfOrders.length} (requires 3-table JOIN)`);
+            }
+            
+            queries.forEach(query => sqlLog(`🔍 ${query}`));
+        }
+
+        function sqlReset() {
+            sqlPosts = [];
+            sqlTags = [];
+            sqlPostTags = [];
+            sqlOrders = [];
+            sqlCustomers = [];
+            sqlAddresses = [];
+            sqlOrderItems = [];
+            sqlPostId = 1;
+            sqlTagId = 1;
+            sqlOrderId = 1;
+            sqlCustomerId = 1;
+            updateSqlDisplay();
+            document.getElementById('sqlLog').innerHTML = '';
+            sqlLog('🔄 Reset SQL data');
+        }
+
+        function updateSqlDisplay() {
+            const display = document.getElementById('sqlData');
+            let html = '';
+            
+            if (sqlPosts.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">📋 POSTS TABLE</div>';
+                html += 'id | title | content\n';
+                html += '---|-------|--------\n';
+                sqlPosts.forEach(post => {
+                    html += `${post.id} | ${post.title} | ${post.content.substring(0, 30)}...\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (sqlTags.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">🏷️ TAGS TABLE</div>';
+                html += 'id | name\n';
+                html += '---|-----\n';
+                sqlTags.forEach(tag => {
+                    html += `${tag.id} | ${tag.name}\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (sqlPostTags.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">🔗 POST_TAGS TABLE (Junction)</div>';
+                html += 'post_id | tag_id\n';
+                html += '--------|-------\n';
+                sqlPostTags.forEach(pt => {
+                    html += `${pt.post_id} | ${pt.tag_id}\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (sqlCustomers.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">👤 CUSTOMERS TABLE</div>';
+                html += 'id | name | email\n';
+                html += '---|------|------\n';
+                sqlCustomers.forEach(customer => {
+                    html += `${customer.id} | ${customer.name} | ${customer.email}\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (sqlAddresses.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">🏠 ADDRESSES TABLE</div>';
+                html += 'id | customer_id | street | city | zip\n';
+                html += '---|------------|--------|------|----\n';
+                sqlAddresses.forEach(addr => {
+                    html += `${addr.id} | ${addr.customer_id} | ${addr.street} | ${addr.city} | ${addr.zip}\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (sqlOrders.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">📦 ORDERS TABLE</div>';
+                html += 'id | order_id | customer_id | total | status\n';
+                html += '---|----------|-------------|-------|-------\n';
+                sqlOrders.forEach(order => {
+                    html += `${order.id} | ${order.order_id} | ${order.customer_id} | ${order.total} | ${order.status}\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (sqlOrderItems.length > 0) {
+                html += '<div class="table-section">';
+                html += '<div class="table-title">📋 ORDER_ITEMS TABLE</div>';
+                html += 'order_id | product_id | name | price | quantity\n';
+                html += '---------|------------|------|-------|----------\n';
+                sqlOrderItems.forEach(item => {
+                    html += `${item.order_id} | ${item.product_id} | ${item.name} | ${item.price} | ${item.quantity}\n`;
+                });
+                html += '</div>';
+            }
+            
+            if (html === '') {
+                html = 'No data yet. Add some blog posts or orders to see the normalized table structure.';
+            }
+            
+            display.innerHTML = html;
+        }
+
+        function sqlLog(message) {
+            const log = document.getElementById('sqlLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
