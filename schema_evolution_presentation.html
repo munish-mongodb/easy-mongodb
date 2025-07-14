@@ -12,10 +12,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
+            color: #001E2B;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
@@ -31,14 +32,200 @@
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
         }
 
         .header p {
-            font-size: 1.2em;
+            font-size: 1.3em;
             opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .so-what-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px auto;
+            max-width: 900px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .so-what-title {
+            color: #00684A;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .so-what-text {
+            color: #001E2B;
+            font-size: 1.1em;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .real-impact-box {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #00ED64;
+            margin-top: 20px;
+        }
+
+        .real-impact-text {
+            color: #001E2B;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        .demo-overview-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px auto;
+            max-width: 900px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .demo-toggle-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-toggle-header:hover {
+            transform: translateY(-2px);
+        }
+
+        .demo-toggle-title {
+            color: #001E2B;
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .demo-toggle-icon {
+            color: #00684A;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .demo-content {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #E8F5E8;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .scenario-card {
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
+        }
+
+        .mongo-scenario {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border: 1px solid #00ED64;
+        }
+
+        .sql-scenario {
+            background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
+            border: 1px solid #FF6B6B;
+        }
+
+        .scenario-title {
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .mongo-title {
+            color: #00684A;
+        }
+
+        .sql-title {
+            color: #D32F2F;
+        }
+
+        .scenario-list {
+            color: #001E2B;
+            line-height: 1.7;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .scenario-list li {
+            margin-bottom: 8px;
+        }
+
+        .scenario-list strong {
+            color: #00684A;
+        }
+
+        .sql-scenario .scenario-list strong {
+            color: #D32F2F;
+        }
+
+        .learning-points {
+            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #E8F5E8;
+        }
+
+        .learning-title {
+            color: #001E2B;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .points-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .learning-point {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
+            border-left: 3px solid #00ED64;
+        }
+
+        .point-title {
+            color: #00684A;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .point-description {
+            color: #001E2B;
+            font-size: 0.95em;
+            opacity: 0.8;
         }
 
         .comparison {
@@ -50,11 +237,12 @@
 
         .side {
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(0, 237, 100, 0.2);
         }
 
         .side::before {
@@ -64,7 +252,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .side.relational::before {
@@ -72,12 +260,13 @@
         }
 
         .side h2 {
-            color: #2E7D32;
+            color: #00684A;
             margin-bottom: 20px;
             font-size: 1.8em;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: 600;
         }
 
         .side.relational h2 {
@@ -87,17 +276,18 @@
         .logo {
             width: 40px;
             height: 40px;
-            background: #4CAF50;
+            background: #00684A;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 1.2em;
         }
 
         .logo.relational {
-            background: #FF6B6B;
+            background: #D32F2F;
         }
 
         .scenario {
@@ -396,6 +586,78 @@
         <div class="header">
             <h1>Schema Evolution Without Migration</h1>
             <p>A Visual Comparison: MongoDB vs Relational Databases</p>
+            
+            <!-- So What Section -->
+            <div class="so-what-section">
+                <h2 class="so-what-title">🚀 Why This Matters: The $10M Question</h2>
+                <p class="so-what-text">
+                    In traditional databases, adding a single new field can trigger <strong>hours of downtime</strong>, complex migration scripts, and coordinated deployments across multiple environments. For a major e-commerce platform, this could mean <strong>millions in lost revenue</strong> during maintenance windows.
+                </p>
+                <p class="so-what-text">
+                    <strong>MongoDB's differentiator:</strong> Your application evolves as fast as your business needs. No migrations, no downtime, no coordination headaches. Deploy new features instantly while existing data continues to work seamlessly.
+                </p>
+                <div class="real-impact-box">
+                    <div class="real-impact-text">
+                        <strong>Real Impact:</strong> Teams ship features 10x faster, eliminate maintenance windows, and adapt to changing requirements without database constraints holding them back.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expandable Demo Overview -->
+            <div class="demo-overview-section">
+                <div class="demo-toggle-header" onclick="toggleDemoOverview()">
+                    <h3 class="demo-toggle-title">📋 What This Demo Shows</h3>
+                    <span id="demoToggle" class="demo-toggle-icon">▼</span>
+                </div>
+                
+                <div id="demoOverview" style="display: none;" class="demo-content">
+                    <div class="scenario-grid">
+                        <div class="scenario-card mongo-scenario">
+                            <h4 class="scenario-title mongo-title">🍃 MongoDB Scenario</h4>
+                            <ul class="scenario-list">
+                                <li>Product team wants to add user preferences</li>
+                                <li>Developer simply starts inserting new fields</li>
+                                <li>Old documents work alongside new ones</li>
+                                <li>Application handles missing fields gracefully</li>
+                                <li><strong>Zero downtime, instant deployment</strong></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="scenario-card sql-scenario">
+                            <h4 class="scenario-title sql-title">🗄️ SQL Scenario</h4>
+                            <ul class="scenario-list">
+                                <li>Same requirement: add user preferences</li>
+                                <li>DBA must write migration scripts</li>
+                                <li>Schedule maintenance window</li>
+                                <li>Coordinate with deployment team</li>
+                                <li><strong>Downtime required, complex orchestration</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="learning-points">
+                        <h4 class="learning-title">🎯 Key Learning Points</h4>
+                        <div class="points-grid">
+                            <div class="learning-point">
+                                <div class="point-title">✅ Backward Compatibility</div>
+                                <div class="point-description">See how old and new data coexist naturally</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Deployment Speed</div>
+                                <div class="point-description">Compare instant vs. coordinated deployments</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Developer Experience</div>
+                                <div class="point-description">Simple code changes vs. complex migrations</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Business Impact</div>
+                                <div class="point-description">Zero downtime vs. maintenance windows</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="comparison">
@@ -850,6 +1112,22 @@ CREATE TABLE user_preferences (
 
         // Initialize on page load
         window.addEventListener('load', init);
+
+        // Toggle demo overview section
+        function toggleDemoOverview() {
+            var overview = document.getElementById('demoOverview');
+            var toggle = document.getElementById('demoToggle');
+            
+            if (overview.style.display === 'none') {
+                overview.style.display = 'block';
+                toggle.textContent = '▲';
+                toggle.style.transform = 'rotate(180deg)';
+            } else {
+                overview.style.display = 'none';
+                toggle.textContent = '▼';
+                toggle.style.transform = 'rotate(0deg)';
+            }
+        }
     </script>
 </body>
 </html>
