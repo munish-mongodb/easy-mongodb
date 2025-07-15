@@ -822,11 +822,13 @@
                         <div class="scenario-card mongo-scenario">
                             <h4 class="scenario-title mongo-title">🍃 MongoDB Replica Set</h4>
                             <ul class="scenario-list">
-                                <li>Primary-Secondary architecture with automatic failover</li>
+                                <li>MongoDB replica set with Primary/Secondary roles and automatic elections</li>
                                 <li>Real-time data replication via oplog</li>
-                                <li>Intelligent leader election (majority voting)</li>
+                                <li>Intelligent leader election (<strong>majority voting required</strong>)</li>
                                 <li>Read scaling across secondary members</li>
+                                <li><strong>Retryable writes and reads</strong> for automatic resilience</li>
                                 <li><strong>Sub-10 second failover with zero data loss</strong></li>
+                                <li><strong>Prevents split-brain with majority consensus</strong></li>
                             </ul>
                         </div>
                         
@@ -861,6 +863,22 @@
                                 <div class="point-title">✅ Recovery Process</div>
                                 <div class="point-description">Observe automatic member recovery and sync</div>
                             </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Majority Voting</div>
+                                <div class="point-description">Learn how MongoDB prevents split-brain scenarios</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ No Primary State</div>
+                                <div class="point-description">See what happens when majority is lost</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Retryable Operations</div>
+                                <div class="point-description">Watch automatic retries handle transient failures</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Driver Resilience</div>
+                                <div class="point-description">See how apps stay unaware of infrastructure issues</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -872,6 +890,7 @@
             <button class="btn btn-danger" onclick="simulateFailure()" id="failureBtn">💥 Simulate Primary Failure</button>
             <button class="btn btn-primary" onclick="addSecondary()" id="addBtn">➕ Add Secondary</button>
             <button class="btn btn-primary" onclick="recoverMember()" id="recoverBtn" disabled>🔧 Recover Failed Member</button>
+            <button class="btn btn-primary" onclick="triggerElectionIfNeeded()" id="electionBtn">🗳️ Force Election Check</button>
             <button class="btn btn-primary" onclick="performWrite()">✍️ Write Data</button>
             <button class="btn btn-primary" onclick="performRead()">📖 Read Data</button>
             <button class="btn btn-primary" onclick="resetDemo()">🔄 Reset Demo</button>
@@ -880,7 +899,7 @@
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-number" id="uptimePercent">100.0%</div>
-                <div class="stat-label">Uptime</div>
+                <div class="stat-label">Write Availability</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="replicaCount">3</div>
@@ -893,6 +912,14 @@
             <div class="stat-card">
                 <div class="stat-number" id="readCount">0</div>
                 <div class="stat-label">Reads Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="writeRetries">0</div>
+                <div class="stat-label">Write Retries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="readRetries">0</div>
+                <div class="stat-label">Read Retries</div>
             </div>
         </div>
 
@@ -944,18 +971,25 @@
     <script>
         // Global state
         let replicaMembers = [
-            { id: 1, role: 'primary', status: 'healthy', host: 'rs-primary-001', port: 27017, lag: 0 },
-            { id: 2, role: 'secondary', status: 'healthy', host: 'rs-secondary-001', port: 27017, lag: 0 },
-            { id: 3, role: 'secondary', status: 'healthy', host: 'rs-secondary-002', port: 27017, lag: 0 }
+            { id: 1, role: 'primary', status: 'healthy', host: 'rs-primary-001', port: 27017, lag: 0, priority: 1, term: 1 },
+            { id: 2, role: 'secondary', status: 'healthy', host: 'rs-secondary-001', port: 27017, lag: 0, priority: 1, term: 1 },
+            { id: 3, role: 'secondary', status: 'healthy', host: 'rs-secondary-002', port: 27017, lag: 0, priority: 1, term: 1 }
         ];
         
         let nextMemberId = 4;
         let writeCount = 0;
         let readCount = 0;
-        let uptimeStart = Date.now();
-        let totalDowntime = 0;
         let currentReadPreference = 'primary';
         let failedMembers = [];
+        let electionInProgress = false;  // Prevent concurrent elections
+        let currentTerm = 1;  // Global term number
+        let noPrimaryStartTime = null;  // Track when system goes into no-primary state
+        
+        // Retryable operations tracking
+        let writeRetryCount = 0;
+        let readRetryCount = 0;
+        let writeFailureCount = 0;
+        let readFailureCount = 0;
 
         // Logging function
         function logMessage(message, type = 'info') {
@@ -969,20 +1003,61 @@
 
         // Update statistics
         function updateStats() {
-            const now = Date.now();
-            const totalTime = now - uptimeStart;
-            const uptimePercent = ((totalTime - totalDowntime) / totalTime * 100).toFixed(1);
+            // Simple logic: Primary available = 100%, No primary = 0%
+            const healthyPrimary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            const writeAvailability = healthyPrimary ? 100.0 : 0.0;
             
-            document.getElementById('uptimePercent').textContent = uptimePercent + '%';
+            document.getElementById('uptimePercent').textContent = writeAvailability.toFixed(1) + '%';
             document.getElementById('replicaCount').textContent = replicaMembers.length;
             document.getElementById('writeCount').textContent = writeCount;
             document.getElementById('readCount').textContent = readCount;
+            document.getElementById('writeRetries').textContent = writeRetryCount;
+            document.getElementById('readRetries').textContent = readRetryCount;
+        }
+
+        // Check if majority of voting members are available
+        function hasMajority() {
+            const totalVotingMembers = replicaMembers.length;
+            const healthyMembers = replicaMembers.filter(m => m.status === 'healthy').length;
+            const majorityRequired = Math.floor(totalVotingMembers / 2) + 1;
+            
+            return healthyMembers >= majorityRequired;
         }
 
         // Render replica set visualization
         function renderReplicaSet() {
             const container = document.getElementById('replicaMembers');
             container.innerHTML = '';
+
+            // Check if we have majority and a primary
+            const hasMaj = hasMajority();
+            const healthyPrimary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            
+            // Add majority status indicator
+            if (!hasMaj) {
+                const majorityWarning = document.createElement('div');
+                majorityWarning.style.cssText = `
+                    grid-column: 1 / -1;
+                    background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
+                    border: 2px solid #FF6B6B;
+                    border-radius: 12px;
+                    padding: 15px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    color: #D32F2F;
+                    font-weight: 600;
+                `;
+                const totalMembers = replicaMembers.length;
+                const healthyMembers = replicaMembers.filter(m => m.status === 'healthy').length;
+                const majorityRequired = Math.floor(totalMembers / 2) + 1;
+                
+                majorityWarning.innerHTML = `
+                    🚫 <strong>NO MAJORITY AVAILABLE</strong><br>
+                    ${healthyMembers}/${totalMembers} healthy (need ${majorityRequired} for primary election)<br>
+                    <small>Writes unavailable until majority is restored</small>
+                `;
+                container.appendChild(majorityWarning);
+            }
 
             replicaMembers.forEach(member => {
                 const memberDiv = document.createElement('div');
@@ -1000,14 +1075,21 @@
                     statusText = 'Syncing';
                 }
 
+                // Special handling for primary role display when no majority
+                let roleDisplay = member.role.charAt(0).toUpperCase() + member.role.slice(1);
+                if (member.role === 'primary' && !healthyPrimary && member.status === 'down') {
+                    roleDisplay = 'Former Primary';
+                }
+
                 memberDiv.innerHTML = `
                     <div class="member-role ${member.role} ${member.status === 'down' ? 'down' : ''} ${member.status === 'recovering' ? 'recovering' : ''}">
-                        ${member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                        ${roleDisplay}
                     </div>
                     <div class="member-details">
                         <div><strong>${member.host}</strong></div>
                         <div>Port: ${member.port}</div>
                         <div class="member-status ${statusClass}">${statusText}</div>
+                        ${member.status === 'healthy' ? `<div style="font-size: 0.8em; color: #666;">Term: ${member.term} | Priority: ${member.priority}</div>` : ''}
                         ${member.role === 'secondary' && member.status === 'healthy' ? `<div style="font-size: 0.8em; color: #666;">Lag: ${member.lag}ms</div>` : ''}
                     </div>
                 `;
@@ -1016,6 +1098,105 @@
             });
 
             updateStats();
+        }
+
+        // MongoDB-style election algorithm
+        function conductElection(triggerReason = 'unknown') {
+            // Prevent concurrent elections
+            if (electionInProgress) {
+                logMessage('🗳️ Election already in progress, skipping...', 'warning');
+                return;
+            }
+
+            // Check if majority exists
+            if (!hasMajority()) {
+                const totalMembers = replicaMembers.length;
+                const healthyMembers = replicaMembers.filter(m => m.status === 'healthy').length;
+                const majorityRequired = Math.floor(totalMembers / 2) + 1;
+                logMessage(`❌ Cannot start election: No majority (${healthyMembers}/${totalMembers}, need ${majorityRequired})`, 'error');
+                return;
+            }
+
+            // Check if we already have a healthy primary
+            const existingPrimary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            if (existingPrimary) {
+                logMessage(`✅ Primary already exists: ${existingPrimary.host} (term ${existingPrimary.term})`, 'info');
+                return;
+            }
+
+            electionInProgress = true;
+            currentTerm++; // Increment term for this election
+            
+            logMessage(`🗳️ Starting election (term ${currentTerm}) - reason: ${triggerReason}`, 'warning');
+
+            // Step 1: Dry Election - find best candidate
+            const eligibleCandidates = replicaMembers.filter(m => 
+                m.status === 'healthy' && m.priority > 0
+            );
+
+            if (eligibleCandidates.length === 0) {
+                logMessage('❌ No eligible candidates for election', 'error');
+                electionInProgress = false;
+                return;
+            }
+
+            // Step 2: Select candidate based on MongoDB's rules:
+            // 1. Highest priority
+            // 2. Most recent data (lowest lag as proxy for optime)
+            // 3. Lowest member ID (tiebreaker)
+            eligibleCandidates.sort((a, b) => {
+                if (a.priority !== b.priority) return b.priority - a.priority; // Higher priority first
+                if (a.lag !== b.lag) return a.lag - b.lag; // Lower lag (fresher data) first
+                return a.id - b.id; // Lower ID as tiebreaker
+            });
+
+            const candidate = eligibleCandidates[0];
+            
+            logMessage(`🏆 Best candidate: ${candidate.host} (priority: ${candidate.priority}, lag: ${candidate.lag}ms)`, 'info');
+
+            // Step 3: Voting process (simplified)
+            setTimeout(() => {
+                const healthyVotingMembers = replicaMembers.filter(m => m.status === 'healthy');
+                const votesNeeded = Math.floor(healthyVotingMembers.length / 2) + 1;
+                const votesReceived = healthyVotingMembers.length; // All healthy members vote for best candidate
+                
+                if (votesReceived >= votesNeeded) {
+                    // Step 4: Step down any existing primaries (even failed ones)
+                    replicaMembers.forEach(member => {
+                        if (member.role === 'primary') {
+                            member.role = 'secondary';
+                            if (member.status === 'healthy') {
+                                logMessage(`📉 ${member.host} stepped down from primary (lower term)`, 'info');
+                            }
+                        }
+                    });
+
+                    // Step 5: Elect new primary
+                    candidate.role = 'primary';
+                    candidate.term = currentTerm;
+                    candidate.lag = 0; // Primary has no lag
+                    
+                    // Update all members to current term
+                    replicaMembers.forEach(member => {
+                        if (member.status === 'healthy') {
+                            member.term = currentTerm;
+                        }
+                    });
+
+                    const totalMembers = replicaMembers.length;
+                    const healthyMembers = replicaMembers.filter(m => m.status === 'healthy').length;
+                    
+                    logMessage(`✅ Election successful! ${candidate.host} elected PRIMARY`, 'success');
+                    logMessage(`📊 Votes: ${votesReceived}/${healthyVotingMembers.length} (needed ${votesNeeded})`, 'success');
+                    logMessage(`🏷️ New term: ${currentTerm}`, 'info');
+                    logMessage('🔄 Replica set is operational', 'success');
+                } else {
+                    logMessage(`❌ Election failed: insufficient votes (${votesReceived}/${votesNeeded})`, 'error');
+                }
+
+                electionInProgress = false;
+                renderReplicaSet();
+            }, 3000); // 3-second election process
         }
 
         // Simulate primary failure and election
@@ -1028,48 +1209,24 @@
 
             logMessage(`💥 Primary ${primary.host} has failed!`, 'error');
             primary.status = 'down';
+            primary.role = 'secondary'; // Failed primary becomes secondary
             failedMembers.push(primary.id);
-            
-            // Start downtime tracking
-            const downtimeStart = Date.now();
             
             document.getElementById('failureBtn').disabled = true;
             document.getElementById('recoverBtn').disabled = false;
 
             renderReplicaSet();
 
-            // Simulate election process
-            logMessage('🗳️ Starting replica set election...', 'warning');
-            
+            // Trigger election after brief delay (simulates heartbeat timeout)
             setTimeout(() => {
-                // Find eligible secondary with lowest lag
-                const eligibleSecondaries = replicaMembers.filter(m => 
-                    m.role === 'secondary' && m.status === 'healthy'
-                );
-                
-                if (eligibleSecondaries.length === 0) {
-                    logMessage('❌ No eligible secondaries for election!', 'error');
-                    return;
-                }
-
-                eligibleSecondaries.sort((a, b) => a.lag - b.lag);
-                const newPrimary = eligibleSecondaries[0];
-                
-                // Update roles
-                primary.role = 'secondary';
-                newPrimary.role = 'primary';
-                newPrimary.lag = 0;
-
-                // End downtime tracking
-                totalDowntime += Date.now() - downtimeStart;
-
-                logMessage(`✅ Election complete! ${newPrimary.host} is now PRIMARY`, 'success');
-                logMessage('🔄 Replica set is operational again', 'success');
-                
+                conductElection('primary failure');
                 document.getElementById('failureBtn').disabled = false;
-                renderReplicaSet();
-                
-            }, 3000); // 3 second election time
+            }, 1000);
+        }
+
+        // Wrapper function for backward compatibility and manual triggers
+        function triggerElectionIfNeeded() {
+            conductElection('manual trigger');
         }
 
         // Add a new secondary member
@@ -1080,7 +1237,9 @@
                 status: 'recovering',
                 host: `rs-secondary-${String(nextMemberId - 1).padStart(3, '0')}`,
                 port: 27017,
-                lag: 5000
+                lag: 5000,
+                priority: 1,
+                term: currentTerm
             };
 
             replicaMembers.push(newMember);
@@ -1095,6 +1254,9 @@
                 newMember.lag = Math.floor(Math.random() * 100) + 10;
                 logMessage(`✅ ${newMember.host} sync complete - now accepting reads`, 'success');
                 renderReplicaSet();
+                
+                // Check if this new member enables an election
+                setTimeout(() => conductElection('new member joined'), 1000);
             }, 4000);
         }
 
@@ -1116,8 +1278,12 @@
                 setTimeout(() => {
                     member.status = 'healthy';
                     member.lag = Math.floor(Math.random() * 200) + 50;
+                    member.term = currentTerm; // Update to current term
                     logMessage(`✅ ${member.host} recovered and synced`, 'success');
                     renderReplicaSet();
+                    
+                    // Check if this recovery enables an election
+                    setTimeout(() => conductElection('member recovery'), 1000);
                     
                     if (failedMembers.length === 0) {
                         document.getElementById('recoverBtn').disabled = true;
@@ -1126,45 +1292,113 @@
             }
         }
 
-        // Simulate write operation
+        // Simulate retryable write operation (MongoDB driver behavior)
         function performWrite() {
-            const primary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            // First attempt
+            logMessage('📝 Attempting write operation...', 'info');
             
-            if (!primary) {
-                logMessage('❌ No healthy primary available for writes!', 'error');
+            // Check for various failure scenarios that trigger retries
+            const primary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            const isElectionInProgress = electionInProgress;
+            const simulateNetworkError = Math.random() < 0.1; // 10% chance of transient network error
+            
+            // First attempt - check for immediate failures
+            if (!primary && !hasMajority()) {
+                writeFailureCount++;
+                logMessage('❌ Write failed: No primary available and no majority for election', 'error');
+                logMessage('🚫 Operation cannot be retried - insufficient nodes', 'error');
                 return;
             }
-
-            writeCount++;
-            logMessage(`✍️ Write operation to ${primary.host}`, 'success');
             
-            // Show replication flow animation
-            const flow = document.getElementById('replicationFlow');
-            flow.classList.add('active');
-            
-            setTimeout(() => {
-                flow.classList.remove('active');
-                logMessage('📤 Data replicated to all healthy secondaries', 'success');
+            // Simulate first attempt failure scenarios
+            if (!primary || isElectionInProgress || simulateNetworkError) {
+                let failureReason = '';
+                if (!primary) failureReason = 'no primary (election needed)';
+                else if (isElectionInProgress) failureReason = 'election in progress';
+                else if (simulateNetworkError) failureReason = 'network timeout';
                 
-                // Update secondary lag (simulate replication delay)
-                replicaMembers.forEach(member => {
-                    if (member.role === 'secondary' && member.status === 'healthy') {
-                        member.lag = Math.floor(Math.random() * 100) + 10;
+                logMessage(`⚠️ Write attempt 1 failed: ${failureReason}`, 'warning');
+                logMessage('🔄 Driver initiating automatic retry...', 'warning');
+                writeRetryCount++;
+                
+                // MongoDB driver waits briefly then retries
+                setTimeout(() => {
+                    // Second attempt - retry logic
+                    const retryPrimary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+                    const retryElectionInProgress = electionInProgress;
+                    
+                    if (retryPrimary && !retryElectionInProgress) {
+                        // Retry succeeded
+                        writeCount++;
+                        logMessage(`✅ Write retry succeeded on ${retryPrimary.host}`, 'success');
+                        logMessage('🎯 Retryable writes: Application unaware of initial failure', 'success');
+                        
+                        // Show replication flow animation
+                        const flow = document.getElementById('replicationFlow');
+                        flow.classList.add('active');
+                        
+                        setTimeout(() => {
+                            flow.classList.remove('active');
+                            logMessage('📤 Data replicated to all healthy secondaries', 'success');
+                            
+                            // Update secondary lag
+                            replicaMembers.forEach(member => {
+                                if (member.role === 'secondary' && member.status === 'healthy') {
+                                    member.lag = Math.floor(Math.random() * 100) + 10;
+                                }
+                            });
+                            renderReplicaSet();
+                        }, 2000);
+                    } else {
+                        // Retry also failed
+                        writeFailureCount++;
+                        let retryFailureReason = !retryPrimary ? 'still no primary' : 'election still in progress';
+                        logMessage(`❌ Write retry failed: ${retryFailureReason}`, 'error');
+                        logMessage('🚫 Driver exhausted retries - returning error to application', 'error');
                     }
-                });
+                    
+                    updateStats();
+                }, 1500); // 1.5 second retry delay
                 
-                renderReplicaSet();
-            }, 2000);
+            } else {
+                // First attempt succeeded
+                writeCount++;
+                logMessage(`✅ Write succeeded on ${primary.host}`, 'success');
+                
+                // Show replication flow animation
+                const flow = document.getElementById('replicationFlow');
+                flow.classList.add('active');
+                
+                setTimeout(() => {
+                    flow.classList.remove('active');
+                    logMessage('📤 Data replicated to all healthy secondaries', 'success');
+                    
+                    // Update secondary lag
+                    replicaMembers.forEach(member => {
+                        if (member.role === 'secondary' && member.status === 'healthy') {
+                            member.lag = Math.floor(Math.random() * 100) + 10;
+                        }
+                    });
+                    renderReplicaSet();
+                }, 2000);
+            }
             
             updateStats();
         }
 
-        // Simulate read operation
+        // Simulate retryable read operation (MongoDB driver behavior)
         function performRead() {
+            logMessage('📖 Attempting read operation...', 'info');
+            
+            // Simulate network errors or temporary unavailability
+            const simulateNetworkError = Math.random() < 0.15; // 15% chance of transient network error
+            const simulateSecondaryLag = Math.random() < 0.1; // 10% chance secondary is too far behind
+            
             let targetMember = null;
             const healthyPrimary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
             const healthySecondaries = replicaMembers.filter(m => m.role === 'secondary' && m.status === 'healthy');
 
+            // Determine target based on read preference
             switch (currentReadPreference) {
                 case 'primary':
                     targetMember = healthyPrimary;
@@ -1180,13 +1414,63 @@
                     break;
             }
 
-            if (!targetMember) {
-                logMessage(`❌ No healthy members available for read preference: ${currentReadPreference}`, 'error');
-                return;
+            // First attempt
+            if (!targetMember || simulateNetworkError || (targetMember.role === 'secondary' && simulateSecondaryLag)) {
+                let failureReason = '';
+                if (!targetMember) failureReason = `no healthy members for read preference: ${currentReadPreference}`;
+                else if (simulateNetworkError) failureReason = 'network timeout to selected member';
+                else if (simulateSecondaryLag) failureReason = 'secondary too far behind (exceeds maxStalenessSeconds)';
+                
+                logMessage(`⚠️ Read attempt 1 failed: ${failureReason}`, 'warning');
+                logMessage('🔄 Driver initiating automatic retry with different member...', 'warning');
+                readRetryCount++;
+                
+                // Retry with different logic
+                setTimeout(() => {
+                    let retryTargetMember = null;
+                    
+                    // For retries, MongoDB often falls back to more permissive selection
+                    if (currentReadPreference === 'secondary' && healthyPrimary) {
+                        // Fall back to primary if secondaries are having issues
+                        retryTargetMember = healthyPrimary;
+                        logMessage('📋 Retry: Falling back to primary due to secondary issues', 'info');
+                    } else {
+                        // Try different member of same type
+                        switch (currentReadPreference) {
+                            case 'primary':
+                                retryTargetMember = healthyPrimary;
+                                break;
+                            case 'primaryPreferred':
+                                retryTargetMember = healthyPrimary || (healthySecondaries.length > 0 ? healthySecondaries[0] : null);
+                                break;
+                            case 'secondary':
+                                retryTargetMember = healthySecondaries.length > 0 ? healthySecondaries[Math.floor(Math.random() * healthySecondaries.length)] : null;
+                                break;
+                            case 'secondaryPreferred':
+                                retryTargetMember = healthySecondaries.length > 0 ? healthySecondaries[Math.floor(Math.random() * healthySecondaries.length)] : healthyPrimary;
+                                break;
+                        }
+                    }
+                    
+                    if (retryTargetMember) {
+                        readCount++;
+                        logMessage(`✅ Read retry succeeded from ${retryTargetMember.host} (${retryTargetMember.role})`, 'success');
+                        logMessage('🎯 Retryable reads: Application unaware of initial failure', 'success');
+                    } else {
+                        readFailureCount++;
+                        logMessage(`❌ Read retry failed: No suitable members available`, 'error');
+                        logMessage('🚫 Driver exhausted retries - returning error to application', 'error');
+                    }
+                    
+                    updateStats();
+                }, 1000); // 1 second retry delay
+                
+            } else {
+                // First attempt succeeded
+                readCount++;
+                logMessage(`✅ Read succeeded from ${targetMember.host} (${targetMember.role})`, 'success');
             }
-
-            readCount++;
-            logMessage(`📖 Read operation from ${targetMember.host} (${targetMember.role})`, 'success');
+            
             updateStats();
         }
 
@@ -1209,9 +1493,9 @@
         // Reset demo
         function resetDemo() {
             replicaMembers = [
-                { id: 1, role: 'primary', status: 'healthy', host: 'rs-primary-001', port: 27017, lag: 0 },
-                { id: 2, role: 'secondary', status: 'healthy', host: 'rs-secondary-001', port: 27017, lag: 0 },
-                { id: 3, role: 'secondary', status: 'healthy', host: 'rs-secondary-002', port: 27017, lag: 0 }
+                { id: 1, role: 'primary', status: 'healthy', host: 'rs-primary-001', port: 27017, lag: 0, priority: 1, term: 1 },
+                { id: 2, role: 'secondary', status: 'healthy', host: 'rs-secondary-001', port: 27017, lag: 0, priority: 1, term: 1 },
+                { id: 3, role: 'secondary', status: 'healthy', host: 'rs-secondary-002', port: 27017, lag: 0, priority: 1, term: 1 }
             ];
             
             nextMemberId = 4;
@@ -1220,6 +1504,9 @@
             uptimeStart = Date.now();
             totalDowntime = 0;
             failedMembers = [];
+            electionInProgress = false;
+            currentTerm = 1;
+            noPrimaryStartTime = null;
             
             document.getElementById('failureBtn').disabled = false;
             document.getElementById('recoverBtn').disabled = true;
@@ -1227,7 +1514,7 @@
             
             renderReplicaSet();
             logMessage('🔄 Demo reset to initial 3-member replica set', 'info');
-            logMessage('🎯 Replica set initialized and ready', 'success');
+            logMessage('🎯 Replica set initialized with term 1', 'success');
         }
 
         // Toggle demo overview section
@@ -1267,7 +1554,9 @@
             renderReplicaSet();
             logMessage('🎉 MongoDB Replica Set demo initialized', 'success');
             logMessage('🔧 3-member replica set active with automatic failover', 'info');
-            logMessage('🚀 Try simulating failures and performing operations!', 'info');
+            logMessage('📊 Election algorithm: Priority-based with term management', 'info');
+            logMessage('🔄 Retryable operations: Automatic driver resilience enabled', 'info');
+            logMessage('🚀 Try performing operations during failures to see retries!', 'info');
         };
     </script>
 </body>
