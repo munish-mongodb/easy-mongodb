@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Replica Set High Availability</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
+            color: #001E2B;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .so-what-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px auto;
+            max-width: 900px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .so-what-title {
+            color: #00684A;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .so-what-text {
+            color: #001E2B;
+            font-size: 1.1em;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .real-impact-box {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #00ED64;
+            margin-top: 20px;
+        }
+
+        .real-impact-text {
+            color: #001E2B;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        .demo-overview-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px auto;
+            max-width: 900px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .demo-toggle-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-toggle-header:hover {
+            transform: translateY(-2px);
+        }
+
+        .demo-toggle-title {
+            color: #001E2B;
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .demo-toggle-icon {
+            color: #00684A;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .demo-content {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #E8F5E8;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .scenario-card {
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
+        }
+
+        .mongo-scenario {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border: 1px solid #00ED64;
+        }
+
+        .traditional-scenario {
+            background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
+            border: 1px solid #FF6B6B;
+        }
+
+        .scenario-title {
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .mongo-title {
+            color: #00684A;
+        }
+
+        .traditional-title {
+            color: #D32F2F;
+        }
+
+        .scenario-list {
+            color: #001E2B;
+            line-height: 1.7;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .scenario-list li {
+            margin-bottom: 8px;
+        }
+
+        .scenario-list strong {
+            color: #00684A;
+        }
+
+        .traditional-scenario .scenario-list strong {
+            color: #D32F2F;
+        }
+
+        .learning-points {
+            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #E8F5E8;
+        }
+
+        .learning-title {
+            color: #001E2B;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .points-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .learning-point {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
+            border-left: 3px solid #00ED64;
+        }
+
+        .point-title {
+            color: #00684A;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .point-description {
+            color: #001E2B;
+            font-size: 0.95em;
+            opacity: 0.8;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .controls h3 {
+            color: #00684A;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ED64, #00B84D);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #00B84D, #00684A);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #FF6B6B, #D32F2F);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #00684A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #001E2B;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .architecture-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .architecture-section h3 {
+            color: #00684A;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .replica-set-container {
+            background: linear-gradient(135deg, #F8FFF8 0%, #F0FFF0 100%);
+            border: 2px solid #00ED64;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .replica-set-title {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #00684A;
+            border: 2px solid #00ED64;
+        }
+
+        .replica-members {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .replica-member {
+            background: white;
+            border: 3px solid #00ED64;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            min-width: 180px;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 30, 43, 0.1);
+        }
+
+        .replica-member:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.15);
+        }
+
+        .replica-member.primary {
+            border-color: #00ED64;
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+        }
+
+        .replica-member.secondary {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+        }
+
+        .replica-member.down {
+            border-color: #FF6B6B;
+            background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
+            opacity: 0.7;
+        }
+
+        .replica-member.recovering {
+            border-color: #FFC107;
+            background: linear-gradient(135deg, #FFF8E1 0%, #FFFACD 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .member-role {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .member-role.primary {
+            background: linear-gradient(135deg, #00ED64, #00B84D);
+        }
+
+        .member-role.secondary {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        }
+
+        .member-role.down {
+            background: linear-gradient(135deg, #FF6B6B, #D32F2F);
+        }
+
+        .member-role.recovering {
+            background: linear-gradient(135deg, #FFC107, #FF8F00);
+        }
+
+        .member-details {
+            font-size: 0.9em;
+            color: #001E2B;
+        }
+
+        .member-status {
+            margin: 5px 0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-healthy {
+            background: #E8F5E8;
+            color: #2E7D32;
+        }
+
+        .status-down {
+            background: #FDE8E8;
+            color: #D32F2F;
+        }
+
+        .status-syncing {
+            background: #FFF8E1;
+            color: #F57C00;
+        }
+
+        .replication-flow {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ED64, transparent);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .replication-flow.active {
+            opacity: 1;
+            animation: flow 2s infinite;
+        }
+
+        @keyframes flow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .read-preferences {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .read-preferences h3 {
+            color: #00684A;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .read-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #F8F9FA;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .read-option:hover {
+            border-color: #00ED64;
+            background: #F0FFF0;
+        }
+
+        .read-option.active {
+            border-color: #00ED64;
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+        }
+
+        .read-option input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ED64;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .read-option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #00ED64;
+            border-radius: 50%;
+        }
+
+        .log-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .log-container h3 {
+            color: #00684A;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .log-content {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 8px;
+            border-left: 3px solid #00ED64;
+            background: rgba(0, 237, 100, 0.1);
+            border-radius: 0 6px 6px 0;
+        }
+
+        .log-entry.warning {
+            border-left-color: #FFC107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .log-entry.error {
+            border-left-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .replica-members {
+                flex-direction: column;
+            }
+            
+            .controls, .architecture-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 MongoDB Replica Set High Availability</h1>
+            <p>Interactive Demo: Automatic Failover & Data Protection</p>
+            
+            <!-- So What Section -->
+            <div class="so-what-section">
+                <h2 class="so-what-title">🛡️ Why This Matters: The Zero-Downtime Promise</h2>
+                <p class="so-what-text">
+                    Traditional databases often require complex clustering solutions, expensive third-party tools, or manual failover procedures that can take <strong>minutes or hours</strong> to restore service during failures. During this time, your application is completely unavailable.
+                </p>
+                <p class="so-what-text">
+                    <strong>MongoDB's differentiator:</strong> Built-in replica sets provide automatic failover in <strong>seconds</strong>, continuous data protection, and transparent read scaling. No additional clustering software, no manual intervention, no single points of failure.
+                </p>
+                <div class="real-impact-box">
+                    <div class="real-impact-text">
+                        <strong>Real Impact:</strong> Applications achieve 99.99%+ uptime with automatic recovery, eliminate data loss risks, and scale read operations across multiple servers without architectural changes.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expandable Demo Overview -->
+            <div class="demo-overview-section">
+                <div class="demo-toggle-header" onclick="toggleDemoOverview()">
+                    <h3 class="demo-toggle-title">📋 What This Demo Shows</h3>
+                    <span id="demoToggle" class="demo-toggle-icon">▼</span>
+                </div>
+                
+                <div id="demoOverview" style="display: none;" class="demo-content">
+                    <div class="scenario-grid">
+                        <div class="scenario-card mongo-scenario">
+                            <h4 class="scenario-title mongo-title">🍃 MongoDB Replica Set</h4>
+                            <ul class="scenario-list">
+                                <li>Primary-Secondary architecture with automatic failover</li>
+                                <li>Real-time data replication via oplog</li>
+                                <li>Intelligent leader election (majority voting)</li>
+                                <li>Read scaling across secondary members</li>
+                                <li><strong>Sub-10 second failover with zero data loss</strong></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="scenario-card traditional-scenario">
+                            <h4 class="scenario-title traditional-title">🗄️ Traditional Database Clustering</h4>
+                            <ul class="scenario-list">
+                                <li>Complex master-slave or active-passive setup</li>
+                                <li>Manual failover procedures or expensive clustering</li>
+                                <li>Potential split-brain scenarios</li>
+                                <li>Application-level connection management</li>
+                                <li><strong>Minutes to hours of downtime during failures</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="learning-points">
+                        <h4 class="learning-title">🎯 Key Learning Points</h4>
+                        <div class="points-grid">
+                            <div class="learning-point">
+                                <div class="point-title">✅ Automatic Failover</div>
+                                <div class="point-description">See how elections happen and new primaries emerge</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Data Protection</div>
+                                <div class="point-description">Watch real-time replication prevent data loss</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Read Scaling</div>
+                                <div class="point-description">Experience how reads distribute across replicas</div>
+                            </div>
+                            <div class="learning-point">
+                                <div class="point-title">✅ Recovery Process</div>
+                                <div class="point-description">Observe automatic member recovery and sync</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3>🎮 Demo Controls</h3>
+            <button class="btn btn-danger" onclick="simulateFailure()" id="failureBtn">💥 Simulate Primary Failure</button>
+            <button class="btn btn-primary" onclick="addSecondary()" id="addBtn">➕ Add Secondary</button>
+            <button class="btn btn-primary" onclick="recoverMember()" id="recoverBtn" disabled>🔧 Recover Failed Member</button>
+            <button class="btn btn-primary" onclick="performWrite()">✍️ Write Data</button>
+            <button class="btn btn-primary" onclick="performRead()">📖 Read Data</button>
+            <button class="btn btn-primary" onclick="resetDemo()">🔄 Reset Demo</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="uptimePercent">100.0%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="replicaCount">3</div>
+                <div class="stat-label">Replica Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="writeCount">0</div>
+                <div class="stat-label">Writes Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="readCount">0</div>
+                <div class="stat-label">Reads Completed</div>
+            </div>
+        </div>
+
+        <div class="architecture-section">
+            <h3>🏗️ MongoDB Replica Set Architecture</h3>
+            <div class="replica-set-container">
+                <div class="replica-set-title">Replica Set: "myReplicaSet"</div>
+                <div class="replication-flow" id="replicationFlow"></div>
+                <div class="replica-members" id="replicaMembers">
+                    <!-- Replica members will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="read-preferences">
+            <h3>📖 Read Preference Options</h3>
+            <div class="read-option active" onclick="setReadPreference('primary')">
+                <input type="radio" name="readPref" value="primary" checked>
+                <div>
+                    <strong>Primary</strong> - All reads from primary (strong consistency)
+                </div>
+            </div>
+            <div class="read-option" onclick="setReadPreference('primaryPreferred')">
+                <input type="radio" name="readPref" value="primaryPreferred">
+                <div>
+                    <strong>Primary Preferred</strong> - Primary first, then secondaries
+                </div>
+            </div>
+            <div class="read-option" onclick="setReadPreference('secondary')">
+                <input type="radio" name="readPref" value="secondary">
+                <div>
+                    <strong>Secondary</strong> - Only from secondaries (read scaling)
+                </div>
+            </div>
+            <div class="read-option" onclick="setReadPreference('secondaryPreferred')">
+                <input type="radio" name="readPref" value="secondaryPreferred">
+                <div>
+                    <strong>Secondary Preferred</strong> - Secondaries first, then primary
+                </div>
+            </div>
+        </div>
+
+        <div class="log-container">
+            <h3>📊 Replica Set Activity Log</h3>
+            <div class="log-content" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let replicaMembers = [
+            { id: 1, role: 'primary', status: 'healthy', host: 'rs-primary-001', port: 27017, lag: 0 },
+            { id: 2, role: 'secondary', status: 'healthy', host: 'rs-secondary-001', port: 27017, lag: 0 },
+            { id: 3, role: 'secondary', status: 'healthy', host: 'rs-secondary-002', port: 27017, lag: 0 }
+        ];
+        
+        let nextMemberId = 4;
+        let writeCount = 0;
+        let readCount = 0;
+        let uptimeStart = Date.now();
+        let totalDowntime = 0;
+        let currentReadPreference = 'primary';
+        let failedMembers = [];
+
+        // Logging function
+        function logMessage(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const now = Date.now();
+            const totalTime = now - uptimeStart;
+            const uptimePercent = ((totalTime - totalDowntime) / totalTime * 100).toFixed(1);
+            
+            document.getElementById('uptimePercent').textContent = uptimePercent + '%';
+            document.getElementById('replicaCount').textContent = replicaMembers.length;
+            document.getElementById('writeCount').textContent = writeCount;
+            document.getElementById('readCount').textContent = readCount;
+        }
+
+        // Render replica set visualization
+        function renderReplicaSet() {
+            const container = document.getElementById('replicaMembers');
+            container.innerHTML = '';
+
+            replicaMembers.forEach(member => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = `replica-member ${member.role} ${member.status === 'down' ? 'down' : ''} ${member.status === 'recovering' ? 'recovering' : ''}`;
+                memberDiv.id = `member-${member.id}`;
+
+                let statusClass = 'status-healthy';
+                let statusText = 'Healthy';
+                
+                if (member.status === 'down') {
+                    statusClass = 'status-down';
+                    statusText = 'Down';
+                } else if (member.status === 'recovering') {
+                    statusClass = 'status-syncing';
+                    statusText = 'Syncing';
+                }
+
+                memberDiv.innerHTML = `
+                    <div class="member-role ${member.role} ${member.status === 'down' ? 'down' : ''} ${member.status === 'recovering' ? 'recovering' : ''}">
+                        ${member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                    </div>
+                    <div class="member-details">
+                        <div><strong>${member.host}</strong></div>
+                        <div>Port: ${member.port}</div>
+                        <div class="member-status ${statusClass}">${statusText}</div>
+                        ${member.role === 'secondary' && member.status === 'healthy' ? `<div style="font-size: 0.8em; color: #666;">Lag: ${member.lag}ms</div>` : ''}
+                    </div>
+                `;
+
+                container.appendChild(memberDiv);
+            });
+
+            updateStats();
+        }
+
+        // Simulate primary failure and election
+        function simulateFailure() {
+            const primary = replicaMembers.find(m => m.role === 'primary');
+            if (!primary) {
+                logMessage('No primary to fail!', 'warning');
+                return;
+            }
+
+            logMessage(`💥 Primary ${primary.host} has failed!`, 'error');
+            primary.status = 'down';
+            failedMembers.push(primary.id);
+            
+            // Start downtime tracking
+            const downtimeStart = Date.now();
+            
+            document.getElementById('failureBtn').disabled = true;
+            document.getElementById('recoverBtn').disabled = false;
+
+            renderReplicaSet();
+
+            // Simulate election process
+            logMessage('🗳️ Starting replica set election...', 'warning');
+            
+            setTimeout(() => {
+                // Find eligible secondary with lowest lag
+                const eligibleSecondaries = replicaMembers.filter(m => 
+                    m.role === 'secondary' && m.status === 'healthy'
+                );
+                
+                if (eligibleSecondaries.length === 0) {
+                    logMessage('❌ No eligible secondaries for election!', 'error');
+                    return;
+                }
+
+                eligibleSecondaries.sort((a, b) => a.lag - b.lag);
+                const newPrimary = eligibleSecondaries[0];
+                
+                // Update roles
+                primary.role = 'secondary';
+                newPrimary.role = 'primary';
+                newPrimary.lag = 0;
+
+                // End downtime tracking
+                totalDowntime += Date.now() - downtimeStart;
+
+                logMessage(`✅ Election complete! ${newPrimary.host} is now PRIMARY`, 'success');
+                logMessage('🔄 Replica set is operational again', 'success');
+                
+                document.getElementById('failureBtn').disabled = false;
+                renderReplicaSet();
+                
+            }, 3000); // 3 second election time
+        }
+
+        // Add a new secondary member
+        function addSecondary() {
+            const newMember = {
+                id: nextMemberId++,
+                role: 'secondary',
+                status: 'recovering',
+                host: `rs-secondary-${String(nextMemberId - 1).padStart(3, '0')}`,
+                port: 27017,
+                lag: 5000
+            };
+
+            replicaMembers.push(newMember);
+            logMessage(`➕ Adding new secondary: ${newMember.host}`, 'warning');
+            logMessage('📊 Initial sync started...', 'warning');
+            
+            renderReplicaSet();
+
+            // Simulate initial sync process
+            setTimeout(() => {
+                newMember.status = 'healthy';
+                newMember.lag = Math.floor(Math.random() * 100) + 10;
+                logMessage(`✅ ${newMember.host} sync complete - now accepting reads`, 'success');
+                renderReplicaSet();
+            }, 4000);
+        }
+
+        // Recover a failed member
+        function recoverMember() {
+            if (failedMembers.length === 0) {
+                logMessage('No failed members to recover', 'warning');
+                return;
+            }
+
+            const memberId = failedMembers.pop();
+            const member = replicaMembers.find(m => m.id === memberId);
+            
+            if (member) {
+                logMessage(`🔧 Recovering ${member.host}...`, 'warning');
+                member.status = 'recovering';
+                renderReplicaSet();
+
+                setTimeout(() => {
+                    member.status = 'healthy';
+                    member.lag = Math.floor(Math.random() * 200) + 50;
+                    logMessage(`✅ ${member.host} recovered and synced`, 'success');
+                    renderReplicaSet();
+                    
+                    if (failedMembers.length === 0) {
+                        document.getElementById('recoverBtn').disabled = true;
+                    }
+                }, 3000);
+            }
+        }
+
+        // Simulate write operation
+        function performWrite() {
+            const primary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            
+            if (!primary) {
+                logMessage('❌ No healthy primary available for writes!', 'error');
+                return;
+            }
+
+            writeCount++;
+            logMessage(`✍️ Write operation to ${primary.host}`, 'success');
+            
+            // Show replication flow animation
+            const flow = document.getElementById('replicationFlow');
+            flow.classList.add('active');
+            
+            setTimeout(() => {
+                flow.classList.remove('active');
+                logMessage('📤 Data replicated to all healthy secondaries', 'success');
+                
+                // Update secondary lag (simulate replication delay)
+                replicaMembers.forEach(member => {
+                    if (member.role === 'secondary' && member.status === 'healthy') {
+                        member.lag = Math.floor(Math.random() * 100) + 10;
+                    }
+                });
+                
+                renderReplicaSet();
+            }, 2000);
+            
+            updateStats();
+        }
+
+        // Simulate read operation
+        function performRead() {
+            let targetMember = null;
+            const healthyPrimary = replicaMembers.find(m => m.role === 'primary' && m.status === 'healthy');
+            const healthySecondaries = replicaMembers.filter(m => m.role === 'secondary' && m.status === 'healthy');
+
+            switch (currentReadPreference) {
+                case 'primary':
+                    targetMember = healthyPrimary;
+                    break;
+                case 'primaryPreferred':
+                    targetMember = healthyPrimary || (healthySecondaries.length > 0 ? healthySecondaries[0] : null);
+                    break;
+                case 'secondary':
+                    targetMember = healthySecondaries.length > 0 ? healthySecondaries[Math.floor(Math.random() * healthySecondaries.length)] : null;
+                    break;
+                case 'secondaryPreferred':
+                    targetMember = healthySecondaries.length > 0 ? healthySecondaries[Math.floor(Math.random() * healthySecondaries.length)] : healthyPrimary;
+                    break;
+            }
+
+            if (!targetMember) {
+                logMessage(`❌ No healthy members available for read preference: ${currentReadPreference}`, 'error');
+                return;
+            }
+
+            readCount++;
+            logMessage(`📖 Read operation from ${targetMember.host} (${targetMember.role})`, 'success');
+            updateStats();
+        }
+
+        // Set read preference
+        function setReadPreference(preference) {
+            currentReadPreference = preference;
+            
+            // Update UI
+            document.querySelectorAll('.read-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.closest('.read-option').classList.add('active');
+            
+            // Update radio button
+            document.querySelector(`input[value="${preference}"]`).checked = true;
+            
+            logMessage(`📋 Read preference changed to: ${preference}`, 'info');
+        }
+
+        // Reset demo
+        function resetDemo() {
+            replicaMembers = [
+                { id: 1, role: 'primary', status: 'healthy', host: 'rs-primary-001', port: 27017, lag: 0 },
+                { id: 2, role: 'secondary', status: 'healthy', host: 'rs-secondary-001', port: 27017, lag: 0 },
+                { id: 3, role: 'secondary', status: 'healthy', host: 'rs-secondary-002', port: 27017, lag: 0 }
+            ];
+            
+            nextMemberId = 4;
+            writeCount = 0;
+            readCount = 0;
+            uptimeStart = Date.now();
+            totalDowntime = 0;
+            failedMembers = [];
+            
+            document.getElementById('failureBtn').disabled = false;
+            document.getElementById('recoverBtn').disabled = true;
+            document.getElementById('logContainer').innerHTML = '';
+            
+            renderReplicaSet();
+            logMessage('🔄 Demo reset to initial 3-member replica set', 'info');
+            logMessage('🎯 Replica set initialized and ready', 'success');
+        }
+
+        // Toggle demo overview section
+        function toggleDemoOverview() {
+            const overview = document.getElementById('demoOverview');
+            const toggle = document.getElementById('demoToggle');
+            
+            if (overview.style.display === 'none') {
+                overview.style.display = 'block';
+                toggle.textContent = '▲';
+                toggle.style.transform = 'rotate(180deg)';
+            } else {
+                overview.style.display = 'none';
+                toggle.textContent = '▼';
+                toggle.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Initialize demo
+        window.onload = function() {
+            renderReplicaSet();
+            logMessage('🎉 MongoDB Replica Set demo initialized', 'success');
+            logMessage('🔧 3-member replica set active with automatic failover', 'info');
+            logMessage('🚀 Try simulating failures and performing operations!', 'info');
+        };
+    </script>
+</body>
+</html>
