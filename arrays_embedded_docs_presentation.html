@@ -17,12 +17,89 @@
             color: #001E2B;
             line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+        }
+
+        .nav-menu {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .nav-menu h2 {
+            margin-bottom: 25px;
+            color: #00684A;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00ED64;
+            font-size: 1.4em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 12px;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 12px 18px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border-left: 4px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+        }
+
+        .nav-category {
+            font-weight: 700;
+            color: #00684A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding: 10px 18px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
+            border-radius: 6px;
+        }
+
+        .nav-category:first-of-type {
+            margin-top: 20px;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
+            flex: 1;
+            margin-left: 300px;
+            max-width: none;
+            padding: 30px;
         }
 
         .header {
@@ -475,12 +552,43 @@
         }
 
         @media (max-width: 768px) {
-            .comparison {
-                grid-template-columns: 1fr;
+            .nav-menu {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            
+            .nav-menu.open {
+                transform: translateX(0);
+            }
+            
+            .container {
+                margin-left: 0;
+                padding: 20px;
             }
             
             .header h1 {
                 font-size: 2em;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: linear-gradient(135deg, #00ED64, #00B84D);
+                color: #001E2B;
+                border: none;
+                padding: 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1.2em;
+                box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
             }
             
             .side {
@@ -503,9 +611,39 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 1024px) {
+            .nav-menu {
+                width: 280px;
+            }
+            
+            .container {
+                margin-left: 280px;
+                padding: 25px;
+            }
+        }
     </style>
 </head>
 <body>
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    
+    <div class="nav-menu" id="navMenu">
+        <h2>MongoDB vs SQL</h2>
+        <ul>
+            <li><a href="index.html">🏠 Home</a></li>
+            
+            <li class="nav-category">Architecture & Performance</li>
+            <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+            <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
+            
+            <li class="nav-category">Development Experience</li>
+            <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+            <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+            <li><a href="arrays_embedded_docs_presentation.html" class="active">📊 Arrays & Embedded Docs</a></li>
+            <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+        </ul>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Arrays & Embedded Documents</h1>
@@ -1261,6 +1399,22 @@ WHERE o.order_id = 'ORD-001';
                 toggle.style.transform = 'rotate(0deg)';
             }
         }
+
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('open');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navMenu = document.getElementById('navMenu');
+            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            
+            if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
+                navMenu.classList.remove('open');
+            }
+        });
 
         // Initialize on page load
         window.addEventListener('load', init);
