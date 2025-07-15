@@ -12,30 +12,37 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
+            color: #001E2B;
             line-height: 1.6;
             display: flex;
             min-height: 100vh;
         }
 
         .nav-menu {
-            width: 280px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            border-right: 1px solid rgba(0, 237, 100, 0.2);
         }
 
         .nav-menu h2 {
-            margin-bottom: 20px;
-            color: #764ba2;
+            margin-bottom: 25px;
+            color: #00684A;
             text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00ED64;
+            font-size: 1.4em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-menu ul {
@@ -43,156 +50,394 @@
         }
 
         .nav-menu li {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .nav-menu a {
             display: block;
-            padding: 10px 15px;
+            padding: 12px 18px;
             text-decoration: none;
-            color: #333;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 5px;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
+            font-weight: 500;
         }
 
         .nav-menu a:hover, .nav-menu a.active {
-            background-color: rgba(102, 126, 234, 0.1);
-            border-left: 4px solid #667eea;
-            transform: translateX(5px);
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border-left: 4px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+        }
+
+        .nav-category {
+            font-weight: 700;
+            color: #00684A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding: 10px 18px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
+            border-radius: 6px;
+        }
+
+        .nav-category:first-of-type {
+            margin-top: 20px;
         }
 
         .content {
             flex: 1;
-            margin-left: 280px;
-            padding: 30px;
+            margin-left: 300px;
+            padding: 40px;
         }
 
         .welcome {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 30, 43, 0.15);
+            margin-bottom: 40px;
+            border: 1px solid rgba(0, 237, 100, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .welcome h1 {
-            color: #764ba2;
-            margin-bottom: 20px;
+            color: #00684A;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome p {
+            color: #001E2B;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            line-height: 1.7;
         }
 
         .card-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
         }
 
         .card {
-            background-color: white;
-            border-radius: 10px;
+            background: white;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 30, 43, 0.15);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 237, 100, 0.2);
+            position: relative;
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.25);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .card-header {
-            background-color: #667eea;
+            background: linear-gradient(135deg, #00684A 0%, #001E2B 100%);
             color: white;
-            padding: 15px;
-            font-weight: bold;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.2em;
         }
 
         .card-body {
-            padding: 20px;
+            padding: 25px;
         }
 
         .card-body p {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            color: #001E2B;
+            opacity: 0.8;
+            line-height: 1.6;
         }
 
         .btn {
             display: inline-block;
-            padding: 8px 15px;
-            background-color: #764ba2;
-            color: white;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
+            color: #001E2B;
             text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95em;
+            border: none;
+            cursor: pointer;
         }
 
         .btn:hover {
-            background-color: #667eea;
+            background: linear-gradient(135deg, #00B84D 0%, #00684A 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 237, 100, 0.3);
+        }
+
+        /* Logo styling */
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #00ED64, #00B84D);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #001E2B;
+            font-weight: bold;
+            font-size: 1.4em;
+            margin-right: 15px;
+            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .nav-menu {
+                width: 280px;
+            }
+            
+            .content {
+                margin-left: 280px;
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            
+            .nav-menu.open {
+                transform: translateX(0);
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .welcome h1 {
+                font-size: 2em;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: linear-gradient(135deg, #00ED64, #00B84D);
+                color: #001E2B;
+                border: none;
+                padding: 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1.2em;
+                box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
+            }
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+        }
+
+        /* Enhanced visual elements */
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #00ED64;
+            margin: 20px 0;
+        }
+
+        .feature-highlight h3 {
+            color: #00684A;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .feature-highlight p {
+            color: #001E2B;
+            opacity: 0.8;
+        }
+
+        /* Scroll animations */
+        .card {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="nav-menu">
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    
+    <div class="nav-menu" id="navMenu">
         <h2>MongoDB vs SQL</h2>
         <ul>
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="mongodb_replica_set_demo.html">High Availability & Replica Sets</a></li>
-            <li><a href="orm_vs_natural_objects_presentation.html">ORM vs Natural Objects</a></li>  
-            <li><a href="horizontal_scaling_presentation.html">Horizontal Scaling</a></li>
-            <li><a href="schema_evolution_presentation.html">Schema Evolution</a></li>
-            <li><a href="arrays_embedded_docs_presentation.html">Arrays & Embedded Docs</a></li>
-            <li><a href="aggregation_pipeline_presentation.html">Aggregation Pipeline</a></li>
-            <li><a href="final_scaling_demo_working.html">Final Scaling Demo</a></li>
+            <li><a href="index.html" class="active">🏠 Home</a></li>
+            
+            <li class="nav-category">Architecture & Performance</li>
+            <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+            <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
+            
+            <li class="nav-category">Development Experience</li>
+            <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+            <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+            <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
+            <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
         </ul>
     </div>
 
     <div class="content">
         <div class="welcome">
             <h1>MongoDB vs SQL Presentations</h1>
-            <p>Welcome to the interactive presentations comparing MongoDB and SQL databases. These presentations demonstrate key differences and advantages of each database system through visual examples and interactive demos.</p>
-            <p>Select a presentation from the menu on the left or from the cards below.</p>
+            <p>Welcome to the comprehensive interactive presentations comparing MongoDB and SQL databases. These presentations demonstrate key differences and advantages of each database system through visual examples and hands-on demos.</p>
+            <p>Explore how MongoDB's document-based approach compares to traditional relational databases across various real-world scenarios.</p>
+            
+            <div class="feature-highlight">
+                <h3>🎯 What You'll Learn</h3>
+                <p>Interactive simulations showing performance differences, schema flexibility, scaling capabilities, and developer productivity comparisons between MongoDB and SQL databases.</p>
+            </div>
         </div>
 
         <div class="card-container">
             <div class="card">
-                <div class="card-header">Horizontal Scaling</div>
+                <div class="card-header">📈 Horizontal Scaling</div>
                 <div class="card-body">
-                    <p>Compare MongoDB's automatic sharding with SQL manual partitioning through an interactive simulation.</p>
-                    <a href="horizontal_scaling_presentation.html" class="btn">View Presentation</a>
+                    <p>Compare MongoDB's automatic sharding with SQL manual partitioning through an interactive simulation that demonstrates real-world scaling scenarios.</p>
+                    <a href="horizontal_scaling_presentation.html" class="btn">Explore Scaling →</a>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">Schema Evolution</div>
+                <div class="card-header">🚀 Schema Evolution</div>
                 <div class="card-body">
-                    <p>See how MongoDB handles schema changes without migrations compared to traditional SQL databases.</p>
-                    <a href="schema_evolution_presentation.html" class="btn">View Presentation</a>
+                    <p>See how MongoDB handles schema changes without migrations compared to traditional SQL databases. Experience zero-downtime deployments.</p>
+                    <a href="schema_evolution_presentation.html" class="btn">Try Schema Evolution →</a>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">Arrays & Embedded Documents</div>
+                <div class="card-header">📊 Arrays & Embedded Documents</div>
                 <div class="card-body">
-                    <p>Explore MongoDB's native support for arrays and embedded documents versus SQL's normalized approach.</p>
-                    <a href="arrays_embedded_docs_presentation.html" class="btn">View Presentation</a>
+                    <p>Explore MongoDB's native support for arrays and embedded documents versus SQL's normalized approach with complex JOINs.</p>
+                    <a href="arrays_embedded_docs_presentation.html" class="btn">View Data Modeling →</a>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">Aggregation Pipeline</div>
+                <div class="card-header">⚡ Aggregation Pipeline</div>
                 <div class="card-body">
-                    <p>Compare MongoDB's aggregation pipeline with SQL's complex JOIN queries for data analysis.</p>
-                    <a href="aggregation_pipeline_presentation.html" class="btn">View Presentation</a>
+                    <p>Compare MongoDB's powerful aggregation pipeline with SQL's complex JOIN queries for advanced data analysis and processing.</p>
+                    <a href="aggregation_pipeline_presentation.html" class="btn">Analyze Data →</a>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">Final Scaling Demo</div>
+                <div class="card-header">🔧 ORM vs Natural Objects</div>
                 <div class="card-body">
-                    <p>A comprehensive demonstration of horizontal scaling differences between MongoDB and SQL.</p>
-                    <a href="final_scaling_demo_working.html" class="btn">View Presentation</a>
+                    <p>Discover how MongoDB's document model eliminates object-relational impedance mismatch for more natural application development.</p>
+                    <a href="orm_vs_natural_objects_presentation.html" class="btn">Compare Development →</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">🔄 High Availability Demo</div>
+                <div class="card-body">
+                    <p>Experience MongoDB's replica set architecture and automatic failover capabilities in action with this interactive demonstration.</p>
+                    <a href="mongodb_replica_set_demo.html" class="btn">Test Resilience →</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('open');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navMenu = document.getElementById('navMenu');
+            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            
+            if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
+                navMenu.classList.remove('open');
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+        });
+    </script>
 </body>
 </html>
