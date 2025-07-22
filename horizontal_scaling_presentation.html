@@ -669,6 +669,82 @@
                 padding: 25px;
             }
         }
+
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 8px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            color: #00684A;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .nav-category-header:hover {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
+            transform: translateX(4px);
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+            color: #00684A;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 300px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 8px;
+            margin-left: 15px;
+        }
+
+        .nav-accordion-content a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .nav-accordion-content a:hover, .nav-accordion-content a.active {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border-left: 3px solid #00ED64;
+            transform: translateX(6px);
+            color: #00684A;
+            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -679,15 +755,29 @@
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
-            <li class="nav-category">Architecture & Performance</li>
-            <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
-            <li><a href="horizontal_scaling_presentation.html" class="active">📈 Horizontal Scaling</a></li>
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
+                    <span>Architecture & Performance</span>
+                    <span class="accordion-icon" id="architecture-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="architecture-content">
+                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+                    <li><a href="horizontal_scaling_presentation.html" class="active">📈 Horizontal Scaling</a></li>
+                </ul>
+            </li>
             
-            <li class="nav-category">Development Experience</li>
-            <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
-            <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
-            <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
-            <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('development')">
+                    <span>Application Development</span>
+                    <span class="accordion-icon" id="development-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="development-content">
+                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
+                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+                </ul>
+            </li>
         </ul>
     </div>
 
@@ -1059,8 +1149,31 @@ END IF;
             }
         });
 
+        // Accordion functionality
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Initialize accordion - expand category containing current page
+        function initializeAccordion() {
+            const content = document.getElementById('architecture-content');
+            const icon = document.getElementById('architecture-icon');
+            content.classList.add('expanded');
+            icon.classList.add('rotated');
+        }
+
         // Initialize when page loads
         window.onload = function() {
+            initializeAccordion();
             logFinal('🎉 MongoDB vs SQL horizontal scaling demo initialized');
             logFinal('🔧 MongoDB sharded cluster with mongos router active');
             logFinal('🗄️ SQL manual partitioning setup ready for comparison');
