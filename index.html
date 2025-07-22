@@ -4,16 +4,19 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCV5KGB8ES"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-YCV5KGB8ES');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YCV5KGB8ES');
     </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MongoDB vs SQL Presentations</title>
+    <meta name="description" content="Interactive presentations comparing MongoDB and PostgreSQL databases with hands-on demos and performance comparisons.">
+    <title>MongoDB vs PostgreSQL - Interactive Presentations & Comparisons</title>
+    
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -21,44 +24,60 @@
         }
 
         body {
-            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
             color: #001E2B;
             line-height: 1.6;
-            display: flex;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* Navigation Menu */
         .nav-menu {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
             position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
             height: 100vh;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 237, 100, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
             z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0, 104, 74, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
         }
 
-        .content {
-            flex: 1;
-            margin-left: 300px;
-            padding: 40px;
+        .nav-menu.open {
+            left: 0;
         }
 
         .nav-menu h2 {
-            margin-bottom: 25px;
             color: #00684A;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            font-weight: 700;
             text-align: center;
             padding-bottom: 15px;
             border-bottom: 3px solid #00ED64;
-            font-size: 1.4em;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            position: relative;
+        }
+
+        .nav-menu h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+            border-radius: 2px;
         }
 
         .nav-menu ul {
@@ -66,74 +85,101 @@
         }
 
         .nav-menu li {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .nav-menu a {
-            display: block;
-            padding: 12px 18px;
+        .nav-menu > ul > li > a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
             text-decoration: none;
             color: #001E2B;
             background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid transparent;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-menu a:hover, .nav-menu a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+        .nav-menu > ul > li > a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu > ul > li > a:hover::before,
+        .nav-menu > ul > li > a.active::before {
+            opacity: 1;
+        }
+
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li > a.active {
             border-left: 4px solid #00ED64;
             transform: translateX(8px);
             color: #00684A;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-category {
-            font-weight: 700;
-            color: #00684A;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding: 10px 18px;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 6px;
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
         }
 
         /* Accordion Styles */
         .nav-accordion {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .nav-category-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 8px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 700;
             color: #00684A;
-            font-size: 0.85em;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 104, 74, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-category-header:hover::before {
+            opacity: 1;
         }
 
         .nav-category-header:hover {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
-            transform: translateX(4px);
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
         }
 
         .accordion-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8em;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
             color: #00684A;
+            z-index: 1;
+            position: relative;
         }
 
         .accordion-icon.rotated {
@@ -143,61 +189,150 @@
         .nav-accordion-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
         .nav-accordion-content.expanded {
-            max-height: 300px;
+            max-height: 400px;
         }
 
         .nav-accordion-content li {
-            margin-bottom: 8px;
-            margin-left: 15px;
+            margin-bottom: 6px;
+            margin-left: 20px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.3s ease forwards;
+        }
+
+        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
+        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
+        .nav-accordion-content.expanded li:nth-child(3) { animation-delay: 0.3s; }
+        .nav-accordion-content.expanded li:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .nav-accordion-content a {
-            display: block;
-            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
             text-decoration: none;
             color: #001E2B;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 3px solid transparent;
             font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .nav-accordion-content a:hover, .nav-accordion-content a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 3px solid #00ED64;
-            transform: translateX(6px);
-            color: #00684A;
-            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-category:first-of-type {
-            margin-top: 20px;
-        }
-
-        .content {
-            flex: 1;
-            margin-left: 300px;
-            padding: 40px;
-        }
-
-        .welcome {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 30, 43, 0.15);
-            margin-bottom: 40px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            font-size: 0.9rem;
             position: relative;
             overflow: hidden;
+        }
+
+        .nav-accordion-content a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-accordion-content a:hover::before,
+        .nav-accordion-content a.active::before {
+            opacity: 1;
+        }
+
+        .nav-accordion-content a:hover,
+        .nav-accordion-content a.active {
+            border-left: 3px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1001;
+            background: rgba(0, 104, 74, 0.95);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-toggle:hover {
+            background: #00ED64;
+            color: #001E2B;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
+        }
+
+        .menu-toggle.menu-open {
+            background: #00ED64;
+            color: #001E2B;
+            transform: rotate(90deg);
+        }
+
+        /* Backdrop */
+        .nav-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 40px;
+            padding-left: 100px; /* Space for menu button */
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Welcome Section */
+        .welcome {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 30, 43, 0.15);
+            margin-bottom: 50px;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .welcome::before {
@@ -206,48 +341,133 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #00ED64, #00B84D);
+            height: 6px;
+            background: linear-gradient(90deg, #00ED64, #00B84D, #00684A);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .welcome::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 100%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0L60.5 35H100L72.5 57L82.5 92L50 70L17.5 92L27.5 57L0 35H39.5L50 0Z" fill="rgba(0,237,100,0.05)"/></svg>') repeat;
+            animation: float 20s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            from { transform: translateY(0) rotate(0deg); }
+            to { transform: translateY(-20px) rotate(360deg); }
         }
 
         .welcome h1 {
             color: #00684A;
             margin-bottom: 25px;
-            font-size: 2.5em;
+            font-size: 3rem;
             font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .welcome p {
             color: #001E2B;
-            font-size: 1.1em;
-            margin-bottom: 15px;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
             opacity: 0.9;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Feature Highlight */
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 6px solid #00ED64;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .feature-highlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-highlight:hover::before {
+            opacity: 1;
+        }
+
+        .feature-highlight h3 {
+            color: #00684A;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-highlight p {
+            color: #001E2B;
+            opacity: 0.9;
+            font-size: 1.1rem;
             line-height: 1.7;
         }
 
+        /* Card Container */
         .card-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
         }
 
+        /* Cards */
         .card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 30, 43, 0.15);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 104, 74, 0.1);
             position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.25);
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+        .card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .card::before {
@@ -256,189 +476,342 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #00ED64, #00B84D);
+            height: 5px;
+            background: linear-gradient(90deg, #00ED64, #00B84D, #00684A);
+        }
+
+        .card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(0, 30, 43, 0.25);
+        }
+
+        .card:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.05) 0%, rgba(0, 184, 77, 0.02) 100%);
+            pointer-events: none;
         }
 
         .card-header {
             background: linear-gradient(135deg, #00684A 0%, #001E2B 100%);
             color: white;
-            padding: 20px;
-            font-weight: 600;
-            font-size: 1.2em;
+            padding: 25px 30px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover .card-header::after {
+            opacity: 1;
         }
 
         .card-body {
-            padding: 25px;
+            padding: 30px;
+            position: relative;
+            z-index: 1;
         }
 
         .card-body p {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: #001E2B;
             opacity: 0.8;
-            line-height: 1.6;
+            line-height: 1.7;
+            font-size: 1.05rem;
         }
 
+        /* Button Styles */
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
             background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             color: #001E2B;
             text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 0.95em;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
+            font-size: 1rem;
             border: none;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #00B84D 0%, #00684A 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
         }
 
         .btn:hover {
-            background: linear-gradient(135deg, #00B84D 0%, #00684A 100%);
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 237, 100, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 237, 100, 0.4);
         }
 
-        /* Logo styling */
-        .logo {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #00ED64, #00B84D);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #001E2B;
-            font-weight: bold;
-            font-size: 1.4em;
-            margin-right: 15px;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
+        .btn span {
+            position: relative;
+            z-index: 1;
         }
 
-        /* Responsive design */
-        @media (max-width: 1024px) {
-            .nav-menu {
-                width: 280px;
+        /* Logo Icons */
+        .mongodb-logo-icon {
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M12 2C8.5 2 5.7 4.8 5.7 8.3c0 2.5 1.5 5.2 3.8 7.8c1.2 1.3 2.5 2.6 2.5 4.9v1h0v-1c0-2.3 1.3-3.6 2.5-4.9c2.3-2.6 3.8-5.3 3.8-7.8C18.3 4.8 15.5 2 12 2z"/></svg>') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .postgresql-logo-icon {
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.6 0 3.1-.4 4.4-1.1-.2-.1-.4-.3-.6-.4-1 .5-2.1.8-3.3.8-4.1 0-7.5-3.4-7.5-7.5S7.9 6.3 12 6.3s7.5 3.4 7.5 7.5c0 1.2-.3 2.3-.8 3.3.1.2.3.4.4.6.7-1.3 1.1-2.8 1.1-4.4C22 6.5 17.5 2 12 2z"/></svg>') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .content {
+                padding: 30px;
+                padding-left: 100px;
             }
             
-            .content {
-                margin-left: 280px;
-                padding: 30px;
+            .card-container {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 25px;
             }
         }
 
         @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+                padding-left: 80px;
+            }
+            
+            .welcome {
+                padding: 30px 25px;
+            }
+            
+            .welcome h1 {
+                font-size: 2.2rem;
+            }
+            
+            .welcome p {
+                font-size: 1rem;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .card-header {
+                padding: 20px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .card-body {
+                padding: 25px;
+            }
+            
+            .feature-highlight {
+                padding: 25px;
+                margin: 25px 0;
+            }
+            
+            .menu-toggle {
+                top: 20px;
+                left: 20px;
+                padding: 12px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 15px;
+                padding-left: 70px;
+            }
+            
+            .welcome {
+                padding: 25px 20px;
+            }
+            
+            .welcome h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card-header {
+                padding: 18px 20px;
+                font-size: 1rem;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+            
             .nav-menu {
-                transform: translateX(-100%);
+                width: 280px;
+                left: -280px;
             }
-            
-            .nav-menu:hover {
-                transform: translateX(-100%);
-            }
-            
-            .nav-menu.expanded {
-                transform: translateX(0);
-            }
-            
-            .hamburger-btn {
-                display: block;
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav-menu,
+            .menu-toggle,
+            .nav-backdrop {
+                display: none;
             }
             
             .content {
-                margin-left: 0;
+                padding: 0;
+                margin: 0;
+                max-width: none;
             }
             
-            .nav-menu:hover + .content,
-            .nav-menu.expanded + .content {
-                margin-left: 0;
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+            
+            body {
+                background: white;
+                color: black;
             }
         }
 
-        .mobile-menu-toggle {
-            display: none;
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        /* Enhanced visual elements */
-        .feature-highlight {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #00ED64;
-            margin: 20px 0;
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
-        .feature-highlight h3 {
-            color: #00684A;
-            margin-bottom: 10px;
-            font-weight: 600;
+        /* Scroll Behavior */
+        html {
+            scroll-behavior: smooth;
         }
 
-        .feature-highlight p {
-            color: #001E2B;
-            opacity: 0.8;
+        /* Focus Styles for Accessibility */
+        button:focus,
+        a:focus {
+            outline: 3px solid #00ED64;
+            outline-offset: 2px;
         }
 
-        /* Scroll animations */
-        .card {
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
-        .card:nth-child(4) { animation-delay: 0.4s; }
-        .card:nth-child(5) { animation-delay: 0.5s; }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            .welcome,
+            .card {
+                border: 2px solid #000;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            
+            .btn {
+                border: 2px solid #000;
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
-    <button class="hamburger-btn" onclick="toggleNav()" id="hamburgerBtn">☰</button>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
+        ☰
+    </button>
     
-    <div class="nav-menu" id="navMenu">
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+    
+    <nav class="nav-menu" id="navMenu" role="navigation">
         <h2>MongoDB vs SQL</h2>
         <ul>
-            <li><a href="index.html" class="active">🏠 Home</a></li>
+            <li><a href="index.html" class="active" aria-current="page">🏠 Home</a></li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')">
+                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
                     <span>Competition</span>
                     <span class="accordion-icon" id="competition-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="competition-content">
-                    <li><a href="mongodb_vs_postgres_presentation.html">🍃 MongoDB vs PostgreSQL</a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">🔬 Postgres Technical Comparison</a></li>
+                <ul class="nav-accordion-content" id="competition-content" role="region">
+                    <li><a href="mongodb_vs_postgres_presentation.html">
+                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
+                    </a></li>
+                    <li><a href="mongodb_postgres_technical_presentation.html">
+                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
+                    </a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
                     <span>Architecture & Performance</span>
                     <span class="accordion-icon" id="architecture-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="architecture-content">
+                <ul class="nav-accordion-content" id="architecture-content" role="region">
                     <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
                     <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')">
+                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
                     <span>Application Development</span>
                     <span class="accordion-icon" id="development-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="development-content">
+                <ul class="nav-accordion-content" id="development-content" role="region">
                     <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
                     <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
                     <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
@@ -446,126 +819,319 @@
                 </ul>
             </li>
         </ul>
-    </div>
+    </nav>
 
-    <div class="content">
-        <div class="welcome">
-            <h1>MongoDB vs SQL Presentations</h1>
-            <p>Welcome to the comprehensive interactive presentations comparing MongoDB and SQL databases. These presentations demonstrate key differences and advantages of each database system through visual examples and hands-on demos.</p>
-            <p>Explore how MongoDB's document-based approach compares to traditional relational databases across various real-world scenarios.</p>
+    <main class="content">
+        <section class="welcome">
+            <h1>MongoDB vs PostgreSQL Presentations</h1>
+            <p>Welcome to the comprehensive interactive presentations comparing MongoDB and PostgreSQL databases. These presentations demonstrate key differences and advantages of MongoDB's document-oriented approach over PostgreSQL's traditional relational model through visual examples and hands-on demos.</p>
+            <p>Explore how MongoDB's native horizontal scaling, AI-first design, and developer-friendly architecture outperform PostgreSQL across various real-world scenarios.</p>
             
             <div class="feature-highlight">
                 <h3>🎯 What You'll Learn</h3>
-                <p>Interactive simulations showing performance differences, schema flexibility, scaling capabilities, and developer productivity comparisons between MongoDB and SQL databases.</p>
+                <p>Interactive simulations showing MongoDB's performance advantages, schema flexibility, automatic scaling capabilities, and developer productivity improvements compared to PostgreSQL's complex setup requirements and maintenance overhead.</p>
             </div>
-        </div>
+        </section>
 
-        <div class="card-container">
-            <div class="card">
-                <div class="card-header">📈 Horizontal Scaling</div>
+        <section class="card-container" role="region" aria-label="Interactive Presentations">
+            <article class="card">
+                <header class="card-header">
+                    <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB Sharding vs <span class="postgresql-logo-icon" aria-hidden="true"></span>PostgreSQL Partitioning
+                </header>
                 <div class="card-body">
-                    <p>Compare MongoDB's automatic sharding with SQL manual partitioning through an interactive simulation that demonstrates real-world scaling scenarios.</p>
-                    <a href="horizontal_scaling_presentation.html" class="btn">Explore Scaling →</a>
+                    <p>Compare MongoDB's automatic sharding with PostgreSQL's manual partitioning through an interactive simulation that demonstrates real-world scaling scenarios.</p>
+                    <a href="horizontal_scaling_presentation.html" class="btn">
+                        <span>Explore Scaling →</span>
+                    </a>
                 </div>
-            </div>
+            </article>
 
-            <div class="card">
-                <div class="card-header">🚀 Schema Evolution</div>
+            <article class="card">
+                <header class="card-header">🚀 Dynamic Schema vs PostgreSQL ALTER TABLE</header>
                 <div class="card-body">
-                    <p>See how MongoDB handles schema changes without migrations compared to traditional SQL databases. Experience zero-downtime deployments.</p>
-                    <a href="schema_evolution_presentation.html" class="btn">Try Schema Evolution →</a>
+                    <p>See how MongoDB handles schema changes without migrations compared to PostgreSQL's complex ALTER TABLE operations. Experience zero-downtime deployments.</p>
+                    <a href="schema_evolution_presentation.html" class="btn">
+                        <span>Try Schema Evolution →</span>
+                    </a>
                 </div>
-            </div>
+            </article>
 
-            <div class="card">
-                <div class="card-header">📊 Arrays & Embedded Documents</div>
+            <article class="card">
+                <header class="card-header">📊 Embedded Documents vs PostgreSQL JOINs</header>
                 <div class="card-body">
-                    <p>Explore MongoDB's native support for arrays and embedded documents versus SQL's normalized approach with complex JOINs.</p>
-                    <a href="arrays_embedded_docs_presentation.html" class="btn">View Data Modeling →</a>
+                    <p>Explore MongoDB's native support for arrays and embedded documents versus PostgreSQL's normalized approach with complex JOINs and foreign keys.</p>
+                    <a href="arrays_embedded_docs_presentation.html" class="btn">
+                        <span>View Data Modeling →</span>
+                    </a>
                 </div>
-            </div>
+            </article>
 
-            <div class="card">
-                <div class="card-header">⚡ Aggregation Pipeline</div>
+            <article class="card">
+                <header class="card-header">⚡ Aggregation Pipeline vs PostgreSQL Queries</header>
                 <div class="card-body">
-                    <p>Compare MongoDB's powerful aggregation pipeline with SQL's complex JOIN queries for advanced data analysis and processing.</p>
-                    <a href="aggregation_pipeline_presentation.html" class="btn">Analyze Data →</a>
+                    <p>Compare MongoDB's powerful aggregation pipeline with PostgreSQL's complex JOIN queries and subqueries for advanced data analysis and processing.</p>
+                    <a href="aggregation_pipeline_presentation.html" class="btn">
+                        <span>Analyze Data →</span>
+                    </a>
                 </div>
-            </div>
+            </article>
 
-            <div class="card">
-                <div class="card-header">🔧 ORM vs Natural Objects</div>
+            <article class="card">
+                <header class="card-header">🔧 Natural Objects vs PostgreSQL ORMs</header>
                 <div class="card-body">
-                    <p>Discover how MongoDB's document model eliminates object-relational impedance mismatch for more natural application development.</p>
-                    <a href="orm_vs_natural_objects_presentation.html" class="btn">Compare Development →</a>
+                    <p>Discover how MongoDB's document model eliminates object-relational impedance mismatch compared to PostgreSQL's complex ORM requirements.</p>
+                    <a href="orm_vs_natural_objects_presentation.html" class="btn">
+                        <span>Compare Development →</span>
+                    </a>
                 </div>
-            </div>
+            </article>
 
-            <div class="card">
-                <div class="card-header">🔄 High Availability Demo</div>
+            <article class="card">
+                <header class="card-header">🔄 Replica Sets vs PostgreSQL Streaming Replication</header>
                 <div class="card-body">
-                    <p>Experience MongoDB's replica set architecture and automatic failover capabilities in action with this interactive demonstration.</p>
-                    <a href="mongodb_replica_set_demo.html" class="btn">Test Resilience →</a>
+                    <p>Experience MongoDB's replica set architecture and automatic failover capabilities compared to PostgreSQL's complex streaming replication setup.</p>
+                    <a href="mongodb_replica_set_demo.html" class="btn">
+                        <span>Test Resilience →</span>
+                    </a>
                 </div>
-            </div>
-        </div>
-    </div>
+            </article>
+        </section>
+    </main>
 
     <script>
+        // Navigation Functions
         function toggleMobileMenu() {
             const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
             navMenu.classList.toggle('open');
+            backdrop.classList.toggle('active');
+            toggleBtn.classList.toggle('menu-open');
+            
+            // Update ARIA attributes
+            const isOpen = navMenu.classList.contains('open');
+            toggleBtn.setAttribute('aria-expanded', isOpen);
         }
 
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
+        function closeMobileMenu() {
             const navMenu = document.getElementById('navMenu');
-            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
             
-            if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
-                navMenu.classList.remove('open');
-            }
-        });
+            navMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            toggleBtn.classList.remove('menu-open');
+            
+            // Update ARIA attributes
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
 
-        // Add smooth scrolling for better UX
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Accordion functionality
+        // Accordion Functions
         function toggleAccordion(categoryId) {
             const content = document.getElementById(categoryId + '-content');
             const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
             
             if (content.classList.contains('expanded')) {
                 content.classList.remove('expanded');
                 icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
             } else {
                 content.classList.add('expanded');
                 icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
             }
         }
 
-        // Initialize accordion - expand all by default on home page
+        // Initialize accordion states
         function initializeAccordion() {
-            const categories = ['architecture', 'development'];
+            const categories = ['architecture', 'development', 'competition'];
             categories.forEach(categoryId => {
                 const content = document.getElementById(categoryId + '-content');
                 const icon = document.getElementById(categoryId + '-icon');
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
+                const header = content ? content.previousElementSibling : null;
+                
+                if (content && icon && header) {
+                    content.classList.add('expanded');
+                    icon.classList.add('rotated');
+                    header.setAttribute('aria-expanded', 'true');
+                }
             });
         }
 
-        // Add loading animation
-        window.addEventListener('load', function() {
-            document.body.classList.add('loaded');
+        // Card interaction effects
+        function initializeCardEffects() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.animationDelay = '0s';
+                });
+                
+                card.addEventListener('click', function(e) {
+                    // If click is not on a link, add click effect
+                    if (!e.target.closest('a')) {
+                        this.style.transform = 'translateY(-8px) scale(1.02)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 200);
+                    }
+                });
+            });
+        }
+
+        // Keyboard navigation support
+        function initializeKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                // Alt + M to toggle menu
+                if (e.altKey && e.key === 'm') {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                }
+                
+                // Escape to close menu
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+                
+                // Enter and Space for accordion headers
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('nav-category-header')) {
+                    e.preventDefault();
+                    const categoryId = e.target.onclick.toString().match(/'([^']+)'/)[1];
+                    toggleAccordion(categoryId);
+                }
+            });
+        }
+
+        // Handle outside clicks
+        function initializeOutsideClickHandler() {
+            document.addEventListener('click', (e) => {
+                const navMenu = document.getElementById('navMenu');
+                const menuToggle = document.getElementById('menuToggle');
+                
+                // Close menu if clicking outside
+                if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+        }
+
+        // Handle window resize
+        function handleResize() {
+            if (window.innerWidth > 1024) {
+                closeMobileMenu();
+            }
+        }
+
+        // Intersection Observer for animations
+        function initializeScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.card, .welcome').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Smooth scrolling for anchor links
+        function initializeSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Navigation link click handler for mobile
+        function initializeNavLinkHandlers() {
+            const navLinks = document.querySelectorAll('.nav-menu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 1024) {
+                        setTimeout(() => {
+                            closeMobileMenu();
+                        }, 100);
+                    }
+                });
+            });
+        }
+
+        // Performance optimization - debounce resize events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
             initializeAccordion();
+            initializeCardEffects();
+            initializeKeyboardNavigation();
+            initializeOutsideClickHandler();
+            initializeScrollAnimations();
+            initializeSmoothScrolling();
+            initializeNavLinkHandlers();
+            
+            // Add debounced resize handler
+            window.addEventListener('resize', debounce(handleResize, 150));
+            
+            console.log('MongoDB vs PostgreSQL Home Page Enhanced - Loaded Successfully');
+            console.log('Use Alt+M to toggle menu, ESC to close menu');
+        });
+
+        // Handle page visibility for performance
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Pause animations when page is not visible
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.animationPlayState = 'paused';
+                });
+            } else {
+                // Resume animations when page becomes visible
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.animationPlayState = 'running';
+                });
+            }
+        });
+
+        // Add loading state management
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.loading').forEach(el => {
+                el.classList.remove('loading');
+            });
+        });
+
+        // Error handling for navigation
+        window.addEventListener('error', function(e) {
+            console.warn('Navigation error:', e.error);
+            // Ensure menu can still be closed if there's an error
+            if (document.getElementById('navMenu').classList.contains('open')) {
+                closeMobileMenu();
+            }
         });
     </script>
 </body>

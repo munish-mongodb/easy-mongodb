@@ -751,7 +751,7 @@
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
     
     <div class="nav-menu" id="navMenu">
-        <h2>MongoDB vs SQL</h2>
+        <h2>MongoDB vs PostgreSQL</h2>
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
@@ -794,8 +794,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>🚀 MongoDB Horizontal Scaling</h1>
-            <p>Interactive Demo: Automatic Sharding vs Manual Partitioning</p>
+            <h1><span class="mongodb-logo-icon logo-large"></span>MongoDB Horizontal Scaling Demo</h1>
+            <p>Automatic Sharding vs <span class="postgresql-logo-icon"></span>PostgreSQL Manual Partitioning</p>
             
             <!-- So What Section -->
             <div class="so-what-section">
@@ -896,7 +896,7 @@
             <h3>💻 Database Commands</h3>
             <div class="command-tabs">
                 <button class="tab-btn active" onclick="showTabFinal('mongo')">MongoDB</button>
-                <button class="tab-btn" onclick="showTabFinal('sql')">SQL</button>
+                <button class="tab-btn" onclick="showTabFinal('postgresql')">PostgreSQL</button>
             </div>
             <div id="mongo-content" class="tab-content active">
 // Current MongoDB sharding commands
@@ -911,26 +911,27 @@ db.users.find({"city": "SF"})     // → Broadcast query
 sh.addShard("shard004/new-region:27017")
 // ✅ Automatic rebalancing, zero downtime
             </div>
-            <div id="sql-content" class="tab-content">
--- Manual SQL partitioning setup
+            <div id="postgresql-content" class="tab-content">
+-- Manual PostgreSQL partitioning setup
 CREATE TABLE users_partition_1 (
     CHECK (user_id >= 1 AND user_id < 100000)
 ) INHERITS (users);
 
 -- Application routing logic required
 IF user_id < 100000 THEN
-    SELECT * FROM users_partition_1 WHERE user_id = ?;
+    SELECT * FROM users_partition_1 WHERE user_id = $1;
 ELSIF user_id < 200000 THEN
-    SELECT * FROM users_partition_2 WHERE user_id = ?;
+    SELECT * FROM users_partition_2 WHERE user_id = $1;
 END IF;
 
--- ⚠️ Manual maintenance, downtime required
+-- ⚠️ Manual maintenance, downtime required for rebalancing
+-- ⚠️ VACUUM and ANALYZE needed on each partition
             </div>
         </div>
 
         <div class="architecture">
             <div class="arch-panel">
-                <div class="arch-title">🍃 MongoDB Sharded Cluster</div>
+                <div class="arch-title"><span class="mongodb-logo-icon"></span>MongoDB Sharded Cluster</div>
                 
                 <div class="query-router">
                     🎯 mongos Query Router
@@ -943,11 +944,11 @@ END IF;
             </div>
 
             <div class="arch-panel">
-                <div class="arch-title sql">🗄️ SQL Manual Partitioning</div>
+                <div class="arch-title sql"><span class="postgresql-logo-icon"></span>PostgreSQL Manual Partitioning</div>
                 
                 <div class="sql-router">
-                    ⚙️ Application Logic
-                    <small>Manual routing & management</small>
+                    ⚙️ Application Logic + pgpool
+                    <small>Manual routing & connection pooling</small>
                 </div>
                 
                 <div class="shards-container sql" id="sqlContainer">

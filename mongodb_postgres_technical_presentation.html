@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB vs PostgreSQL: Technical Architecture Deep Dive</title>
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -12,19 +13,302 @@
         }
 
         body {
-            font-family: 'Euclidflex', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #001E2B 0%, #00684A 100%);
             color: #333;
             line-height: 1.6;
             overflow-x: hidden;
         }
 
+        /* Navigation Menu */
+        .nav-menu {
+            position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0, 104, 74, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
+        }
+
+        .nav-menu.open {
+            left: 0;
+        }
+
+        .nav-menu h2 {
+            color: #00684A;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00ED64;
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .nav-menu h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+            border-radius: 2px;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 8px;
+        }
+
+        .nav-menu > ul > li > a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid transparent;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-menu > ul > li > a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu > ul > li > a:hover::before,
+        .nav-menu > ul > li > a.active::before {
+            opacity: 1;
+        }
+
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li > a.active {
+            border-left: 4px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 10px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
+            color: #00684A;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 104, 74, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-category-header:hover::before {
+            opacity: 1;
+        }
+
+        .nav-category-header:hover {
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
+        }
+
+        .accordion-icon {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            color: #00684A;
+            z-index: 1;
+            position: relative;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 400px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 6px;
+            margin-left: 20px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.3s ease forwards;
+        }
+
+        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
+        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
+        .nav-accordion-content.expanded li:nth-child(3) { animation-delay: 0.3s; }
+        .nav-accordion-content.expanded li:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .nav-accordion-content a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-accordion-content a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-accordion-content a:hover::before,
+        .nav-accordion-content a.active::before {
+            opacity: 1;
+        }
+
+        .nav-accordion-content a:hover,
+        .nav-accordion-content a.active {
+            border-left: 3px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1001;
+            background: rgba(0, 104, 74, 0.95);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-toggle:hover {
+            background: #00ED64;
+            color: #001E2B;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
+        }
+
+        .menu-toggle.menu-open {
+            background: #00ED64;
+            color: #001E2B;
+            transform: rotate(90deg);
+        }
+
+        /* Backdrop */
+        .nav-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main Container */
         .presentation-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px;
+            padding-left: 100px; /* Space for menu button */
         }
 
+        /* Slide Styles */
         .slide {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(15px);
@@ -36,8 +320,10 @@
             transform: translateY(30px);
             animation: slideIn 0.8s ease-out forwards;
             border: 1px solid rgba(0, 104, 74, 0.1);
+            position: relative;
         }
 
+        /* Staggered animation delays */
         .slide:nth-child(1) { animation-delay: 0.1s; }
         .slide:nth-child(2) { animation-delay: 0.2s; }
         .slide:nth-child(3) { animation-delay: 0.3s; }
@@ -58,12 +344,18 @@
             }
         }
 
+        /* Title Slide */
         .title-slide {
             text-align: center;
             background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
             color: white;
             position: relative;
             overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .title-slide::before {
@@ -75,6 +367,7 @@
             height: 200%;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0L60.5 35H100L72.5 57L82.5 92L50 70L17.5 92L27.5 57L0 35H39.5L50 0Z" fill="rgba(255,255,255,0.05)"/></svg>') repeat;
             animation: float 20s linear infinite;
+            opacity: 0.3;
         }
 
         @keyframes float {
@@ -82,401 +375,355 @@
             to { transform: translateY(-20px) rotate(360deg); }
         }
 
-        .mongodb-logo {
-            width: 100px;
-            height: 100px;
-            background: #13AA52;
-            border-radius: 50%;
-            margin: 0 auto 30px;
+        .title-slide h1 {
+            font-size: 3rem;
+            margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Logo Icons */
+        .mongodb-logo-icon {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2313AA52" d="M12 2C8.5 2 5.7 4.8 5.7 8.3c0 2.5 1.5 5.2 3.8 7.8c1.2 1.3 2.5 2.6 2.5 4.9v1h0v-1c0-2.3 1.3-3.6 2.5-4.9c2.3-2.6 3.8-5.3 3.8-7.8C18.3 4.8 15.5 2 12 2z"/></svg>') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .postgresql-logo-icon {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23336791" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.6 0 3.1-.4 4.4-1.1-.2-.1-.4-.3-.6-.4-1 .5-2.1.8-3.3.8-4.1 0-7.5-3.4-7.5-7.5S7.9 6.3 12 6.3s7.5 3.4 7.5 7.5c0 1.2-.3 2.3-.8 3.3.1.2.3.4.4.6.7-1.3 1.1-2.8 1.1-4.4C22 6.5 17.5 2 12 2z"/></svg>') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .logo-large .mongodb-logo-icon {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Typography */
+        h2 {
+            color: #001E2B;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #00ED64;
+            padding-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            position: relative;
-            z-index: 1;
+            gap: 10px;
         }
 
-        .title-slide h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
+        h3 {
+            color: #00684A;
+            font-size: 1.6rem;
+            margin: 25px 0 15px 0;
         }
 
-        .title-slide .subtitle {
-            font-size: 1.8rem;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
-        }
-
-        .slide h2 {
+        h4 {
             color: #001E2B;
-            font-size: 2.8rem;
-            margin-bottom: 30px;
-            border-bottom: 4px solid #13AA52;
-            padding-bottom: 15px;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        h5 {
+            color: #00684A;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* Tables */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.1);
+            border: 1px solid rgba(0, 104, 74, 0.1);
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .comparison-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(232, 245, 232, 0.5);
+            vertical-align: top;
+            transition: background-color 0.3s ease;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 237, 100, 0.05);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .advantage {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(19, 170, 82, 0.05) 100%);
+            color: #00684A;
+            font-weight: 600;
             position: relative;
-            font-weight: 300;
         }
 
-        .slide h2::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #13AA52, #00684A);
-            animation: expandBorder 2s ease-out forwards;
-            animation-delay: 0.5s;
+        .advantage::before {
+            content: '✓';
+            color: #00ED64;
+            font-weight: bold;
+            margin-right: 5px;
         }
 
-        @keyframes expandBorder {
-            to { width: 250px; }
+        .challenge {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+            color: #D32F2F;
         }
 
-        .slide h3 {
-            color: #001E2B;
-            font-size: 2rem;
-            margin: 30px 0 20px 0;
-            position: relative;
-            padding-left: 20px;
-            font-weight: 400;
+        .challenge::before {
+            content: '⚠';
+            color: #FF6B6B;
+            margin-right: 5px;
         }
 
-        .slide h3::before {
-            content: '▶';
-            position: absolute;
-            left: 0;
-            color: #13AA52;
-            font-size: 1.2rem;
-        }
-
-        .slide h4 {
-            color: #001E2B;
-            font-size: 1.5rem;
-            margin: 20px 0 15px 0;
-            font-weight: 500;
-        }
-
-        .slide p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 20px;
-            color: #343434;
-        }
-
+        /* Grid Layouts */
         .tech-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
         }
 
-        .tech-card {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
-            color: white;
-            padding: 30px;
+        .cloud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        /* Cards */
+        .tech-card,
+        .cloud-feature,
+        .enterprise-feature,
+        .ai-framework {
+            background: white;
             border-radius: 12px;
-            text-align: center;
-            transform: scale(1);
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.1);
+            border: 1px solid rgba(232, 245, 232, 0.5);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .tech-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .tech-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 104, 74, 0.3);
-        }
-
-        .tech-card:hover::before {
-            left: 100%;
+        .tech-card:hover,
+        .cloud-feature:hover,
+        .enterprise-feature:hover,
+        .ai-framework:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 30, 43, 0.15);
         }
 
         .mongodb-advantage {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
+            border-left: 4px solid #00ED64;
+            background: linear-gradient(135deg, rgba(232, 245, 232, 0.3) 0%, rgba(240, 255, 240, 0.1) 100%);
         }
 
         .postgres-feature {
-            background: linear-gradient(135deg, #336791 0%, #4a90e2 100%);
+            border-left: 4px solid #336791;
+            background: linear-gradient(135deg, rgba(232, 244, 248, 0.3) 0%, rgba(240, 248, 255, 0.1) 100%);
         }
 
-        .acid-highlight {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #001E2B;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-            border: 3px solid #13AA52;
-            text-align: center;
-            font-weight: bold;
+        .postgres-feature h4,
+        .postgres-feature h5 {
+            color: #336791;
         }
 
+        /* Code Blocks */
         .code-block {
-            background: #001E2B;
-            color: #13AA52;
-            padding: 25px;
+            background: #1a1a1a;
+            color: #f8f8f2;
+            padding: 24px;
             border-radius: 12px;
-            margin: 25px 0;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
             overflow-x: auto;
             position: relative;
-            border-left: 4px solid #13AA52;
+            border: 1px solid rgba(0, 104, 74, 0.2);
         }
 
         .code-block::before {
             content: attr(data-lang);
             position: absolute;
-            top: 10px;
-            right: 15px;
-            background: #13AA52;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            top: 8px;
+            right: 12px;
+            background: rgba(0, 237, 100, 0.2);
+            color: #00ED64;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Highlight Boxes */
+        .highlight-box,
+        .acid-highlight {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border: 2px solid #00ED64;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .highlight-box::before,
+        .acid-highlight::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 0 10px;
+            font-size: 20px;
+        }
+
+        .acid-highlight {
+            background: linear-gradient(135deg, #E8F8E8 0%, #F5FFF5 100%);
+        }
+
+        .acid-highlight h3 {
+            color: #00684A;
+            margin-bottom: 10px;
+        }
+
+        /* Performance Metrics */
         .benchmark-chart {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 2px solid #13AA52;
+            background: white;
             border-radius: 12px;
             padding: 30px;
             margin: 25px 0;
-            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.1);
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
         .metric-row {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
         }
 
         .metric {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 10px;
-            padding: 20px;
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
-            color: white;
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border: 2px solid #00ED64;
             border-radius: 12px;
-            min-width: 150px;
+            padding: 20px;
+            text-align: center;
             transition: transform 0.3s ease;
         }
 
         .metric:hover {
-            transform: translateY(-5px);
+            transform: scale(1.05);
         }
 
         .metric-value {
             font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 700;
+            color: #00684A;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .metric-label {
+            color: #001E2B;
+            font-weight: 600;
             font-size: 1rem;
-            opacity: 0.9;
         }
 
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 30px 0;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 30, 43, 0.1);
-        }
-
-        .comparison-table th {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
+        /* Security Badges */
+        .security-badge {
+            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
             color: white;
-            padding: 20px;
-            text-align: left;
-            font-size: 1.2rem;
-            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 104, 74, 0.3);
+            transition: transform 0.3s ease;
         }
 
-        .comparison-table td {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            font-size: 1.1rem;
+        .security-badge:hover {
+            transform: translateY(-2px);
         }
 
-        .comparison-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        .comparison-table tr:hover {
-            background: #e8f5e8;
-        }
-
-        .advantage {
-            background: linear-gradient(135d, #d4edda 0%, #c3e6cb 100%);
-            color: #00684A;
-            font-weight: bold;
-        }
-
-        .challenge {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            color: #721c24;
-        }
-
+        /* Architecture Diagrams */
         .architecture-diagram {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 2px dashed #13AA52;
+            background: white;
             border-radius: 12px;
             padding: 30px;
             margin: 25px 0;
             text-align: center;
-            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.1);
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
         .diagram-element {
             display: inline-block;
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
+            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
             color: white;
             padding: 15px 25px;
             margin: 10px;
-            border-radius: 8px;
-            position: relative;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0, 104, 74, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .diagram-element:hover {
+            transform: translateY(-3px);
         }
 
         .arrow {
-            font-size: 2rem;
-            color: #13AA52;
-            margin: 0 10px;
-        }
-
-        .highlight-box {
-            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-            border: 2px solid #13AA52;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .highlight-box::before {
-            content: '💡';
-            position: absolute;
-            top: -15px;
-            left: 20px;
-            background: #13AA52;
-            padding: 8px 12px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-        }
-
-        .highlight-box h4 {
+            font-size: 1.5rem;
             color: #00684A;
-            margin-bottom: 15px;
-            padding-left: 10px;
-            font-weight: 600;
+            margin: 0 10px;
+            vertical-align: middle;
         }
 
-        .highlight-box p {
-            color: #001E2B;
-            margin-bottom: 0;
-        }
-
-        .ai-showcase {
-            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-            border-radius: 12px;
-            padding: 30px;
-            margin: 25px 0;
-            border: 2px solid #13AA52;
-        }
-
-        .ai-framework {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border: 1px solid #13AA52;
-        }
-
-        .ai-framework h5 {
-            color: white;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .source-link {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px 5px 0 0;
-            transition: all 0.3s ease;
-        }
-
-        .source-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-
-        .expandable-section {
-            margin: 20px 0;
-            border: 2px solid #13AA52;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .expandable-header {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
-
-        .expandable-header:hover {
-            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
-        }
-
-        .expandable-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease;
-            background: #f8f9fa;
-        }
-
-        .expandable-content.expanded {
-            max-height: 2000px;
-        }
-
-        .expandable-inner {
-            padding: 20px;
-        }
-
+        /* Architecture Comparison */
         .architecture-comparison {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -484,356 +731,343 @@
             margin: 30px 0;
         }
 
-        .arch-column {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-            border: 2px solid #13AA52;
-        }
-
         .arch-column h4 {
-            color: #001E2B;
-            margin-bottom: 20px;
             text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #13AA52;
+            margin-bottom: 20px;
+            color: #001E2B;
+            font-size: 1.4rem;
         }
 
         .arch-layer {
-            background: white;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #13AA52;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .arch-layer.mongodb {
-            border-left-color: #13AA52;
-        }
-
-        .arch-layer.postgres {
-            border-left-color: #336791;
-        }
-
-        .advantage-badge {
-            background: #13AA52;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .vector-demo {
-            background: #001E2B;
-            color: #13AA52;
+            margin-bottom: 15px;
             padding: 20px;
-            border-radius: 8px;
-            font-family: monospace;
-            margin: 20px 0;
-            border: 2px solid #13AA52;
-        }
-
-        .performance-indicator {
-            display: inline-block;
-            background: linear-gradient(90deg, #13AA52, #00684A);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin: 5px;
-            font-size: 0.9rem;
-        }
-
-        .cloud-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .cloud-feature {
-            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-            border: 2px solid #13AA52;
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
+            border-radius: 10px;
+            position: relative;
             transition: transform 0.3s ease;
         }
 
-        .cloud-feature:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(19, 170, 82, 0.3);
+        .arch-layer:hover {
+            transform: translateX(5px);
         }
 
-        .security-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #001E2B 0%, #00684A 100%);
+        .arch-layer.mongodb {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(19, 170, 82, 0.05) 100%);
+            border-left: 4px solid #00ED64;
+        }
+
+        .arch-layer.postgres {
+            background: linear-gradient(135deg, rgba(51, 103, 145, 0.1) 0%, rgba(51, 103, 145, 0.05) 100%);
+            border-left: 4px solid #336791;
+        }
+
+        .advantage-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #00ED64;
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Expandable Sections */
+        .expandable-section {
+            margin: 30px 0;
+            border: 1px solid rgba(0, 104, 74, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
+        }
+
+        .expandable-header {
+            background: linear-gradient(135deg, #F0FFF0 0%, #E8F5E8 100%);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #00684A;
+            transition: background-color 0.3s ease;
+        }
+
+        .expandable-header:hover {
+            background: linear-gradient(135deg, #E8F5E8 0%, #D0F0D0 100%);
+        }
+
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .expandable-content.expanded {
+            max-height: 2000px;
+        }
+
+        .expandable-inner {
+            padding: 30px;
+            background: white;
+        }
+
+        /* Source Links */
+        .source-link {
+            color: #00684A;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 15px;
             font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
 
-        .enterprise-feature {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
+        .source-link:hover {
+            color: #00ED64;
+            text-decoration: underline;
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-button {
+            background: rgba(0, 104, 74, 0.9);
             color: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 15px 0;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
-        .enterprise-feature h5 {
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            font-weight: 500;
+        .nav-button:hover {
+            background: #00ED64;
+            transform: translateY(-2px);
         }
 
-        .migration-tool {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #001E2B;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-            border: 2px solid #13AA52;
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .presentation-container {
+                padding: 30px;
+                padding-left: 100px;
+            }
         }
 
         @media (max-width: 768px) {
+            .presentation-container {
+                padding: 20px;
+                padding-left: 80px;
+            }
+
+            .slide {
+                padding: 20px;
+                margin: 15px 0;
+            }
+
+            .title-slide h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
             .tech-grid,
             .cloud-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .slide h1 {
-                font-size: 2.5rem;
-            }
-            
-            .slide h2 {
-                font-size: 2rem;
+
+            .architecture-comparison {
+                grid-template-columns: 1fr;
             }
 
             .metric-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+
+            .nav-menu {
+                width: 280px;
+                left: -280px;
+            }
+
+            .navigation {
+                bottom: 10px;
+                right: 10px;
                 flex-direction: column;
-                align-items: center;
+            }
+
+            .menu-toggle {
+                top: 20px;
+                left: 20px;
+                padding: 12px;
+                font-size: 1.2rem;
             }
         }
 
-        .navigation {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
+        @media (max-width: 480px) {
+            .presentation-container {
+                padding: 15px;
+                padding-left: 70px;
+            }
+
+            .metric-row {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: 16px;
+            }
+
+            .tech-card,
+            .cloud-feature,
+            .enterprise-feature,
+            .ai-framework {
+                padding: 16px;
+            }
+
+            .nav-menu {
+                width: 250px;
+                left: -250px;
+            }
         }
 
-        .nav-button {
-            background: linear-gradient(135deg, #13AA52 0%, #00684A 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin: 5px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .slide {
+                background: white;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .nav-menu,
+            .menu-toggle,
+            .navigation {
+                display: none;
+            }
+
+            .presentation-container {
+                padding: 0;
+            }
+
+            .expandable-content {
+                max-height: none;
+                overflow: visible;
+            }
         }
 
-        .nav-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(19, 170, 82, 0.4);
+        /* Scroll Animations */
+        .slide {
+            scroll-margin-top: 100px;
         }
 
-        .nav-menu {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 237, 100, 0.2);
-            z-index: 1000;
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .nav-menu h2 {
-            margin-bottom: 25px;
-            color: #00684A;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #00ED64;
-            font-size: 1.4em;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-menu ul {
-            list-style: none;
-        }
-
-        .nav-menu li {
-            margin-bottom: 12px;
-        }
-
-        .nav-menu a {
-            display: block;
-            padding: 12px 18px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            font-weight: 500;
-        }
-
-        .nav-menu a:hover, .nav-menu a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 4px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-accordion {
-            margin-bottom: 8px;
-        }
-
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-category-header:hover {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
-            transform: translateX(4px);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8em;
-            color: #00684A;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 300px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 8px;
-            margin-left: 15px;
-        }
-
-        .nav-accordion-content a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .nav-accordion-content a:hover, .nav-accordion-content a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 3px solid #00ED64;
-            transform: translateX(6px);
-            color: #00684A;
-            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
-        }
-
-        .presentation-container {
-            margin-left: 300px;
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
         }
     </style>
 </head>
 <body>
-    <div class="nav-menu" id="navMenu">
+    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
+        ☰
+    </button>
+    
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+
+    <nav class="nav-menu" id="navMenu" role="navigation">
         <h2>MongoDB vs SQL</h2>
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')">
+                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
                     <span>Competition</span>
                     <span class="accordion-icon" id="competition-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="competition-content">
+                <ul class="nav-accordion-content" id="competition-content" role="region">
                     <li><a href="mongodb_vs_postgres_presentation.html">🍃 MongoDB vs PostgreSQL</a></li>
                     <li><a href="mongodb_postgres_technical_presentation.html" class="active">🔬 Postgres Technical Comparison</a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
                     <span>Architecture & Performance</span>
                     <span class="accordion-icon" id="architecture-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="architecture-content">
+                <ul class="nav-accordion-content" id="architecture-content" role="region">
                     <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
                     <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')">
+                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
                     <span>Application Development</span>
                     <span class="accordion-icon" id="development-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="development-content">
-                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+                <ul class="nav-accordion-content" id="development-content" role="region">
+                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>
                     <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
                     <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
                     <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
                 </ul>
             </li>
         </ul>
-    </div>
-    <div class="presentation-container">
+    </nav>
+
+    <main class="presentation-container">
         
         <!-- Title Slide -->
-        <div class="slide title-slide">
-            <div class="mongodb-logo">🍃</div>
+        <section class="slide title-slide">
+            <div class="mongodb-logo logo-large">
+                <span class="mongodb-logo-icon" aria-label="MongoDB Logo"></span>
+            </div>
             <h1>MongoDB vs PostgreSQL</h1>
             <p class="subtitle">Technical Architecture Deep Dive for Enterprise Decision Makers</p>
-            <p style="margin-top: 30px; font-size: 1.2rem;">Comprehensive Analysis: Core Capabilities • AI Integration • Cloud-Native Architecture</p>
-        </div>
+            <p style="margin-top: 30px; font-size: 1.2rem; z-index: 1; position: relative;">
+                Comprehensive Analysis: Core Capabilities • AI Integration • Cloud-Native Architecture
+            </p>
+        </section>
 
         <!-- Executive Overview -->
-        <div class="slide">
+        <section class="slide">
             <h2>🎯 Executive Overview</h2>
             <p>Modern applications demand databases that can handle complex data structures, scale horizontally, integrate with AI/ML pipelines, and deploy seamlessly in cloud-native environments.</p>
             
@@ -860,10 +1094,10 @@
                 <h4>Key Decision Factors</h4>
                 <p>Technical architects should evaluate: Performance at scale, developer productivity, operational complexity, AI integration readiness, and cloud-native architecture support.</p>
             </div>
-        </div>
+        </section>
 
         <!-- ACID Compliance Highlight -->
-        <div class="slide">
+        <section class="slide">
             <h2>🔒 ACID Compliance & Transactions</h2>
             
             <div class="acid-highlight">
@@ -936,10 +1170,10 @@ result = collection.insert_one(
                 <h4>Enterprise Readiness</h4>
                 <p>MongoDB's ACID compliance makes it suitable for financial services, healthcare, e-commerce, and any mission-critical application requiring transactional integrity - while maintaining the flexibility and performance advantages of the document model.</p>
             </div>
-        </div>
+        </section>
 
         <!-- Core Database Architecture -->
-        <div class="slide">
+        <section class="slide">
             <h2>🏗️ Core Database Architecture Comparison</h2>
             
             <h3>Storage Engine & Data Model</h3>
@@ -948,8 +1182,8 @@ result = collection.insert_one(
                 <thead>
                     <tr>
                         <th>Architecture Aspect</th>
-                        <th>MongoDB (WiredTiger)</th>
-                        <th>PostgreSQL (Heap-based)</th>
+                        <th><span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB (WiredTiger)</th>
+                        <th><span class="postgresql-logo-icon" aria-hidden="true"></span>PostgreSQL (Heap-based)</th>
                         <th>Impact</th>
                     </tr>
                 </thead>
@@ -981,7 +1215,7 @@ result = collection.insert_one(
                 </tbody>
             </table>
 
-            <div class="code-block" data-lang="MongoDB">
+            <div class="code-block" data-lang="MongoDB Aggregation">
 // MongoDB: Complex nested query with aggregation
 db.customers.aggregate([
   { $match: { "address.country": "USA" } },
@@ -996,7 +1230,7 @@ db.customers.aggregate([
 ]);
             </div>
 
-            <div class="code-block" data-lang="PostgreSQL">
+            <div class="code-block" data-lang="PostgreSQL SQL">
 -- PostgreSQL: Equivalent query requires multiple JOINs
 SELECT c.id, SUM(o.amount) as total_spent, AVG(o.amount) as avg_order
 FROM customers c
@@ -1009,7 +1243,7 @@ ORDER BY total_spent DESC;
             </div>
 
             <div class="expandable-section">
-                <div class="expandable-header" onclick="toggleExpandable('detailed-architecture')">
+                <div class="expandable-header" onclick="toggleExpandable('detailed-architecture')" role="button" tabindex="0">
                     <span>🏗️ Detailed Architecture Comparison</span>
                     <span>▼</span>
                 </div>
@@ -1017,7 +1251,7 @@ ORDER BY total_spent DESC;
                     <div class="expandable-inner">
                         <div class="architecture-comparison">
                             <div class="arch-column">
-                                <h4>MongoDB Architecture</h4>
+                                <h4><span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB Architecture</h4>
                                 <div class="arch-layer mongodb">
                                     <strong>Application Layer</strong>
                                     <p>Direct object mapping, no ORM overhead</p>
@@ -1046,7 +1280,7 @@ ORDER BY total_spent DESC;
                             </div>
                             
                             <div class="arch-column">
-                                <h4>PostgreSQL Architecture</h4>
+                                <h4><span class="postgresql-logo-icon" aria-hidden="true"></span>PostgreSQL Architecture</h4>
                                 <div class="arch-layer postgres">
                                     <strong>Application Layer</strong>
                                     <p>ORM required, object-relational mapping overhead</p>
@@ -1076,17 +1310,17 @@ ORDER BY total_spent DESC;
                         </div>
                         
                         <p><em>Sources: </em>
-                            <a href="#" class="source-link" onclick="showSource('MongoDB Architecture Guide: https://docs.mongodb.com/manual/core/architecture/')">MongoDB Architecture Guide</a>
-                            <a href="#" class="source-link" onclick="showSource('PostgreSQL Internals: https://www.postgresql.org/docs/current/overview.html')">PostgreSQL Internals</a>
-                            <a href="#" class="source-link" onclick="showSource('Performance Benchmarks: Internal MongoDB Labs, Q4 2024')">Performance Study</a>
+                            <a href="#" class="source-link" onclick="showSource('MongoDB Architecture Guide: Official MongoDB documentation covering core architecture principles and storage engine design.')">MongoDB Architecture Guide</a>
+                            <a href="#" class="source-link" onclick="showSource('PostgreSQL Internals: Official PostgreSQL documentation on system architecture and internal processes.')">PostgreSQL Internals</a>
+                            <a href="#" class="source-link" onclick="showSource('Performance Benchmarks: Internal MongoDB Labs performance studies conducted in Q4 2024.')">Performance Study</a>
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Performance Benchmarks -->
-        <div class="slide">
+        <section class="slide">
             <h2>⚡ Performance Analysis</h2>
             
             <div class="benchmark-chart">
@@ -1135,10 +1369,10 @@ ORDER BY total_spent DESC;
                 <h4>Performance Insight</h4>
                 <p>MongoDB's document model eliminates JOIN operations that become exponentially expensive at scale. For applications with complex, nested data structures, this architectural advantage translates to 2-5x performance improvements.</p>
             </div>
-        </div>
+        </section>
 
         <!-- Horizontal Scaling Architecture -->
-        <div class="slide">
+        <section class="slide">
             <h2>📈 Horizontal Scaling Deep Dive</h2>
             
             <div class="architecture-diagram">
@@ -1204,7 +1438,7 @@ ORDER BY total_spent DESC;
             </div>
 
             <div class="expandable-section">
-                <div class="expandable-header" onclick="toggleExpandable('scaling-case-studies')">
+                <div class="expandable-header" onclick="toggleExpandable('scaling-case-studies')" role="button" tabindex="0">
                     <span>📈 Real-World Scaling Case Studies</span>
                     <span>▼</span>
                 </div>
@@ -1230,16 +1464,16 @@ ORDER BY total_spent DESC;
                             </div>
                         </div>
                         <p><em>Sources: </em>
-                            <a href="#" class="source-link" onclick="showSource('MongoDB World 2024: Customer presentations and case studies')">MongoDB World 2024</a>
-                            <a href="#" class="source-link" onclick="showSource('Engineering Blogs: Public technical talks and scaling stories')">Engineering Blogs</a>
+                            <a href="#" class="source-link" onclick="showSource('MongoDB World 2024: Customer presentations and case studies from major enterprises.')">MongoDB World 2024</a>
+                            <a href="#" class="source-link" onclick="showSource('Engineering Blogs: Public technical talks and scaling stories from MongoDB users.')">Engineering Blogs</a>
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- AI & Vector Search Capabilities -->
-        <div class="slide">
+        <section class="slide">
             <h2>🤖 AI Framework Integration & Vector Search</h2>
             
             <div class="ai-showcase">
@@ -1252,8 +1486,8 @@ ORDER BY total_spent DESC;
                         <p>• Semantic caching for LLM responses</p>
                         <p>• Document loaders and memory stores</p>
                         <p>• RAG pattern implementations</p>
-                        <a href="#" class="source-link" onclick="showSource('LangChain Documentation: https://python.langchain.com/docs/integrations/vectorstores/mongodb_atlas')">📚 LangChain Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('MongoDB LangChain Guide: https://www.mongodb.com/docs/atlas/atlas-vector-search/ai-integrations/langchain/')">🔗 MongoDB Integration</a>
+                        <a href="#" class="source-link" onclick="showSource('LangChain Documentation: Official integration documentation for MongoDB vector store capabilities.')">📚 LangChain Docs</a>
+                        <a href="#" class="source-link" onclick="showSource('MongoDB LangChain Guide: Comprehensive guide for using MongoDB with LangChain framework.')">🔗 MongoDB Integration</a>
                     </div>
                     <div class="ai-framework">
                         <h5>🔍 LlamaIndex Support</h5>
@@ -1261,8 +1495,8 @@ ORDER BY total_spent DESC;
                         <p>• Vector and keyword search</p>
                         <p>• Metadata filtering</p>
                         <p>• Hierarchical document storage</p>
-                        <a href="#" class="source-link" onclick="showSource('LlamaIndex Documentation: https://docs.llamaindex.ai/en/stable/examples/vector_stores/MongoDBAtlasVectorSearch.html')">📚 LlamaIndex Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('MongoDB LlamaIndex Guide: https://www.mongodb.com/docs/atlas/atlas-vector-search/ai-integrations/llamaindex/')">🔗 MongoDB Guide</a>
+                        <a href="#" class="source-link" onclick="showSource('LlamaIndex Documentation: Official MongoDB integration guide for LlamaIndex framework.')">📚 LlamaIndex Docs</a>
+                        <a href="#" class="source-link" onclick="showSource('MongoDB LlamaIndex Guide: Step-by-step guide for MongoDB Atlas vector search with LlamaIndex.')">🔗 MongoDB Guide</a>
                     </div>
                     <div class="ai-framework">
                         <h5>🧠 Haystack Framework</h5>
@@ -1270,8 +1504,8 @@ ORDER BY total_spent DESC;
                         <p>• Hybrid retrieval pipelines</p>
                         <p>• Question answering systems</p>
                         <p>• Semantic search capabilities</p>
-                        <a href="#" class="source-link" onclick="showSource('Haystack Documentation: https://docs.haystack.deepset.ai/docs/document_store#mongodbatlasstore')">📚 Haystack Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('MongoDB Haystack Integration: https://www.mongodb.com/docs/atlas/atlas-vector-search/ai-integrations/haystack/')">🔗 MongoDB Integration</a>
+                        <a href="#" class="source-link" onclick="showSource('Haystack Documentation: Official documentation for MongoDB Atlas integration with Haystack.')">📚 Haystack Docs</a>
+                        <a href="#" class="source-link" onclick="showSource('MongoDB Haystack Integration: Complete integration guide for using MongoDB with Haystack framework.')">🔗 MongoDB Integration</a>
                     </div>
                     <div class="ai-framework">
                         <h5>⚡ AutoGen & Crew AI</h5>
@@ -1279,13 +1513,13 @@ ORDER BY total_spent DESC;
                         <p>• Tool call and response logging</p>
                         <p>• Agent memory persistence</p>
                         <p>• Workflow state management</p>
-                        <a href="#" class="source-link" onclick="showSource('AutoGen Documentation: https://microsoft.github.io/autogen/')">📚 AutoGen Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('Crew AI Documentation: https://docs.crewai.com/')">📚 Crew AI Docs</a>
+                        <a href="#" class="source-link" onclick="showSource('AutoGen Documentation: Microsoft AutoGen framework for multi-agent conversations.')">📚 AutoGen Docs</a>
+                        <a href="#" class="source-link" onclick="showSource('Crew AI Documentation: Official Crew AI framework documentation and examples.')">📚 Crew AI Docs</a>
                     </div>
                 </div>
 
                 <div class="expandable-section">
-                    <div class="expandable-header" onclick="toggleExpandable('ai-benchmarks')">
+                    <div class="expandable-header" onclick="toggleExpandable('ai-benchmarks')" role="button" tabindex="0">
                         <span>📊 AI Framework Performance Benchmarks</span>
                         <span>▼</span>
                     </div>
@@ -1293,11 +1527,15 @@ ORDER BY total_spent DESC;
                         <div class="expandable-inner">
                             <h5>LangChain + MongoDB vs PostgreSQL Performance</h5>
                             <table class="comparison-table">
-                                <tr><th>Metric</th><th>MongoDB</th><th>PostgreSQL + pgvector</th></tr>
-                                <tr><td>RAG Query Latency</td><td class="advantage">12ms</td><td>45ms</td></tr>
-                                <tr><td>Vector Index Build Time</td><td class="advantage">2.3 min (1M vectors)</td><td>8.7 min (1M vectors)</td></tr>
-                                <tr><td>Hybrid Search QPS</td><td class="advantage">50K</td><td>15K</td></tr>
-                                <tr><td>Memory Usage</td><td class="advantage">40% less</td><td>Baseline</td></tr>
+                                <thead>
+                                    <tr><th>Metric</th><th>MongoDB</th><th>PostgreSQL + pgvector</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>RAG Query Latency</td><td class="advantage">12ms</td><td>45ms</td></tr>
+                                    <tr><td>Vector Index Build Time</td><td class="advantage">2.3 min (1M vectors)</td><td>8.7 min (1M vectors)</td></tr>
+                                    <tr><td>Hybrid Search QPS</td><td class="advantage">50K</td><td>15K</td></tr>
+                                    <tr><td>Memory Usage</td><td class="advantage">40% less</td><td>Baseline</td></tr>
+                                </tbody>
                             </table>
                             <p><em>Source: Internal MongoDB benchmarks, December 2024</em></p>
                         </div>
@@ -1305,7 +1543,7 @@ ORDER BY total_spent DESC;
                 </div>
             </div>
 
-            <div class="vector-demo">
+            <div class="code-block" data-lang="LangChain + MongoDB">
 # LangChain + MongoDB Vector Search Example
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 from langchain.embeddings import OpenAIEmbeddings
@@ -1385,10 +1623,10 @@ docs = vector_store.similarity_search_with_score(
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Migration with Relational Migrator -->
-        <div class="slide">
+        <section class="slide">
             <h2>🔄 Enterprise Migration Strategy</h2>
             
             <div class="migration-tool">
@@ -1427,7 +1665,7 @@ docs = vector_store.similarity_search_with_score(
                 </div>
             </div>
 
-            <div class="code-block" data-lang="Relational Migrator">
+            <div class="code-block" data-lang="Schema Transformation">
 // Relational Migrator - Schema Transformation Example
 // PostgreSQL normalized structure
 Table: customers (id, name, email)
@@ -1474,7 +1712,7 @@ Table: orders (id, customer_id, amount, date)
             </div>
 
             <div class="expandable-section">
-                <div class="expandable-header" onclick="toggleExpandable('migration-details')">
+                <div class="expandable-header" onclick="toggleExpandable('migration-details')" role="button" tabindex="0">
                     <span>🔧 Relational Migrator Technical Deep Dive</span>
                     <span>▼</span>
                 </div>
@@ -1482,15 +1720,19 @@ Table: orders (id, customer_id, amount, date)
                     <div class="expandable-inner">
                         <h5>Advanced Migration Features</h5>
                         <table class="comparison-table">
-                            <tr><th>Feature</th><th>Capability</th><th>Benefit</th></tr>
-                            <tr><td><strong>Schema Analysis</strong></td><td>Automatic relationship detection</td><td>Reduces planning time by 60%</td></tr>
-                            <tr><td><strong>Data Transformation</strong></td><td>Custom mapping rules + validation</td><td>Ensures data integrity</td></tr>
-                            <tr><td><strong>Code Generation</strong></td><td>Java, .NET, Node.js, Python</td><td>90% code automation</td></tr>
-                            <tr><td><strong>Live Sync</strong></td><td>Change stream integration</td><td>Zero-downtime migrations</td></tr>
-                            <tr><td><strong>Rollback</strong></td><td>Bidirectional synchronization</td><td>Risk mitigation</td></tr>
+                            <thead>
+                                <tr><th>Feature</th><th>Capability</th><th>Benefit</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Schema Analysis</strong></td><td>Automatic relationship detection</td><td>Reduces planning time by 60%</td></tr>
+                                <tr><td><strong>Data Transformation</strong></td><td>Custom mapping rules + validation</td><td>Ensures data integrity</td></tr>
+                                <tr><td><strong>Code Generation</strong></td><td>Java, .NET, Node.js, Python</td><td>90% code automation</td></tr>
+                                <tr><td><strong>Live Sync</strong></td><td>Change stream integration</td><td>Zero-downtime migrations</td></tr>
+                                <tr><td><strong>Rollback</strong></td><td>Bidirectional synchronization</td><td>Risk mitigation</td></tr>
+                            </tbody>
                         </table>
                         
-                        <div class="code-block" data-lang="Generated Migration Code">
+                        <div class="code-block" data-lang="Generated Java Code">
 // Auto-generated MongoDB Java code from PostgreSQL
 @Document(collection = "customers")
 public class Customer {
@@ -1515,17 +1757,17 @@ public class Customer {
                         </div>
                         
                         <p><em>Sources: </em>
-                            <a href="#" class="source-link" onclick="showSource('MongoDB Relational Migrator Documentation: https://docs.mongodb.com/relational-migrator/')">Relational Migrator Docs</a>
-                            <a href="#" class="source-link" onclick="showSource('Migration success stories and customer case studies')">Customer Case Studies</a>
-                            <a href="#" class="source-link" onclick="showSource('Download Relational Migrator: https://www.mongodb.com/products/relational-migrator')">Download Tool</a>
+                            <a href="#" class="source-link" onclick="showSource('MongoDB Relational Migrator Documentation: Comprehensive guide for database migration from relational to MongoDB.')">Relational Migrator Docs</a>
+                            <a href="#" class="source-link" onclick="showSource('Migration success stories and customer case studies from enterprise MongoDB adoptions.')">Customer Case Studies</a>
+                            <a href="#" class="source-link" onclick="showSource('Download Relational Migrator: Free tool for PostgreSQL to MongoDB migration.')">Download Tool</a>
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Cloud-Native Architecture -->
-        <div class="slide">
+        <section class="slide">
             <h2>☁️ Cloud-Native Architecture Excellence</h2>
             
             <h3>Multi-Cloud & Serverless Deployment</h3>
@@ -1593,7 +1835,7 @@ public class Customer {
                 </table>
             </div>
 
-            <div class="code-block" data-lang="Terraform">
+            <div class="code-block" data-lang="Terraform Infrastructure">
 # MongoDB Atlas infrastructure as code
 resource "mongodbatlas_cluster" "production" {
   project_id   = var.project_id
@@ -1624,10 +1866,10 @@ resource "mongodbatlas_cluster" "production" {
   auto_scaling_compute_scale_down_enabled = true
 }
             </div>
-        </div>
+        </section>
 
         <!-- Enterprise Security & Compliance -->
-        <div class="slide">
+        <section class="slide">
             <h2>🔒 Enterprise Security & Compliance</h2>
             
             <h3>Security Features Comparison</h3>
@@ -1655,7 +1897,7 @@ resource "mongodbatlas_cluster" "production" {
                 <p>MongoDB's Queryable Encryption allows searching encrypted data without decryption on the server side, maintaining performance while ensuring compliance with regulations like GDPR, HIPAA, and SOX.</p>
             </div>
 
-            <div class="code-block" data-lang="MongoDB CSFLE">
+            <div class="code-block" data-lang="MongoDB Encryption">
 // Client-Side Field Level Encryption
 const clientEncryption = new ClientEncryption(keyVault, kmsProviders);
 
@@ -1687,10 +1929,10 @@ db.patients.insertOne({
                     <div class="security-badge">PCI DSS</div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Total Cost of Ownership -->
-        <div class="slide">
+        <section class="slide">
             <h2>💰 Total Cost of Ownership Analysis</h2>
             
             <div class="benchmark-chart">
@@ -1764,10 +2006,10 @@ db.patients.insertOne({
                 <h4>ROI Insight</h4>
                 <p>Organizations typically see 300-400% ROI within 18 months when migrating from PostgreSQL to MongoDB for modern application workloads, primarily driven by reduced development time, operational overhead, and migration costs.</p>
             </div>
-        </div>
+        </section>
 
         <!-- Conclusion & Next Steps -->
-        <div class="slide">
+        <section class="slide">
             <h2>🎯 Executive Summary & Recommendations</h2>
             
             <div class="highlight-box">
@@ -1806,17 +2048,19 @@ db.patients.insertOne({
             <h3>Recommended Next Steps</h3>
             <div class="enterprise-feature">
                 <h5>🚀 Immediate Actions</h5>
-                <p>1. **Proof of Concept**: 30-day MongoDB Atlas trial with vector search for your AI use cases</p>
-                <p>2. **Architecture Review**: Technical deep-dive with MongoDB solutions architects</p>
-                <p>3. **Migration Assessment**: Relational Migrator evaluation of your PostgreSQL schemas</p>
-                <p>4. **AI Workshop**: Hands-on session with LangChain + MongoDB integration</p>
-                <p>5. **Cost Analysis**: Detailed TCO modeling for your specific requirements</p>
-                <p>6. **Team Training**: MongoDB University certification for development teams</p>
+                <ol style="text-align: left; padding-left: 20px;">
+                    <li><strong>Proof of Concept</strong>: 30-day MongoDB Atlas trial with vector search for your AI use cases</li>
+                    <li><strong>Architecture Review</strong>: Technical deep-dive with MongoDB solutions architects</li>
+                    <li><strong>Migration Assessment</strong>: Relational Migrator evaluation of your PostgreSQL schemas</li>
+                    <li><strong>AI Workshop</strong>: Hands-on session with LangChain + MongoDB integration</li>
+                    <li><strong>Cost Analysis</strong>: Detailed TCO modeling for your specific requirements</li>
+                    <li><strong>Team Training</strong>: MongoDB University certification for development teams</li>
+                </ol>
             </div>
 
             <div class="benchmark-chart">
                 <h4>Questions for Your Technical Evaluation</h4>
-                <div style="text-align: left; padding: 20px;">
+                <div style="text-align: left; padding: 20px; line-height: 1.8;">
                     <p><strong>📊 Data Model:</strong> How complex are your nested data structures?</p>
                     <p><strong>📈 Scale:</strong> What are your 3-year growth projections?</p>
                     <p><strong>🤖 AI Strategy:</strong> Are you planning AI/ML integration with vector search?</p>
@@ -1826,17 +2070,45 @@ db.patients.insertOne({
                     <p><strong>👥 Team:</strong> Developer productivity and time-to-market priorities?</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-    </div>
+    </main>
 
-    <div class="navigation">
-        <button class="nav-button" onclick="scrollToTop()">↑ Top</button>
-        <button class="nav-button" onclick="scrollToSection('detailed-architecture')">🏗️ Architecture</button>
-        <button class="nav-button" onclick="window.print()">🖨️ Print</button>
-    </div>
+    <nav class="navigation" aria-label="Presentation navigation">
+        <button class="nav-button" onclick="scrollToTop()" aria-label="Scroll to top">↑ Top</button>
+        <button class="nav-button" onclick="scrollToSection('detailed-architecture')" aria-label="Go to architecture section">🏗️ Architecture</button>
+        <button class="nav-button" onclick="window.print()" aria-label="Print presentation">🖨️ Print</button>
+    </nav>
 
     <script>
+        // Navigation Functions
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.toggle('open');
+            backdrop.classList.toggle('active');
+            toggleBtn.classList.toggle('menu-open');
+            
+            // Update ARIA attributes
+            const isOpen = navMenu.classList.contains('open');
+            toggleBtn.setAttribute('aria-expanded', isOpen);
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            toggleBtn.classList.remove('menu-open');
+            
+            // Update ARIA attributes
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1847,7 +2119,7 @@ db.patients.insertOne({
                 if (!section.classList.contains('expanded')) {
                     toggleExpandable(sectionId);
                 }
-                setTimeout(function() {
+                setTimeout(() => {
                     section.scrollIntoView({ 
                         behavior: 'smooth', 
                         block: 'start' 
@@ -1856,6 +2128,7 @@ db.patients.insertOne({
             }
         }
 
+        // Expandable Section Functions
         function toggleExpandable(id) {
             const content = document.getElementById(id);
             const header = content.previousElementSibling;
@@ -1868,7 +2141,7 @@ db.patients.insertOne({
                 content.classList.add('expanded');
                 arrow.textContent = '▲';
                 
-                setTimeout(function() {
+                setTimeout(() => {
                     content.scrollIntoView({ 
                         behavior: 'smooth', 
                         block: 'nearest' 
@@ -1877,86 +2150,233 @@ db.patients.insertOne({
             }
         }
 
+        // Accordion Functions
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // Source Modal Function
         function showSource(sourceInfo) {
             const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 43, 0.9); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px);';
+            modal.style.cssText = `
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%; 
+                background: rgba(0, 30, 43, 0.9); 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                z-index: 10000; 
+                backdrop-filter: blur(5px);
+            `;
             
             const content = document.createElement('div');
-            content.style.cssText = 'background: white; padding: 30px; border-radius: 15px; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);';
+            content.style.cssText = `
+                background: white; 
+                padding: 30px; 
+                border-radius: 15px; 
+                max-width: 600px; 
+                max-height: 80vh; 
+                overflow-y: auto; 
+                position: relative; 
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            `;
             
-            content.innerHTML = '<button onclick="this.closest(\'div[style*=\"position: fixed\"]\').remove()" style="position: absolute; top: 15px; right: 20px; background: #13AA52; color: white; border: none; padding: 8px 12px; border-radius: 50%; cursor: pointer; font-weight: bold;">✕</button><h3 style="color: #001E2B; margin-bottom: 20px;">📚 Source Information</h3><p style="color: #333; line-height: 1.6; font-size: 1.1rem;">' + sourceInfo + '</p><div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #13AA52;"><p style="color: #666; font-size: 0.9rem;"><em>Note: Links are for reference - please access through official documentation sites.</em></p></div>';
+            content.innerHTML = `
+                <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" 
+                        style="position: absolute; top: 15px; right: 20px; background: #13AA52; color: white; border: none; padding: 8px 12px; border-radius: 50%; cursor: pointer; font-weight: bold;" 
+                        aria-label="Close modal">✕</button>
+                <h3 style="color: #001E2B; margin-bottom: 20px;">📚 Source Information</h3>
+                <p style="color: #333; line-height: 1.6; font-size: 1.1rem;">${sourceInfo}</p>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #13AA52;">
+                    <p style="color: #666; font-size: 0.9rem;">
+                        <em>Note: Links are for reference - please access through official documentation sites.</em>
+                    </p>
+                </div>
+            `;
             
             modal.appendChild(content);
             document.body.appendChild(modal);
             
-            modal.addEventListener('click', function(e) {
+            modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.remove();
                 }
             });
+
+            // ESC key to close modal
+            const handleEsc = (e) => {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', handleEsc);
+                }
+            };
+            document.addEventListener('keydown', handleEsc);
         }
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationPlayState = 'running';
-                    
-                    const metrics = entry.target.querySelectorAll('.metric');
-                    metrics.forEach(function(metric, index) {
-                        setTimeout(function() {
-                            metric.style.transform = 'scale(1.1)';
-                            setTimeout(function() {
-                                metric.style.transform = 'scale(1)';
-                            }, 200);
-                        }, index * 100);
+        // Initialize Functions
+        function initializeAccordion() {
+            const content = document.getElementById('competition-content');
+            const icon = document.getElementById('competition-icon');
+            const header = content ? content.previousElementSibling : null;
+            
+            if (content && icon && header) {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // Intersection Observer for animations
+        function initializeAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        
+                        const metrics = entry.target.querySelectorAll('.metric');
+                        metrics.forEach((metric, index) => {
+                            setTimeout(() => {
+                                metric.style.transform = 'scale(1.1)';
+                                setTimeout(() => {
+                                    metric.style.transform = 'scale(1)';
+                                }, 200);
+                            }, index * 100);
+                        });
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            document.querySelectorAll('.slide').forEach((slide) => {
+                observer.observe(slide);
+            });
+        }
+
+        // Card Interaction Effects
+        function initializeCardEffects() {
+            document.querySelectorAll('.tech-card, .cloud-feature, .enterprise-feature, .ai-framework').forEach((card) => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.02) translateY(-4px)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+        }
+
+        // Keyboard Navigation
+        function initializeKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                // Alt + M to toggle menu
+                if (e.altKey && e.key === 'm') {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                }
+                
+                // Escape to close menu
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+                
+                // Alt + T to scroll to top
+                if (e.altKey && e.key === 't') {
+                    e.preventDefault();
+                    scrollToTop();
+                }
+                
+                // Enter and Space for accordion headers
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('nav-category-header')) {
+                    e.preventDefault();
+                    const categoryId = e.target.onclick.toString().match(/'([^']+)'/)[1];
+                    toggleAccordion(categoryId);
+                }
+            });
+        }
+
+        // Close nav menu when clicking outside
+        function initializeOutsideClickHandler() {
+            document.addEventListener('click', (e) => {
+                const navMenu = document.getElementById('navMenu');
+                const menuToggle = document.getElementById('menuToggle');
+                
+                // Close menu if clicking outside
+                if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+        }
+
+        // Navigation link click handler for mobile
+        function initializeNavLinkHandlers() {
+            const navLinks = document.querySelectorAll('.nav-menu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 1024) {
+                        setTimeout(() => {
+                            closeMobileMenu();
+                        }, 100);
+                    }
+                });
+            });
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAccordion();
+            initializeAnimations();
+            initializeCardEffects();
+            initializeKeyboardNavigation();
+            initializeOutsideClickHandler();
+            initializeNavLinkHandlers();
+            
+            console.log('MongoDB vs PostgreSQL Technical Presentation Loaded - Enhanced Version');
+            console.log('Slide count:', document.querySelectorAll('.slide').length);
+            console.log('Use Alt+M to toggle menu, ESC to close menu, Alt+T to scroll to top');
+        });
+
+        // Handle window resize for responsive design
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                closeMobileMenu();
+            }
+        });
+
+        // Smooth scroll behavior for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
                     });
                 }
             });
         });
 
-        document.querySelectorAll('.slide').forEach(function(slide) {
-            observer.observe(slide);
-        });
-
-        document.querySelectorAll('.tech-card').forEach(function(card) {
-            card.addEventListener('click', function() {
-                this.style.transform = 'scale(1.1) rotateY(5deg)';
-                setTimeout(function() {
-                    card.style.transform = 'scale(1.05)';
-                }, 200);
+        // Add loading state management
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.loading').forEach(el => {
+                el.classList.remove('loading');
             });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('MongoDB vs PostgreSQL Technical Presentation Loaded - MongoDB Template');
-            console.log('Slide count:', document.querySelectorAll('.slide').length);
-        });
-
-        // Accordion functionality
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-            }
-        }
-
-        // Initialize accordion - expand competition category for this page
-        function initializeAccordion() {
-            const content = document.getElementById('competition-content');
-            const icon = document.getElementById('competition-icon');
-            content.classList.add('expanded');
-            icon.classList.add('rotated');
-        }
-
-        // Initialize on page load
-        window.addEventListener('load', function() {
-            initializeAccordion();
         });
     </script>
 </body>

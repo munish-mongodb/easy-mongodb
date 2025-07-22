@@ -763,7 +763,7 @@
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
     
     <div class="nav-menu" id="navMenu">
-        <h2>MongoDB vs SQL</h2>
+        <h2>MongoDB vs PostgreSQL</h2>
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
@@ -886,7 +886,7 @@
             <!-- MongoDB Side -->
             <div class="side mongodb">
                 <h2>
-                    <div class="logo">M</div>
+                    <span class="mongodb-logo-icon logo-medium"></span>
                     MongoDB: Objects Stored As-Is
                 </h2>
 
@@ -1023,66 +1023,49 @@ const darkThemeUsers = await db.users.find({
                 </div>
             </div>
 
-            <!-- Relational Database Side -->
-            <div class="side relational">
+            <!-- PostgreSQL Side -->
+            <div class="side sql">
                 <h2>
-                    <div class="logo relational">ORM</div>
-                    SQL + ORM: Complex Mapping Layer
+                    <span class="postgresql-logo-icon logo-medium"></span>
+                    PostgreSQL: Complex ORM Mapping
                 </h2>
 
-                <div class="layer-section relational">
-                    <div class="layer-title relational">🗄️ Normalized Table Structure</div>
+                <div class="layer-section">
+                    <div class="layer-title">🔧 Object-Relational Mapping (ORM)</div>
                     
                     <div class="code-block">
-<span class="code-label">SQL Schema</span>
--- Users table
+<span class="code-label">PostgreSQL Schema</span>
+-- Normalized PostgreSQL tables
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255),
+    name VARCHAR(100),
+    email VARCHAR(100)
+);
+
+CREATE TABLE user_profiles (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     avatar VARCHAR(255),
-    bio TEXT,
-    theme VARCHAR(50),
+    bio TEXT
+);
+
+CREATE TABLE user_preferences (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    theme VARCHAR(20),
     notifications BOOLEAN
 );
 
--- User skills table
 CREATE TABLE user_skills (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id),
     skill_name VARCHAR(100),
-    skill_level VARCHAR(50)
+    skill_level VARCHAR(20)
 );
-
--- User projects table  
-CREATE TABLE user_projects (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    project_id INTEGER,
-    project_name VARCHAR(255),
-    status VARCHAR(50)
-);
-                    </div>
-
-                    <div class="flow-diagram">
-                        <div class="flow-step">
-                            <strong>🎯 Application Object</strong><br>
-                            <small>Complex nested structure</small>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <strong>🔧 ORM Mapping</strong><br>
-                            <small>Complex transformation</small>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <strong>🗄️ Multiple Tables</strong><br>
-                            <small>Normalized relations</small>
-                        </div>
                     </div>
 
                     <div class="impedance-mismatch error">
-                        <strong>⚠️ Object-Relational Impedance Mismatch:</strong> Complex objects must be decomposed into multiple tables with extensive ORM configuration.
+                        <strong>❌ Object-Relational Impedance Mismatch:</strong> Complex mapping between objects and normalized tables requires heavy ORM configuration.
                     </div>
                 </div>
 
