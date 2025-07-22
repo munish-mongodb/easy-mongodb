@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB vs PostgreSQL: The Strategic Choice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2942 50%, #2d4a6b 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .presentation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: slideIn 0.8s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+        
+        .slide:nth-child(odd) {
+            animation-delay: 0.4s;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4ade80, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #4ade80;
+        }
+        
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #06b6d4;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem 0;
+        }
+        
+        .db-column {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .db-column:hover {
+            transform: translateY(-10px);
+            border-color: #4ade80;
+            box-shadow: 0 20px 40px rgba(74, 222, 128, 0.3);
+        }
+        
+        .mongodb-highlight {
+            border: 2px solid #4ade80;
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(6, 182, 212, 0.1) 100%);
+        }
+        
+        .postgres-column {
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background: rgba(148, 163, 184, 0.1);
+        }
+        
+        .feature-list {
+            list-style: none;
+            text-align: left;
+            margin: 1rem 0;
+        }
+        
+        .feature-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .postgres-feature:before {
+            content: "○";
+            color: #94a3b8;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            width: 100%;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #4ade80;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: #e2e8f0;
+        }
+        
+        .advantage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            width: 100%;
+        }
+        
+        .advantage-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .advantage-card:hover {
+            transform: translateY(-5px);
+            border-color: #4ade80;
+            box-shadow: 0 15px 30px rgba(74, 222, 128, 0.2);
+        }
+        
+        .advantage-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #4ade80 0%, #06b6d4 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            color: #0a1628;
+        }
+        
+        .cta-button {
+            background: #0a1628;
+            color: #4ade80;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem;
+        }
+        
+        .cta-button:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid #4ade80;
+            color: #4ade80;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #4ade80;
+            color: #0a1628;
+        }
+        
+        .slide-indicator {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .slide {
+                padding: 1rem;
+            }
+        }
+        .nav-menu {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0, 237, 100, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-menu h2 {
+            margin-bottom: 25px;
+            color: #00684A;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00ED64;
+            font-size: 1.4em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 12px;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 12px 18px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border-left: 4px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 8px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            color: #00684A;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(0, 237, 100, 0.2);
+        }
+
+        .nav-category-header:hover {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
+            transform: translateX(4px);
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+            color: #00684A;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 300px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 8px;
+            margin-left: 15px;
+        }
+
+        .nav-accordion-content a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .nav-accordion-content a:hover, .nav-accordion-content a.active {
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+            border-left: 3px solid #00ED64;
+            transform: translateX(6px);
+            color: #00684A;
+            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Adjust presentation container for nav menu */
+        .presentation-container {
+            margin-left: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-menu" id="navMenu">
+        <h2>MongoDB vs SQL</h2>
+        <ul>
+            <li><a href="index.html">🏠 Home</a></li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('competition')">
+                    <span>Competition</span>
+                    <span class="accordion-icon" id="competition-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="competition-content">
+                    <li><a href="mongodb_vs_postgres_presentation.html" class="active">🍃 MongoDB vs PostgreSQL</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
+                    <span>Architecture & Performance</span>
+                    <span class="accordion-icon" id="architecture-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="architecture-content">
+                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('development')">
+                    <span>Application Development</span>
+                    <span class="accordion-icon" id="development-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="development-content">
+                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
+                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="presentation-container">
+        <div class="slide-indicator">
+            <span id="slide-counter">1 / 6</span>
+        </div>
+        
+        <!-- Slide 1: Title -->
+        <div class="slide" id="slide1">
+            <h1>MongoDB vs PostgreSQL</h1>
+            <p class="subtitle">The Strategic Database Choice for Modern Enterprises</p>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-number">70%</span>
+                    <span class="stat-label">of Fortune 100 use MongoDB</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">50,000+</span>
+                    <span class="stat-label">MongoDB customers globally</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">5x</span>
+                    <span class="stat-label">faster development cycles</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Architecture Comparison -->
+        <div class="slide" id="slide2">
+            <h2>Architecture: Built for the Modern Era</h2>
+            <div class="comparison-grid">
+                <div class="db-column mongodb-highlight">
+                    <h3>🍃 MongoDB</h3>
+                    <ul class="feature-list">
+                        <li>Horizontal scaling (sharding) built-in</li>
+                        <li>Flexible document model</li>
+                        <li>Schema evolution without downtime</li>
+                        <li>Native JSON support (BSON)</li>
+                        <li>Automatic failover & replication</li>
+                        <li>Distributed by design</li>
+                    </ul>
+                </div>
+                <div class="db-column postgres-column">
+                    <h3>🐘 PostgreSQL</h3>
+                    <ul class="feature-list">
+                        <li class="postgres-feature">Primarily vertical scaling</li>
+                        <li class="postgres-feature">Fixed schema requirements</li>
+                        <li class="postgres-feature">Schema changes require coordination</li>
+                        <li class="postgres-feature">JSON support added later</li>
+                        <li class="postgres-feature">Third-party failover solutions</li>
+                        <li class="postgres-feature">Single-node focus</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Developer Productivity -->
+        <div class="slide" id="slide3">
+            <h2>Developer Productivity: Speed to Market</h2>
+            <div class="advantage-grid">
+                <div class="advantage-card">
+                    <span class="advantage-icon">🚀</span>
+                    <h3>Faster Development</h3>
+                    <p>Document model maps naturally to application objects. No complex ORM required. Developers can iterate quickly without schema migrations.</p>
+                </div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">🔄</span>
+                    <h3>Agile-Friendly</h3>
+                    <p>Schema flexibility enables rapid prototyping and iteration. Adapt data structures as requirements evolve without database downtime.</p>
+                </div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">💡</span>
+                    <h3>Modern Stack Integration</h3>
+                    <p>Native JavaScript/Node.js support. Perfect for microservices, APIs, and cloud-native applications. Extensive driver ecosystem.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Scalability & Performance -->
+        <div class="slide" id="slide4">
+            <h2>Scalability: Built for Enterprise Growth</h2>
+            <div class="comparison-grid">
+                <div class="db-column mongodb-highlight">
+                    <h3>MongoDB Scaling Advantages</h3>
+                    <ul class="feature-list">
+                        <li><strong>Automatic Sharding:</strong> Distribute data across servers automatically</li>
+                        <li><strong>Linear Performance:</strong> Add nodes = proportional performance gains</li>
+                        <li><strong>No Join Complexity:</strong> Denormalized data = faster queries</li>
+                        <li><strong>Global Clusters:</strong> Multi-region deployment with automatic failover</li>
+                        <li><strong>Elastic Scaling:</strong> Scale up/down based on demand</li>
+                    </ul>
+                </div>
+                <div class="db-column postgres-column">
+                    <h3>PostgreSQL Scaling Challenges</h3>
+                    <ul class="feature-list">
+                        <li class="postgres-feature">Manual sharding implementation required</li>
+                        <li class="postgres-feature">Complex joins impact performance at scale</li>
+                        <li class="postgres-feature">Read replicas help but writing still bottlenecks</li>
+                        <li class="postgres-feature">Horizontal scaling requires significant engineering</li>
+                        <li class="postgres-feature">Cross-shard queries are complex</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Enterprise Features & ROI -->
+        <div class="slide" id="slide5">
+            <h2>Enterprise Value: Beyond Just Technology</h2>
+            <div class="advantage-grid">
+                <div class="advantage-card">
+                    <span class="advantage-icon">🛡️</span>
+                    <h3>Enterprise Security</h3>
+                    <p><strong>MongoDB Enterprise Advanced:</strong> LDAP/Kerberos integration, field-level encryption, auditing, and quantum-safe security protocols for 2025+</p>
+                </div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">☁️</span>
+                    <h3>Cloud-Native</h3>
+                    <p><strong>MongoDB Atlas:</strong> Fully managed service across AWS, Azure, GCP. 125+ regions. Built-in monitoring, backup, and security.</p>
+                </div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">💰</span>
+                    <h3>Lower TCO</h3>
+                    <p>Reduced operational complexity, faster development cycles, less DBA overhead. Single platform from prototype to production scale.</p>
+                </div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">🤖</span>
+                    <h3>AI/ML Ready</h3>
+                    <p>Native vector search, integration with IBM watsonx.ai, built for real-time analytics and machine learning workloads.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Call to Action -->
+        <div class="slide" id="slide6">
+            <div class="cta-section">
+                <h2 style="color: #0a1628; margin-bottom: 1rem;">The Strategic Choice is Clear</h2>
+                <p style="font-size: 1.3rem; margin-bottom: 2rem; color: #1e293b;">
+                    MongoDB delivers the flexibility, scalability, and developer productivity needed for modern applications while providing enterprise-grade security and support.
+                </p>
+                <div>
+                    <button class="cta-button">Start MongoDB Atlas Free Tier</button>
+                    <button class="cta-button">Schedule Enterprise Demo</button>
+                </div>
+                <p style="margin-top: 2rem; font-size: 1.1rem; color: #334155;">
+                    Join 70% of the Fortune 100 who trust MongoDB for their mission-critical applications
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 6;
+
+        function updateSlideCounter() {
+            document.getElementById('slide-counter').textContent = `${currentSlide} / ${totalSlides}`;
+        }
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => slide.style.display = 'none');
+            
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            document.getElementById(`slide${currentSlide}`).style.display = 'flex';
+            updateSlideCounter();
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Initialize
+        showSlide(1);
+
+        // Auto-advance slides (optional)
+        // setInterval(nextSlide, 30000); // 30 seconds
+
+        // Accordion functionality
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Initialize accordion - expand competition category for this page
+        function initializeAccordion() {
+            const content = document.getElementById('competition-content');
+            const icon = document.getElementById('competition-icon');
+            content.classList.add('expanded');
+            icon.classList.add('rotated');
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            initializeAccordion();
+        });
+    </script>
+</body>
+</html>
