@@ -14,6 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB Replica Set High Availability</title>
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -21,37 +22,60 @@
         }
 
         body {
-            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
             color: #001E2B;
             line-height: 1.6;
             min-height: 100vh;
-            display: flex;
+            overflow-x: hidden;
         }
 
+        /* Navigation Menu - Matching index.html style */
         .nav-menu {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
             position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
             height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px;
             overflow-y: auto;
-            border-right: 1px solid rgba(0, 237, 100, 0.2);
+            border-right: 1px solid rgba(0, 104, 74, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
+        }
+
+        .nav-menu.open {
+            left: 0;
         }
 
         .nav-menu h2 {
-            margin-bottom: 25px;
             color: #00684A;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            font-weight: 700;
             text-align: center;
             padding-bottom: 15px;
             border-bottom: 3px solid #00ED64;
-            font-size: 1.4em;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            position: relative;
+        }
+
+        .nav-menu h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+            border-radius: 2px;
         }
 
         .nav-menu ul {
@@ -59,56 +83,241 @@
         }
 
         .nav-menu li {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .nav-menu a {
-            display: block;
-            padding: 12px 18px;
+        .nav-menu > ul > li > a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
             text-decoration: none;
             color: #001E2B;
             background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid transparent;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-menu a:hover, .nav-menu a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+        .nav-menu > ul > li > a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu > ul > li > a:hover::before,
+        .nav-menu > ul > li > a.active::before {
+            opacity: 1;
+        }
+
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li > a.active {
             border-left: 4px solid #00ED64;
             transform: translateX(8px);
             color: #00684A;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
         }
 
-        .nav-category {
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 10px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 700;
             color: #00684A;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding: 10px 18px;
-            font-size: 0.85em;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 6px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 104, 74, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-category:first-of-type {
-            margin-top: 20px;
+        .nav-category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .mobile-menu-toggle {
-            display: none;
+        .nav-category-header:hover::before {
+            opacity: 1;
         }
 
+        .nav-category-header:hover {
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
+        }
+
+        .accordion-icon {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            color: #00684A;
+            z-index: 1;
+            position: relative;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 400px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 6px;
+            margin-left: 20px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.3s ease forwards;
+        }
+
+        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
+        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
+        .nav-accordion-content.expanded li:nth-child(3) { animation-delay: 0.3s; }
+        .nav-accordion-content.expanded li:nth-child(4) { animation-delay: 0.4s; }
+        .nav-accordion-content.expanded li:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .nav-accordion-content a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-accordion-content a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-accordion-content a:hover::before,
+        .nav-accordion-content a.active::before {
+            opacity: 1;
+        }
+
+        .nav-accordion-content a:hover,
+        .nav-accordion-content a.active {
+            border-left: 3px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1001;
+            background: rgba(0, 104, 74, 0.95);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-toggle:hover {
+            background: #00ED64;
+            color: #001E2B;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
+        }
+
+        .menu-toggle.menu-open {
+            background: #00ED64;
+            color: #001E2B;
+            transform: rotate(90deg);
+        }
+
+        /* Backdrop */
+        .nav-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main Content Container */
         .container {
-            flex: 1;
-            margin-left: 300px;
-            max-width: none;
-            padding: 30px;
+            padding: 40px;
+            padding-left: 100px; /* Space for menu button */
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .header {
@@ -674,40 +883,22 @@
             background: rgba(76, 175, 80, 0.1);
         }
 
-        @media (max-width: 768px) {
-            .nav-menu {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-            }
-            
-            .nav-menu.open {
-                transform: translateX(0);
-            }
-            
+        /* Responsive Design */
+        @media (max-width: 1200px) {
             .container {
-                margin-left: 0;
+                padding: 30px;
+                padding-left: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
                 padding: 20px;
+                padding-left: 80px;
             }
             
             .header h1 {
                 font-size: 2em;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                background: linear-gradient(135deg, #00ED64, #00B84D);
-                color: #001E2B;
-                border: none;
-                padding: 12px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 1.2em;
-                box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
             }
 
             .scenario-grid {
@@ -740,20 +931,21 @@
                 min-width: 90%;
                 margin-bottom: 10px;
             }
-        }
 
-        @media (max-width: 1024px) {
-            .nav-menu {
-                width: 280px;
-            }
-            
-            .container {
-                margin-left: 280px;
-                padding: 25px;
+            .menu-toggle {
+                top: 20px;
+                left: 20px;
+                padding: 12px;
+                font-size: 1.2rem;
             }
         }
 
         @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                padding-left: 70px;
+            }
+
             .stats {
                 grid-template-columns: 1fr;
             }
@@ -775,121 +967,106 @@
                 padding: 15px;
                 min-width: 100%;
             }
+
+            .nav-menu {
+                width: 280px;
+                left: -280px;
+            }
         }
 
-        /* Accordion Styles */
-        .nav-accordion {
-            margin-bottom: 8px;
+        /* Focus Styles for Accessibility */
+        button:focus,
+        a:focus {
+            outline: 3px solid #00ED64;
+            outline-offset: 2px;
         }
 
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            .controls,
+            .architecture-section,
+            .read-preferences,
+            .log-container {
+                border: 2px solid #000;
+            }
+            
+            .btn {
+                border: 2px solid #000;
+            }
         }
 
-        .nav-category-header:hover {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
-            transform: translateX(4px);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8em;
-            color: #00684A;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 300px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 8px;
-            margin-left: 15px;
-        }
-
-        .nav-accordion-content a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .nav-accordion-content a:hover, .nav-accordion-content a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 3px solid #00ED64;
-            transform: translateX(6px);
-            color: #00684A;
-            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
+        ☰
+    </button>
     
-    <div class="nav-menu" id="navMenu">
-        <h2>MongoDB vs PostgreSQL</h2>
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+    
+    <nav class="nav-menu" id="navMenu" role="navigation">
+        <h2>MongoDB vs SQL</h2>
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')">
-                    <span>Competition</span>
+                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Comparative Analysis</span>
                     <span class="accordion-icon" id="competition-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="competition-content">
-                    <li><a href="mongodb_vs_postgres_presentation.html">🍃 MongoDB vs PostgreSQL</a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">🔬 Postgres Technical Comparison</a></li>
+                <ul class="nav-accordion-content" id="competition-content" role="region">
+                    <li><a href="mongodb_vs_postgres_presentation.html">
+                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
+                    </a></li>
+                    <li><a href="mongodb_postgres_technical_presentation.html">
+                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
+                    </a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
-                    <span>Architecture & Performance</span>
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="true">
+                    <span>High Availability and Scalability</span>
                     <span class="accordion-icon" id="architecture-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="architecture-content">
+                <ul class="nav-accordion-content expanded" id="architecture-content" role="region">
                     <li><a href="mongodb_replica_set_demo.html" class="active">🔄 High Availability</a></li>
                     <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')">
+                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Architecture Patterns</span>
+                    <span class="accordion-icon" id="patterns-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="patterns-content" role="region">
+                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
+                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
+                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
+                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
+                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
+                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
+                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
                     <span>Application Development</span>
                     <span class="accordion-icon" id="development-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="development-content">
+                <ul class="nav-accordion-content" id="development-content" role="region">
                     <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
                     <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
                     <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
@@ -898,7 +1075,7 @@
                 </ul>
             </li>
         </ul>
-    </div>
+    </nav>
 
     <div class="container">
         <div class="header">
@@ -1101,6 +1278,132 @@
         let readRetryCount = 0;
         let writeFailureCount = 0;
         let readFailureCount = 0;
+
+        // Navigation Functions
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.toggle('open');
+            backdrop.classList.toggle('active');
+            toggleBtn.classList.toggle('menu-open');
+            
+            // Update ARIA attributes
+            const isOpen = navMenu.classList.contains('open');
+            toggleBtn.setAttribute('aria-expanded', isOpen);
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            toggleBtn.classList.remove('menu-open');
+            
+            // Update ARIA attributes
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        // Accordion Functions
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // Initialize accordion - expand category containing current page
+        function initializeAccordion() {
+            const content = document.getElementById('architecture-content');
+            const icon = document.getElementById('architecture-icon');
+            const header = content.previousElementSibling;
+            
+            content.classList.add('expanded');
+            icon.classList.add('rotated');
+            header.setAttribute('aria-expanded', 'true');
+        }
+
+        // Keyboard navigation support
+        function initializeKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                // Alt + M to toggle menu
+                if (e.altKey && e.key === 'm') {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                }
+                
+                // Escape to close menu
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+                
+                // Enter and Space for accordion headers
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('nav-category-header')) {
+                    e.preventDefault();
+                    const categoryId = e.target.onclick.toString().match(/'([^']+)'/)[1];
+                    toggleAccordion(categoryId);
+                }
+            });
+        }
+
+        // Handle outside clicks
+        function initializeOutsideClickHandler() {
+            document.addEventListener('click', (e) => {
+                const navMenu = document.getElementById('navMenu');
+                const menuToggle = document.getElementById('menuToggle');
+                
+                // Close menu if clicking outside
+                if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+        }
+
+        // Navigation link click handler for mobile
+        function initializeNavLinkHandlers() {
+            const navLinks = document.querySelectorAll('.nav-menu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 1024) {
+                        setTimeout(() => {
+                            closeMobileMenu();
+                        }, 100);
+                    }
+                });
+            });
+        }
+
+        // Handle window resize
+        function handleResize() {
+            if (window.innerWidth > 1024) {
+                closeMobileMenu();
+            }
+        }
+
+        // Performance optimization - debounce resize events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
 
         // Logging function
         function logMessage(message, type = 'info') {
@@ -1644,58 +1947,51 @@
             }
         }
 
-        // Accordion functionality
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-            }
-        }
-
-        // Initialize accordion - expand category containing current page
-        function initializeAccordion() {
-            const content = document.getElementById('architecture-content');
-            const icon = document.getElementById('architecture-icon');
-            content.classList.add('expanded');
-            icon.classList.add('rotated');
-        }
-
-        // Mobile menu functionality
-        function toggleMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            navMenu.classList.toggle('open');
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const navMenu = document.getElementById('navMenu');
-            const toggleButton = document.querySelector('.mobile-menu-toggle');
-            
-            if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
-                navMenu.classList.remove('open');
-            }
-        });
-
-        // Initialize on page load
-        window.addEventListener('load', function() {
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
             initializeAccordion();
-        });
-
-        // Initialize demo
-        window.onload = function() {
+            initializeKeyboardNavigation();
+            initializeOutsideClickHandler();
+            initializeNavLinkHandlers();
+            
+            // Add debounced resize handler
+            window.addEventListener('resize', debounce(handleResize, 150));
+            
+            // Initialize demo
             renderReplicaSet();
             logMessage('🎉 MongoDB Replica Set demo initialized', 'success');
             logMessage('🔧 3-member replica set active with automatic failover', 'info');
             logMessage('📊 Election algorithm: Priority-based with term management', 'info');
             logMessage('🔄 Retryable operations: Automatic driver resilience enabled', 'info');
             logMessage('🚀 Try performing operations during failures to see retries!', 'info');
-        };
+            
+            console.log('MongoDB Replica Set Demo - Loaded Successfully');
+            console.log('Use Alt+M to toggle menu, ESC to close menu');
+        });
+
+        // Handle page visibility for performance
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Pause animations when page is not visible (except for critical replica animations)
+                document.querySelectorAll('.nav-accordion-content li').forEach(el => {
+                    el.style.animationPlayState = 'paused';
+                });
+            } else {
+                // Resume animations when page becomes visible
+                document.querySelectorAll('.nav-accordion-content li').forEach(el => {
+                    el.style.animationPlayState = 'running';
+                });
+            }
+        });
+
+        // Error handling for navigation
+        window.addEventListener('error', function(e) {
+            console.warn('Navigation error:', e.error);
+            // Ensure menu can still be closed if there's an error
+            if (document.getElementById('navMenu').classList.contains('open')) {
+                closeMobileMenu();
+            }
+        });
     </script>
 </body>
 </html>

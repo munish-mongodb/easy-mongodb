@@ -718,33 +718,53 @@
             <li><a href="index.html">🏠 Home</a></li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')">
-                    <span>Competition</span>
+                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Comparative Analysis</span>
                     <span class="accordion-icon" id="competition-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="competition-content">
-                    <li><a href="mongodb_vs_postgres_presentation.html">🍃 MongoDB vs PostgreSQL</a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">🔬 Postgres Technical Comparison</a></li>
+                <ul class="nav-accordion-content" id="competition-content" role="region">
+                    <li><a href="mongodb_vs_postgres_presentation.html">
+                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
+                    </a></li>
+                    <li><a href="mongodb_postgres_technical_presentation.html">
+                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
+                    </a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
-                    <span>Architecture & Performance</span>
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
+                    <span>High Availability and Scalability</span>
                     <span class="accordion-icon" id="architecture-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="architecture-content">
+                <ul class="nav-accordion-content" id="architecture-content" role="region">
                     <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
                     <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
                 </ul>
             </li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')">
+                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Architecture Patterns</span>
+                    <span class="accordion-icon" id="patterns-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="patterns-content" role="region">
+                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
+                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
+                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
+                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
+                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
+                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
+                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="true">
                     <span>Application Development</span>
                     <span class="accordion-icon" id="development-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content" id="development-content">
+                <ul class="nav-accordion-content expanded" id="development-content" role="region">
                     <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
                     <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
                     <li><a href="arrays_embedded_docs_presentation.html" class="active">📊 Arrays & Embedded Docs</a></li>
@@ -753,7 +773,7 @@
                 </ul>
             </li>
         </ul>
-    </div>
+    </nav>
 
     <div class="container">
         <div class="header">

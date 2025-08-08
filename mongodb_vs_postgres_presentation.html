@@ -705,7 +705,7 @@
             
             <li class="nav-accordion">
                 <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Competition</span>
+                    <span>Comparative Analysis</span>
                     <span class="accordion-icon" id="competition-icon">▼</span>
                 </div>
                 <ul class="nav-accordion-content" id="competition-content" role="region">
@@ -716,7 +716,7 @@
             
             <li class="nav-accordion">
                 <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Architecture & Performance</span>
+                    <span>High Availability and Scalability</span>
                     <span class="accordion-icon" id="architecture-icon">▼</span>
                 </div>
                 <ul class="nav-accordion-content" id="architecture-content" role="region">
@@ -1243,6 +1243,25 @@
             }
         }
 
+        // Initialize accordion states
+        function initializeAccordion() {
+            const categories = ['competition', 'architecture', 'patterns', 'development'];
+            categories.forEach(categoryId => {
+                const content = document.getElementById(categoryId + '-content');
+                const icon = document.getElementById(categoryId + '-icon');
+                const header = content ? content.previousElementSibling : null;
+                
+                if (content && icon && header) {
+                    // Expand competition section by default since we're in comparative analysis
+                    if (categoryId === 'competition') {
+                        content.classList.add('expanded');
+                        icon.classList.add('rotated');
+                        header.setAttribute('aria-expanded', 'true');
+                    }
+                }
+            });
+        }
+
         // Keyboard navigation
         document.addEventListener('keydown', function(e) {
             if (e.key === 'ArrowRight' || e.key === ' ') {
@@ -1258,19 +1277,6 @@
                 toggleMobileMenu();
             }
         });
-
-        // Initialize accordion
-        function initializeAccordion() {
-            const content = document.getElementById('competition-content');
-            const icon = document.getElementById('competition-icon');
-            const header = content ? content.previousElementSibling : null;
-            
-            if (content && icon && header) {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                header.setAttribute('aria-expanded', 'true');
-            }
-        }
 
         // Outside click handler
         document.addEventListener('click', (e) => {

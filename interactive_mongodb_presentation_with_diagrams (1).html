@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Architecture Patterns</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .slide {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .text-content {
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #4CAF50;
+            backdrop-filter: blur(10px);
+        }
+
+        .slide h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .architecture-description {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .architecture-description h3 {
+            color: #8BC34A;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .architecture-description p {
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #E8F5E8;
+        }
+
+        .benefits-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .benefits-list li {
+            background: rgba(76, 175, 80, 0.1);
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #4CAF50;
+            font-size: 14px;
+            transform: translateX(-20px);
+            opacity: 0;
+            animation: slideInBenefit 0.6s ease-out forwards;
+        }
+
+        .benefits-list li:nth-child(1) { animation-delay: 0.2s; }
+        .benefits-list li:nth-child(2) { animation-delay: 0.4s; }
+        .benefits-list li:nth-child(3) { animation-delay: 0.6s; }
+        .benefits-list li:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes slideInBenefit {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .diagram-container {
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            height: 100%;
+            min-height: 500px;
+        }
+
+        .architecture-diagram {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            max-height: 80vh;
+        }
+
+        .architecture-diagram:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .diagram-overlay {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: #4CAF50;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .postgresql-comparison {
+            background: rgba(255, 152, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 3px solid #FF9800;
+        }
+
+        .postgresql-comparison h4 {
+            color: #FFB74D;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .postgresql-comparison p {
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: #FFF3E0;
+        }
+
+        .mongodb-highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .slide-indicator {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #4CAF50;
+            transform: scale(1.2);
+        }
+
+        .indicator-dot:hover {
+            background: rgba(255,255,255,0.6);
+        }
+
+        /* Zoom modal for diagrams */
+        .zoom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .zoom-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .zoom-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .slide-content {
+                grid-template-columns: 300px 1fr;
+                gap: 20px;
+            }
+            
+            .text-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .slide-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .text-content {
+                max-height: 40vh;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="header">
+            <h1>MongoDB Architecture Patterns</h1>
+            <p>Interactive Technical Presentation with Professional Diagrams</p>
+        </div>
+
+        <!-- Slide 1: Introduction -->
+        <div class="slide active">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>MongoDB: Universal Data Platform</h2>
+                    <div class="architecture-description">
+                        <h3>Platform Overview</h3>
+                        <p>MongoDB serves as the foundation for modern applications across various architectural patterns, providing flexibility, scalability, and performance.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Schema Flexibility:</strong> Dynamic schemas adapt to changing requirements without migrations</li>
+                        <li><strong>Horizontal Scale:</strong> Built-in sharding distributes data across multiple servers</li>
+                        <li><strong>Rich Querying:</strong> Powerful aggregation framework and flexible indexing</li>
+                        <li><strong>High Availability:</strong> Replica sets ensure 99.999% uptime with automatic failover</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL requires predefined schemas and expensive migrations for changes. Horizontal scaling needs complex sharding solutions like Citus. The relational model struggles with varied data structures common in modern applications, and scaling reads requires manual read replica management.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">MongoDB Ecosystem</div>
+                    <img src="assets/mongodb_platform_overview.png" alt="MongoDB Platform Overview" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Microservices -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>Microservices Architecture</h2>
+                    <div class="architecture-description">
+                        <h3>Service Autonomy with <span class="mongodb-highlight">MongoDB</span></h3>
+                        <p>Each microservice owns its MongoDB database, enabling independent development, deployment, and scaling while maintaining data isolation.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Service Autonomy:</strong> Each service owns its MongoDB database with full schema control</li>
+                        <li><strong>Independent Scaling:</strong> Scale databases based on individual service needs</li>
+                        <li><strong>Schema Evolution:</strong> Services evolve data models without affecting others</li>
+                        <li><strong>Fault Isolation:</strong> Database issues don't cascade across services</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL requires rigid schema migrations across all services, making independent deployments difficult. Its relational model doesn't adapt well to varying service data needs, and managing multiple PostgreSQL instances increases operational complexity without MongoDB's built-in sharding and replication.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">Click to Zoom</div>
+                    <img src="assets/mongodb_microservices.png" alt="MongoDB Microservices Architecture" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: RAG Architecture -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>RAG (Retrieval-Augmented Generation)</h2>
+                    <div class="architecture-description">
+                        <h3>AI-Powered Search with <span class="mongodb-highlight">MongoDB Vector Search</span></h3>
+                        <p>Combine retrieval-based and generative AI using MongoDB's native vector search capabilities for semantic similarity and context retrieval.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Vector Search:</strong> Native vector indexing enables semantic search without additional infrastructure</li>
+                        <li><strong>Unified Platform:</strong> Store vectors, metadata, and application data in one database</li>
+                        <li><strong>Real-time Updates:</strong> Update knowledge base without retraining models</li>
+                        <li><strong>Rich Filtering:</strong> Combine vector search with traditional MongoDB queries</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL requires separate vector extensions (pgvector) with limited performance at scale. You need additional infrastructure for vector search, complex joins for metadata filtering, and the relational model doesn't handle unstructured document content efficiently for RAG applications.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">Vector Search Flow</div>
+                    <img src="assets/mongodb_rag.png" alt="MongoDB RAG Architecture" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Event-Driven Architecture -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>Event-Driven Architecture</h2>
+                    <div class="architecture-description">
+                        <h3>Real-time Events with <span class="mongodb-highlight">MongoDB Change Streams</span></h3>
+                        <p>Use MongoDB as both the event store and application database, with Change Streams providing real-time event detection and processing.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Change Streams:</strong> Real-time event detection from any data change in MongoDB</li>
+                        <li><strong>Event Store:</strong> Durable event persistence with guaranteed ordering</li>
+                        <li><strong>Loose Coupling:</strong> Services communicate through events, not direct calls</li>
+                        <li><strong>Audit Trail:</strong> Complete event history for compliance and debugging</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL lacks native change streams, requiring complex trigger-based solutions or external tools like Debezium. Event storage in relational tables is inefficient for high-throughput event systems, and you need additional message brokers since PostgreSQL isn't designed for event streaming.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">Event Flow</div>
+                    <img src="assets/mongodb_event_driven.png" alt="MongoDB Event-Driven Architecture" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: CQRS + Event Sourcing -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>CQRS + Event Sourcing</h2>
+                    <div class="architecture-description">
+                        <h3>Immutable Events with <span class="mongodb-highlight">MongoDB</span></h3>
+                        <p>Separate read and write models using MongoDB for event storage and multiple optimized read models, enabling temporal queries and audit trails.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Immutable Events:</strong> MongoDB's document model is perfect for storing events</li>
+                        <li><strong>Optimized Reads:</strong> Multiple read models optimized for different query patterns</li>
+                        <li><strong>Temporal Queries:</strong> Query system state at any point in time</li>
+                        <li><strong>Scalable Projections:</strong> Use MongoDB aggregation pipelines for read model updates</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL's rigid schema makes event structure changes difficult. Managing multiple read models requires complex table structures and joins. Event sourcing with PostgreSQL needs careful transaction management and lacks the flexible aggregation capabilities that MongoDB provides for building projections.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">CQRS Pattern</div>
+                    <img src="assets/mongodb_cqrs.png" alt="MongoDB CQRS + Event Sourcing" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: IoT Pipeline -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>IoT Data Pipeline</h2>
+                    <div class="architecture-description">
+                        <h3>High-Throughput IoT with <span class="mongodb-highlight">MongoDB Time Series</span></h3>
+                        <p>Process millions of sensor data points per second using MongoDB's optimized time-series collections with automatic compression and retention.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Time-Series Collections:</strong> Optimized storage and queries for sensor data</li>
+                        <li><strong>High Throughput:</strong> Handle millions of data points per second with automatic batching</li>
+                        <li><strong>Automatic Compression:</strong> Up to 93% storage reduction for historical data</li>
+                        <li><strong>Real-time Analytics:</strong> Built-in aggregation framework for streaming insights</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL lacks native time-series optimization, requiring extensions like TimescaleDB. High-volume IoT data ingestion can overwhelm PostgreSQL's ACID guarantees. You need external tools for real-time analytics, and the relational model isn't efficient for rapidly changing sensor data schemas.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">IoT Data Flow</div>
+                    <img src="assets/mongodb_iot.png" alt="MongoDB IoT Data Pipeline" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Real-time Analytics -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>Real-time Analytics</h2>
+                    <div class="architecture-description">
+                        <h3>Instant Insights with <span class="mongodb-highlight">MongoDB Change Streams</span></h3>
+                        <p>Enable real-time analytics with sub-second latency using MongoDB Change Streams to trigger instant processing of data changes.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Change Streams:</strong> Real-time triggers for instant analytics on data changes</li>
+                        <li><strong>Aggregation Framework:</strong> Complex analytics without external ETL processes</li>
+                        <li><strong>Low Latency:</strong> Sub-second data availability for real-time dashboards</li>
+                        <li><strong>Unified Platform:</strong> Combine real-time and historical analytics in one system</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL needs external tools like Kafka for real-time streaming. Complex analytics require expensive ETL processes and separate OLAP systems. The relational model struggles with dynamic schema analytics workloads, and you can't achieve MongoDB's sub-second change detection without significant infrastructure overhead.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">Real-time Processing</div>
+                    <img src="assets/mongodb_realtime_analytics.png" alt="MongoDB Real-time Analytics" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Multi-tenant SaaS -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>Multi-tenant SaaS</h2>
+                    <div class="architecture-description">
+                        <h3>Flexible Isolation with <span class="mongodb-highlight">MongoDB</span></h3>
+                        <p>Support multiple tenants with flexible data isolation strategies: database-per-tenant, collection-per-tenant, or shared collections with tenant filtering.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Flexible Isolation:</strong> Choose from database, collection, or document-level tenant isolation</li>
+                        <li><strong>Shared Infrastructure:</strong> Cost-efficient multi-tenancy with shared MongoDB clusters</li>
+                        <li><strong>Tenant Metadata:</strong> Store tenant configurations and customizations in MongoDB</li>
+                        <li><strong>Cross-tenant Analytics:</strong> Aggregated reporting and insights across all tenants</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL multi-tenancy is limited to schema-per-tenant or row-level security, both with performance penalties. Managing tenant-specific customizations requires complex schema alterations. Cross-tenant analytics need expensive joins across schemas, and tenant isolation options are rigid compared to MongoDB's flexible approaches.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">Multi-tenant Strategy</div>
+                    <img src="assets/mongodb_multitenant.png" alt="MongoDB Multi-tenant SaaS" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: API Gateway -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>API Gateway Architecture</h2>
+                    <div class="architecture-description">
+                        <h3>Centralized API Management with <span class="mongodb-highlight">MongoDB</span></h3>
+                        <p>Use MongoDB to store API configurations, routing rules, analytics, and user permissions for centralized API gateway management.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Configuration Store:</strong> API definitions, routing rules, and policies in MongoDB</li>
+                        <li><strong>Analytics Storage:</strong> Real-time API usage metrics and performance data</li>
+                        <li><strong>Authentication Data:</strong> User credentials, tokens, and permission management</li>
+                        <li><strong>Rate Limiting:</strong> Request counters and throttling rules with MongoDB operations</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL's relational structure makes storing diverse API configurations complex, requiring multiple joined tables. High-frequency API analytics can overwhelm transactional performance. Flexible rate limiting and dynamic routing rules are difficult to implement efficiently in a rigid relational schema designed for consistency over performance.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">API Management</div>
+                    <img src="assets/mongodb_api_gateway.png" alt="MongoDB API Gateway Architecture" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">9</span>
+    </div>
+
+    <div class="slide-indicator">
+        <div class="indicator-dot active" onclick="goToSlide(0)"></div>
+        <div class="indicator-dot" onclick="goToSlide(1)"></div>
+        <div class="indicator-dot" onclick="goToSlide(2)"></div>
+        <div class="indicator-dot" onclick="goToSlide(3)"></div>
+        <div class="indicator-dot" onclick="goToSlide(4)"></div>
+        <div class="indicator-dot" onclick="goToSlide(5)"></div>
+        <div class="indicator-dot" onclick="goToSlide(6)"></div>
+        <div class="indicator-dot" onclick="goToSlide(7)"></div>
+        <div class="indicator-dot" onclick="goToSlide(8)"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="prev-btn" onclick="changeSlide(-1)">← Previous</button>
+        <button class="btn" id="next-btn" onclick="changeSlide(1)">Next →</button>
+        <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+
+    <!-- Zoom Modal -->
+    <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
+        <button class="zoom-close" onclick="closeZoom()">×</button>
+        <img id="zoomImage" src="" alt="Zoomed Architecture Diagram">
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let totalSlides = 9;
+
+        function updateSlideCounter() {
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function updateIndicators() {
+            const dots = document.querySelectorAll('.indicator-dot');
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n >= totalSlides) currentSlide = 0;
+            if (n < 0) currentSlide = totalSlides - 1;
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide].classList.add('active');
+
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+
+            updateSlideCounter();
+            updateIndicators();
+
+            // Trigger animations
+            const activeSlide = slides[currentSlide];
+            const benefitsList = activeSlide.querySelectorAll('.benefits-list li');
+            benefitsList.forEach((li, index) => {
+                li.style.animation = 'none';
+                setTimeout(() => {
+                    li.style.animation = `slideInBenefit 0.6s ease-out forwards`;
+                    li.style.animationDelay = `${(index + 1) * 0.2}s`;
+                }, 50);
+            });
+
+            // Animate diagram
+            const diagram = activeSlide.querySelector('.architecture-diagram');
+            if (diagram) {
+                diagram.style.opacity = '0';
+                diagram.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    diagram.style.transition = 'all 0.8s ease-out';
+                    diagram.style.opacity = '1';
+                    diagram.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(n) {
+            currentSlide = n;
+            showSlide(currentSlide);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function openZoom(imageSrc) {
+            const modal = document.getElementById('zoomModal');
+            const zoomImage = document.getElementById('zoomImage');
+            zoomImage.src = imageSrc;
+            modal.classList.add('active');
+        }
+
+        function closeZoom() {
+            const modal = document.getElementById('zoomModal');
+            modal.classList.remove('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentSlide > 0) changeSlide(-1);
+            if (e.key === 'ArrowRight' && currentSlide < totalSlides - 1) changeSlide(1);
+            if (e.key === 'Escape') {
+                closeZoom();
+            }
+            if (e.key === 'f' || e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+
+        // Preload images for smooth transitions
+        function preloadImages() {
+            const images = [
+                'assets/mongodb_microservices.png',
+                'assets/mongodb_rag.png',
+                'assets/mongodb_event_driven.png',
+                'assets/mongodb_cqrs.png',
+                'assets/mongodb_iot.png',
+                'assets/mongodb_realtime_analytics.png',
+                'assets/mongodb_multitenant.png',
+                'assets/mongodb_api_gateway.png'
+            ];
+
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
+
+        // Start preloading images when page loads
+        window.addEventListener('load', preloadImages);
+
+        // Handle image load errors
+        document.querySelectorAll('.architecture-diagram').forEach(img => {
+            img.addEventListener('error', function() {
+                this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="%23f0f0f0"/><text x="200" y="150" text-anchor="middle" fill="%23666">Diagram Loading...</text></svg>';
+            });
+        });
+    </script>
+</body>
+</html>

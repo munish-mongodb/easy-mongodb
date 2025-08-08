@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB CQRS + Event Sourcing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 30, 43, 0.8);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #00ED64;
+            backdrop-filter: blur(20px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00ED64, #00B84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .slide {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .text-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #00ED64;
+            color: #001E2B;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+        }
+
+        .slide h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #00684A;
+        }
+
+        .architecture-description {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid #00ED64;
+        }
+
+        .architecture-description h3 {
+            color: #00684A;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .architecture-description p {
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #001E2B;
+            opacity: 0.8;
+        }
+
+        .benefits-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .benefits-list li {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #00ED64;
+            font-size: 14px;
+            color: #001E2B;
+            transform: translateX(-20px);
+            opacity: 0;
+            animation: slideInBenefit 0.6s ease-out forwards;
+        }
+
+        .benefits-list li:nth-child(1) { animation-delay: 0.2s; }
+        .benefits-list li:nth-child(2) { animation-delay: 0.4s; }
+        .benefits-list li:nth-child(3) { animation-delay: 0.6s; }
+        .benefits-list li:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes slideInBenefit {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .diagram-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            height: 100%;
+            min-height: 500px;
+        }
+
+        .architecture-diagram {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            max-height: 80vh;
+        }
+
+        .architecture-diagram:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.4);
+        }
+
+        .diagram-overlay {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 104, 74, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .postgresql-comparison {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 3px solid #FF9800;
+        }
+
+        .postgresql-comparison h4 {
+            color: #E65100;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .postgresql-comparison p {
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: #001E2B;
+            opacity: 0.8;
+        }
+
+        .mongodb-highlight {
+            color: #00684A;
+            font-weight: bold;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: white;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0, 104, 74, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
+        }
+
+        .nav-menu.open {
+            left: 0;
+        }
+
+        .nav-menu h2 {
+            color: #00684A;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00ED64;
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 8px;
+        }
+
+        .nav-menu > ul > li > a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid transparent;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-menu > ul > li > a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu > ul > li > a:hover::before,
+        .nav-menu > ul > li > a.active::before {
+            opacity: 1;
+        }
+
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li > a.active {
+            border-left: 4px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 10px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
+            color: #00684A;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 104, 74, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-category-header:hover::before {
+            opacity: 1;
+        }
+
+        .nav-category-header:hover {
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
+        }
+
+        .accordion-icon {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            color: #00684A;
+            z-index: 1;
+            position: relative;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 400px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 6px;
+            margin-left: 20px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.3s ease forwards;
+        }
+
+        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
+        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
+        .nav-accordion-content.expanded li:nth-child(3) { animation-delay: 0.3s; }
+        .nav-accordion-content.expanded li:nth-child(4) { animation-delay: 0.4s; }
+        .nav-accordion-content.expanded li:nth-child(5) { animation-delay: 0.5s; }
+        .nav-accordion-content.expanded li:nth-child(6) { animation-delay: 0.6s; }
+        .nav-accordion-content.expanded li:nth-child(7) { animation-delay: 0.7s; }
+        .nav-accordion-content.expanded li:nth-child(8) { animation-delay: 0.8s; }
+        .nav-accordion-content.expanded li:nth-child(9) { animation-delay: 0.9s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .nav-accordion-content a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-accordion-content a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-accordion-content a:hover::before,
+        .nav-accordion-content a.active::before {
+            opacity: 1;
+        }
+
+        .nav-accordion-content a:hover,
+        .nav-accordion-content a.active {
+            border-left: 3px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
+        }
+
+        .mongodb-logo-icon {
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C8.5 2 5.7 4.8 5.7 8.3c0 2.5 1.5 5.2 3.8 7.8c1.2 1.3 2.5 2.6 2.5 4.9v1h0v-1c0-2.3 1.3-3.6 2.5-4.9c2.3-2.6 3.8-5.3 3.8-7.8C18.3 4.8 15.5 2 12 2z"/></svg>') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .postgresql-logo-icon {
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.6 0 3.1-.4 4.4-1.1-.2-.1-.4-.3-.6-.4-1 .5-2.1.8-3.3.8-4.1 0-7.5-3.4-7.5-7.5S7.9 6.3 12 6.3s7.5 3.4 7.5 7.5c0 1.2-.3 2.3-.8 3.3.1.2.3.4.4.6.7-1.3 1.1-2.8 1.1-4.4C22 6.5 17.5 2 12 2z"/></svg>') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1001;
+            background: rgba(0, 104, 74, 0.95);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-toggle:hover {
+            background: #00ED64;
+            color: #001E2B;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
+        }
+
+        .nav-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Zoom modal for diagrams */
+        .zoom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 30, 43, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+        }
+
+        .zoom-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .zoom-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 237, 100, 0.8);
+            border: none;
+            color: #001E2B;
+            font-size: 24px;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-close:hover {
+            background: #00ED64;
+            transform: scale(1.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .slide-content {
+                grid-template-columns: 300px 1fr;
+                gap: 20px;
+            }
+            
+            .text-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .slide-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .text-content {
+                max-height: 40vh;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle">
+        ☰
+    </button>
+    
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+    
+    <nav class="nav-menu" id="navMenu">
+        <h2>MongoDB vs SQL</h2>
+        <ul>
+            <li><a href="index.html">🏠 Home</a></li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Comparative Analysis</span>
+                    <span class="accordion-icon" id="competition-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="competition-content" role="region">
+                    <li><a href="mongodb_vs_postgres_presentation.html">
+                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
+                    </a></li>
+                    <li><a href="mongodb_postgres_technical_presentation.html">
+                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
+                    </a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
+                    <span>High Availability and Scalability</span>
+                    <span class="accordion-icon" id="architecture-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="architecture-content" role="region">
+                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="true">
+                    <span>Architecture Patterns</span>
+                    <span class="accordion-icon" id="patterns-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content expanded" id="patterns-content" role="region">
+                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
+                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
+                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
+                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
+                    <li><a href="mongodb_cqrs.html" class="active">🔄 CQRS + Event Sourcing</a></li>
+                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
+                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Application Development</span>
+                    <span class="accordion-icon" id="development-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="development-content" role="region">
+                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
+                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="presentation-container">
+        <div class="header">
+            <h1>CQRS + Event Sourcing</h1>
+            <p>Immutable Events with MongoDB</p>
+        </div>
+
+        <!-- CQRS Slide -->
+        <div class="slide active">
+            <div class="slide-content">
+                <div class="text-content fade-in">
+                    <h2>CQRS + Event Sourcing</h2>
+                    <div class="architecture-description">
+                        <h3>Immutable Events with <span class="mongodb-highlight">MongoDB</span></h3>
+                        <p>Separate read and write models using MongoDB for event storage and multiple optimized read models, enabling temporal queries and audit trails.</p>
+                    </div>
+                    <ul class="benefits-list">
+                        <li><strong>Immutable Events:</strong> MongoDB's document model is perfect for storing events</li>
+                        <li><strong>Optimized Reads:</strong> Multiple read models optimized for different query patterns</li>
+                        <li><strong>Temporal Queries:</strong> Query system state at any point in time</li>
+                        <li><strong>Scalable Projections:</strong> Use MongoDB aggregation pipelines for read model updates</li>
+                    </ul>
+                    <div class="postgresql-comparison">
+                        <h4>Why PostgreSQL Falls Short:</h4>
+                        <p>PostgreSQL's rigid schema makes event structure changes difficult. Managing multiple read models requires complex table structures and joins. Event sourcing with PostgreSQL needs careful transaction management and lacks the flexible aggregation capabilities that MongoDB provides for building projections.</p>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-overlay">CQRS Pattern</div>
+                    <img src="assets/mongodb_cqrs.png" alt="MongoDB CQRS + Event Sourcing" class="architecture-diagram" onclick="openZoom(this.src)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        CQRS + Event Sourcing
+    </div>
+
+    <!-- Zoom Modal -->
+    <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
+        <button class="zoom-close" onclick="closeZoom()">×</button>
+        <img id="zoomImage" src="" alt="Zoomed Architecture Diagram">
+    </div>
+
+    <script>
+        // Navigation Functions
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function initializeAccordion() {
+            // Auto-expand patterns section since this is an architecture pattern demo
+            const patternsContent = document.getElementById('patterns-content');
+            const patternsIcon = document.getElementById('patterns-icon');
+            const patternsHeader = patternsContent.previousElementSibling;
+            
+            if (patternsContent && patternsIcon && patternsHeader) {
+                patternsContent.classList.add('expanded');
+                patternsIcon.classList.add('rotated');
+                patternsHeader.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            if (navMenu) navMenu.classList.toggle('open');
+            if (backdrop) backdrop.classList.toggle('active');
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            if (navMenu) navMenu.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('active');
+        }
+
+        function openZoom(imageSrc) {
+            // Create zoom overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'zoom-overlay';
+            overlay.innerHTML = `
+                <div class="zoom-content">
+                    <img src="${imageSrc}" alt="Zoomed diagram">
+                    <button class="zoom-close" onclick="closeZoom()">&times;</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeZoom() {
+            const overlay = document.querySelector('.zoom-overlay');
+            if (overlay) {
+                overlay.remove();
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeAccordion);
+    </script>
+</body>
+</html>

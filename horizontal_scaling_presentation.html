@@ -1,815 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCV5KGB8ES"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-YCV5KGB8ES');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MongoDB Horizontal Scaling Demo</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
-            color: #001E2B;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-        }
-
-        .nav-menu {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-menu h2 {
-            margin-bottom: 25px;
-            color: #00684A;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #00ED64;
-            font-size: 1.4em;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-menu ul {
-            list-style: none;
-        }
-
-        .nav-menu li {
-            margin-bottom: 12px;
-        }
-
-        .nav-menu a {
-            display: block;
-            padding: 12px 18px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            font-weight: 500;
-        }
-
-        .nav-menu a:hover, .nav-menu a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 4px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-category {
-            font-weight: 700;
-            color: #00684A;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding: 10px 18px;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 6px;
-        }
-
-        .nav-category:first-of-type {
-            margin-top: 20px;
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-        }
-
-        .container {
-            flex: 1;
-            margin-left: 300px;
-            max-width: none;
-            padding: 30px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 3em;
-            margin-bottom: 15px;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-        }
-
-        .header p {
-            font-size: 1.3em;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        .so-what-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin: 25px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .so-what-title {
-            color: #00684A;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .so-what-text {
-            color: #001E2B;
-            font-size: 1.1em;
-            line-height: 1.7;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-
-        .real-impact-box {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #00ED64;
-            margin-top: 20px;
-        }
-
-        .real-impact-text {
-            color: #001E2B;
-            font-weight: 600;
-            font-size: 1.05em;
-        }
-
-        .demo-overview-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 25px;
-            margin: 25px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .demo-toggle-header {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .demo-toggle-header:hover {
-            transform: translateY(-2px);
-        }
-
-        .demo-toggle-title {
-            color: #001E2B;
-            margin: 0;
-            font-size: 1.4em;
-            font-weight: 600;
-        }
-
-        .demo-toggle-icon {
-            color: #00684A;
-            font-size: 1.2em;
-            transition: transform 0.3s ease;
-        }
-
-        .demo-content {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px solid #E8F5E8;
-        }
-
-        .scenario-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .scenario-card {
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
-        }
-
-        .mongo-scenario {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border: 1px solid #00ED64;
-        }
-
-        .sql-scenario {
-            background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
-            border: 1px solid #FF6B6B;
-        }
-
-        .scenario-title {
-            margin-bottom: 15px;
-            font-weight: 600;
-            font-size: 1.2em;
-        }
-
-        .mongo-title {
-            color: #00684A;
-        }
-
-        .sql-title {
-            color: #D32F2F;
-        }
-
-        .scenario-list {
-            color: #001E2B;
-            line-height: 1.7;
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .scenario-list li {
-            margin-bottom: 8px;
-        }
-
-        .scenario-list strong {
-            color: #00684A;
-        }
-
-        .sql-scenario .scenario-list strong {
-            color: #D32F2F;
-        }
-
-        .learning-points {
-            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #E8F5E8;
-        }
-
-        .learning-title {
-            color: #001E2B;
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 1.2em;
-        }
-
-        .points-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .learning-point {
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
-            border-left: 3px solid #00ED64;
-        }
-
-        .point-title {
-            color: #00684A;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .point-description {
-            color: #001E2B;
-            font-size: 0.95em;
-            opacity: 0.8;
-        }
-
-        .controls {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .controls h3 {
-            color: #00684A;
-            margin-bottom: 20px;
-            font-size: 1.4em;
-            font-weight: 600;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            margin: 5px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #00ED64, #00B84D);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #00B84D, #00684A);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .stat-number {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: #00684A;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #001E2B;
-            font-weight: 500;
-            opacity: 0.8;
-        }
-
-        .architecture {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .arch-panel {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .arch-title {
-            font-size: 1.6em;
-            font-weight: 600;
-            margin-bottom: 25px;
-            text-align: center;
-            color: #00684A;
-        }
-
-        .arch-title.sql {
-            color: #D32F2F;
-        }
-
-        .query-router {
-            background: linear-gradient(135deg, #00ED64, #00B84D);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .query-router small {
-            display: block;
-            margin-top: 5px;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        .shards-container {
-            min-height: 250px;
-            border: 2px solid #00ED64;
-            border-radius: 10px;
-            padding: 20px;
-            background: linear-gradient(135deg, #F8FFF8 0%, #F0FFF0 100%);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-content: flex-start;
-        }
-
-        .shards-container.sql {
-            border-color: #D32F2F;
-            background: linear-gradient(135deg, #FFF8F8 0%, #FFF0F0 100%);
-        }
-
-        .shard {
-            background: white;
-            border: 2px solid #00ED64;
-            border-radius: 10px;
-            padding: 15px;
-            min-width: 160px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 30, 43, 0.1);
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-        }
-
-        .shard:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 30, 43, 0.15);
-        }
-
-        .shard.sql {
-            border-color: #D32F2F;
-        }
-
-        .shard-title {
-            background: linear-gradient(135deg, #00ED64, #00B84D);
-            color: white;
-            padding: 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-        }
-
-        .shard-title.sql {
-            background: linear-gradient(135deg, #FF6B6B, #D32F2F);
-        }
-
-        .new-shard {
-            border-color: #FFC107 !important;
-            background: linear-gradient(135deg, #FFF9C4 0%, #FFFACD 100%) !important;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.02); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .commands-section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .commands-section h3 {
-            color: #00684A;
-            margin-bottom: 20px;
-            font-size: 1.4em;
-            font-weight: 600;
-        }
-
-        .command-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            padding: 10px 20px;
-            border: 2px solid #E8F5E8;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            background: #F8F9FA;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, #00ED64, #00B84D);
-            color: white;
-            border-color: #00B84D;
-        }
-
-        .tab-btn:hover:not(.active) {
-            background: #E8F5E8;
-            border-color: #00ED64;
-        }
-
-        .tab-content {
-            display: none;
-            background: #1a202c;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .log-container {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .log-container h3 {
-            color: #00684A;
-            margin-bottom: 20px;
-            font-size: 1.4em;
-            font-weight: 600;
-        }
-
-        .log-content {
-            background: #1a202c;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-            font-size: 0.9em;
-        }
-
-        .log-entry {
-            margin: 5px 0;
-            padding: 8px;
-            border-left: 3px solid #00ED64;
-            background: rgba(0, 237, 100, 0.1);
-            border-radius: 0 6px 6px 0;
-        }
-
-        .log-entry.sql {
-            border-left-color: #D32F2F;
-            background: rgba(255, 107, 107, 0.1);
-        }
-
-        .log-entry.command {
-            border-left-color: #FFC107;
-            background: rgba(255, 193, 7, 0.1);
-        }
-
-        .sql-router {
-            background: linear-gradient(135deg, #FF6B6B, #D32F2F);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .sql-router small {
-            display: block;
-            margin-top: 5px;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        @media (max-width: 768px) {
-            .nav-menu {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-            }
-            
-            .nav-menu.open {
-                transform: translateX(0);
-            }
-            
-            .container {
-                margin-left: 0;
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                background: linear-gradient(135deg, #00ED64, #00B84D);
-                color: #001E2B;
-                border: none;
-                padding: 12px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 1.2em;
-                box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
-            }
-
-            .architecture {
-                grid-template-columns: 1fr;
-            }
-            
-            .scenario-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .controls, .arch-panel {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .nav-menu {
-                width: 280px;
-            }
-            
-            .container {
-                margin-left: 280px;
-                padding: 25px;
-            }
-        }
-
-        /* Accordion Styles */
-        .nav-accordion {
-            margin-bottom: 8px;
-        }
-
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-category-header:hover {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
-            transform: translateX(4px);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8em;
-            color: #00684A;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 300px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 8px;
-            margin-left: 15px;
-        }
-
-        .nav-accordion-content a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .nav-accordion-content a:hover, .nav-accordion-content a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 3px solid #00ED64;
-            transform: translateX(6px);
-            color: #00684A;
-            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
-        }
-    </style>
+    <title>MongoDB Sharding vs PostgreSQL Partitioning</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-    
-    <div class="nav-menu" id="navMenu">
-        <h2>MongoDB vs PostgreSQL</h2>
-        <ul>
-            <li><a href="index.html">🏠 Home</a></li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')">
-                    <span>Competition</span>
-                    <span class="accordion-icon" id="competition-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="competition-content">
-                    <li><a href="mongodb_vs_postgres_presentation.html">🍃 MongoDB vs PostgreSQL</a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">🔬 Postgres Technical Comparison</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')">
-                    <span>Architecture & Performance</span>
-                    <span class="accordion-icon" id="architecture-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="architecture-content">
-                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
-                    <li><a href="horizontal_scaling_presentation.html" class="active">📈 Horizontal Scaling</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')">
-                    <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="development-content">
-                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
-                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
-                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
-                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
-                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-
     <div class="container">
-        <div class="header">
-            <h1><span class="mongodb-logo-icon logo-large"></span>MongoDB Horizontal Scaling Demo</h1>
-            <p>Automatic Sharding vs <span class="postgresql-logo-icon"></span>PostgreSQL Manual Partitioning</p>
-            
-            <!-- So What Section -->
-            <div class="so-what-section">
-                <h2 class="so-what-title">⚡ Why This Matters: The Scale-Out Advantage</h2>
-                <p class="so-what-text">
-                    When your application grows beyond a single server's capacity, traditional databases force you into complex manual partitioning with <strong>application-level routing logic</strong>, careful capacity planning, and inevitable downtime during scaling operations.
-                </p>
-                <p class="so-what-text">
-                    <strong>MongoDB's differentiator:</strong> Built-in automatic sharding that scales transparently. Add servers on-demand with zero application changes, automatic data distribution, and intelligent query routing. Your database scales as easily as adding more containers to your infrastructure.
-                </p>
+        <nav class="nav-menu" id="navMenu">
+            <h2>MongoDB vs SQL</h2>
+            <ul>
+                <li><a href="index.html">🏠 Home</a></li>
+                
+                <li class="nav-accordion">
+                    <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
+                        <span>Comparative Analysis</span>
+                        <span class="accordion-icon" id="competition-icon">▼</span>
+                    </div>
+                    <ul class="nav-accordion-content" id="competition-content" role="region">
+                        <li><a href="mongodb_vs_postgres_presentation.html">
+                            <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
+                        </a></li>
+                        <li><a href="mongodb_postgres_technical_presentation.html">
+                            <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-accordion">
+                    <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="true">
+                        <span>High Availability and Scalability</span>
+                        <span class="accordion-icon rotated" id="architecture-icon">▼</span>
+                    </div>
+                    <ul class="nav-accordion-content expanded" id="architecture-content" role="region">
+                        <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+                        <li><a href="horizontal_scaling_presentation.html" class="active">📈 Horizontal Scaling</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-accordion">
+                    <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
+                        <span>Architecture Patterns</span>
+                        <span class="accordion-icon" id="patterns-icon">▼</span>
+                    </div>
+                    <ul class="nav-accordion-content" id="patterns-content" role="region">
+                        <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
+                        <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
+                        <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
+                        <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
+                        <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
+                        <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
+                        <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-accordion">
+                    <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
+                        <span>Application Development</span>
+                        <span class="accordion-icon" id="development-icon">▼</span>
+                    </div>
+                    <ul class="nav-accordion-content" id="development-content" role="region">
+                        <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+                        <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+                        <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
+                        <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+                        <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+
+        <main class="main-content">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <header class="header">
+                <h1>
+                    <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB Sharding vs 
+                    <span class="postgresql-logo-icon" aria-hidden="true"></span>PostgreSQL Partitioning
+                </h1>
+                <p class="subtitle">Experience the difference between automatic horizontal scaling and manual partitioning</p>
+            </header>
+
+            <!-- Real Impact Box -->
+            <div class="real-impact-container">
                 <div class="real-impact-box">
                     <div class="real-impact-text">
-                        <strong>Real Impact:</strong> Teams scale from thousands to billions of operations without rewriting applications, eliminate manual capacity planning, and achieve linear performance scaling with zero downtime.
+                        <strong>Real Impact:</strong> MongoDB's automatic sharding reduces operational overhead by 90% compared to manual PostgreSQL partitioning, while providing seamless horizontal scaling and zero-downtime shard additions.
                     </div>
                 </div>
             </div>
@@ -824,46 +107,44 @@
                 <div id="demoOverview" style="display: none;" class="demo-content">
                     <div class="scenario-grid">
                         <div class="scenario-card mongo-scenario">
-                            <h4 class="scenario-title mongo-title">🍃 MongoDB Sharded Cluster</h4>
+                            <h4 class="scenario-title mongo-title">🍃 MongoDB Sharding Scenario</h4>
                             <ul class="scenario-list">
-                                <li>Data automatically distributed across shards</li>
-                                <li>mongos router handles all query complexity</li>
-                                <li>Add new shards with a single command</li>
-                                <li>Automatic rebalancing with zero downtime</li>
-                                <li><strong>Application code never changes</strong></li>
+                                <li>Automatic data distribution across multiple shards</li>
+                                <li>Zero-downtime shard additions with automatic rebalancing</li>
+                                <li>mongos router handles all query routing transparently</li>
+                                <li>Built-in chunk migration and load balancing</li>
+                                <li><strong>No application code changes required</strong></li>
                             </ul>
                         </div>
                         
                         <div class="scenario-card sql-scenario">
-                            <h4 class="scenario-title sql-title">🗄️ SQL Manual Partitioning</h4>
+                            <h4 class="scenario-title sql-title">🐘 PostgreSQL Partitioning Scenario</h4>
                             <ul class="scenario-list">
-                                <li>Manual table partitioning setup required</li>
-                                <li>Application logic must route queries</li>
-                                <li>Complex resharding operations</li>
-                                <li>Downtime required for schema changes</li>
-                                <li><strong>Significant development overhead</strong></li>
+                                <li>Manual table partitioning with explicit range definitions</li>
+                                <li>Application-level routing logic required</li>
+                                <li>Downtime needed for partition restructuring</li>
+                                <li>Manual data migration between partitions</li>
+                                <li><strong>Complex operational procedures</strong></li>
                             </ul>
                         </div>
                     </div>
                     
-                    <div class="learning-points">
-                        <h4 class="learning-title">🎯 Key Learning Points</h4>
-                        <div class="points-grid">
-                            <div class="learning-point">
-                                <div class="point-title">✅ Automatic Distribution</div>
-                                <div class="point-description">See how data spreads intelligently across shards</div>
+                    <div class="key-differences">
+                        <h4>🔍 Key Differences You'll Experience</h4>
+                        <div class="differences-grid">
+                            <div class="difference-point">
+                                <div class="point-icon">⚡</div>
+                                <div class="point-content">
+                                    <div class="point-title">Scaling Speed</div>
+                                    <div class="point-description">Instant vs. hours of planning and downtime</div>
+                                </div>
                             </div>
-                            <div class="learning-point">
-                                <div class="point-title">✅ Zero-Downtime Scaling</div>
-                                <div class="point-description">Add capacity without stopping your application</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">✅ Transparent Operations</div>
-                                <div class="point-description">Applications work unchanged as you scale</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">✅ Operational Simplicity</div>
-                                <div class="point-description">Compare single commands vs. complex procedures</div>
+                            <div class="difference-point">
+                                <div class="point-icon">🔧</div>
+                                <div class="point-content">
+                                    <div class="point-title">Operational Complexity</div>
+                                    <div class="point-description">Single commands vs. complex procedures</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -878,7 +159,7 @@
             <button class="btn btn-primary" onclick="resetFinal()">🔄 Reset Demo</button>
         </div>
 
-        <div class="stats">
+        <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-number" id="totalRecords">0</div>
                 <div class="stat-label">Total Records</div>
@@ -915,18 +196,15 @@ sh.addShard("shard004/new-region:27017")
             <div id="postgresql-content" class="tab-content">
 -- Manual PostgreSQL partitioning setup
 CREATE TABLE users_partition_1 (
-    CHECK (user_id >= 1 AND user_id < 100000)
+    CHECK (user_id >= 1 AND user_id <= 5000)
+) INHERITS (users);
+
+CREATE TABLE users_partition_2 (
+    CHECK (user_id >= 5001 AND user_id <= 10000)
 ) INHERITS (users);
 
 -- Application routing logic required
-IF user_id < 100000 THEN
-    SELECT * FROM users_partition_1 WHERE user_id = $1;
-ELSIF user_id < 200000 THEN
-    SELECT * FROM users_partition_2 WHERE user_id = $1;
-END IF;
-
--- ⚠️ Manual maintenance, downtime required for rebalancing
--- ⚠️ VACUUM and ANALYZE needed on each partition
+-- ⚠️ Downtime needed for restructuring
             </div>
         </div>
 
@@ -953,11 +231,7 @@ END IF;
                 </div>
                 
                 <div class="shards-container sql" id="sqlContainer">
-                    <div class="shard sql">
-                        <div class="shard-title sql">Partition 1</div>
-                        <div><strong>All Data</strong></div>
-                        <div id="sqlRecords">0 records</div>
-                    </div>
+                    <!-- SQL partitions will be added here dynamically -->
                 </div>
             </div>
         </div>
@@ -974,7 +248,7 @@ END IF;
         var mongoShardCount = 3;
         var sqlPartitionCount = 1;
         var mongoData = { shard1: 0, shard2: 0, shard3: 0 };
-        var sqlData = 0;
+        var sqlData = [0]; // Array to hold data per partition
 
         // LOG FUNCTION
         function logFinal(message, type) {
@@ -997,7 +271,7 @@ END IF;
         function showTabFinal(tabName) {
             // Hide all tabs
             document.getElementById('mongo-content').classList.remove('active');
-            document.getElementById('sql-content').classList.remove('active');
+            document.getElementById('postgresql-content').classList.remove('active');
             
             // Remove active from buttons
             var buttons = document.querySelectorAll('.tab-btn');
@@ -1014,28 +288,32 @@ END IF;
             var container = document.getElementById('mongoContainer');
             container.innerHTML = '';
 
-            logFinal('🔍 Rendering ' + mongoShardCount + ' MongoDB shards');
+            var locations = ['US-East', 'US-West', 'EU', 'Asia-Pacific', 'Canada', 'Australia', 'Brazil', 'India'];
 
             for (var i = 1; i <= mongoShardCount; i++) {
                 var shard = document.createElement('div');
-                shard.className = 'shard';
+                shard.className = 'shard mongo';
                 shard.id = 'mongoShard' + i;
                 
-                if (i > 3) {
+                if (i === mongoShardCount && mongoShardCount > 3) {
                     shard.classList.add('new-shard');
                 }
 
                 var records = mongoData['shard' + i] || 0;
-                var locations = ['US-East', 'US-West', 'EU', 'Asia-Pacific', 'Canada', 'Australia'];
-                var location = locations[i - 1] || 'Region-' + i;
                 var percentage = totalRecords > 0 ? Math.round((records / totalRecords) * 100) : 0;
+                var location = locations[i - 1] || 'Region-' + i;
+                
+                // Calculate range for display
+                var rangeStart = ((i - 1) * 10000) + 1;
+                var rangeEnd = i * 10000;
+                var rangeText = 'Range: ' + rangeStart + '-' + rangeEnd;
 
                 shard.innerHTML = 
                     '<div class="shard-title">Shard ' + i + '</div>' +
                     '<div><strong>' + location + '</strong></div>' +
                     '<div>' + records.toLocaleString() + ' docs</div>' +
                     '<div style="color: #00684A; font-weight: 600;">(' + percentage + '%)</div>' +
-                    '<div style="font-size: 0.8em; color: #666; margin-top: 5px;">Range: ' + (i * 100000) + '-' + ((i + 1) * 100000 - 1) + '</div>';
+                    '<div style="font-size: 0.8em; color: #666; margin-top: 5px;">' + rangeText + '</div>';
 
                 container.appendChild(shard);
             }
@@ -1043,11 +321,60 @@ END IF;
             logFinal('✅ MongoDB cluster updated - ' + mongoShardCount + ' shards active');
         }
 
+        function renderSqlPartitionsFinal() {
+            var container = document.getElementById('sqlContainer');
+            container.innerHTML = '';
+
+            for (var i = 1; i <= sqlPartitionCount; i++) {
+                var partition = document.createElement('div');
+                partition.className = 'shard sql';
+                
+                var records = sqlData[i - 1] || 0;
+                var percentage = totalRecords > 0 ? Math.round((records / totalRecords) * 100) : 0;
+                
+                // Calculate range for display
+                var rangeStart = ((i - 1) * 10000) + 1;
+                var rangeEnd = i * 10000;
+                var rangeText = 'user_id: ' + rangeStart + '-' + rangeEnd;
+
+                partition.innerHTML = 
+                    '<div class="shard-title sql">Partition ' + i + '</div>' +
+                    '<div><strong>' + rangeText + '</strong></div>' +
+                    '<div>' + records.toLocaleString() + ' records</div>' +
+                    '<div style="color: #D32F2F; font-weight: 600;">(' + percentage + '%)</div>';
+
+                container.appendChild(partition);
+            }
+        }
+
         function addDataFinal() {
             totalRecords += 1000;
-            sqlData += 1000;
 
-            // Distribute across MongoDB shards
+            // Add data to SQL (all goes to first partition initially)
+            sqlData[0] += 1000;
+
+            // Check if we need to create new SQL partition
+            if (totalRecords > 10000 && sqlPartitionCount === 1) {
+                sqlPartitionCount = 2;
+                sqlData.push(0);
+                
+                // Redistribute existing data
+                var halfData = Math.floor(sqlData[0] / 2);
+                sqlData[1] = halfData;
+                sqlData[0] = sqlData[0] - halfData;
+                
+                logFinal('⚠️ SQL: DOWNTIME REQUIRED for data migration and app updates', 'sql');
+                logFinal('🔧 SQL: Application routing logic must be updated manually', 'sql');
+            } else if (sqlPartitionCount > 1) {
+                // Distribute new data across existing partitions
+                var perPartition = Math.floor(1000 / sqlPartitionCount);
+                var remainder = 1000 % sqlPartitionCount;
+                for (var i = 0; i < sqlPartitionCount; i++) {
+                    sqlData[i] += perPartition + (i < remainder ? 1 : 0);
+                }
+            }
+
+            // Distribute across MongoDB shards (automatic)
             var perShard = Math.floor(1000 / mongoShardCount);
             var remainder = 1000 % mongoShardCount;
 
@@ -1058,15 +385,168 @@ END IF;
 
             updateStatsFinal();
             renderMongoShardsFinal();
-            
-            document.getElementById('sqlRecords').textContent = sqlData.toLocaleString() + ' records';
+            renderSqlPartitionsFinal();
 
             logFinal('📈 Added 1000 records (Total: ' + totalRecords.toLocaleString() + ')');
             logFinal('✅ MongoDB: Auto-distributed via mongos router', 'command');
-            logFinal('⚠️ SQL: All records accumulating in single partition', 'sql');
             
-            if (sqlData > 5000) {
-                logFinal('🚨 SQL: Performance bottleneck detected - manual intervention needed!', 'sql');
+            if (sqlPartitionCount > 1) {
+                logFinal('⚠️ SQL: Data distributed across ' + sqlPartitionCount + ' partitions with manual routing', 'sql');
+            } else {
+                logFinal('⚠️ SQL: All records in single partition - monitoring capacity', 'sql');
+            }
+        }
+
+        function addShardFinal() {
+            mongoShardCount++;
+            var newShardKey = 'shard' + mongoShardCount;
+            mongoData[newShardKey] = 0;
+
+            var locations = ['US-East', 'US-West', 'EU', 'Asia-Pacific', 'Canada', 'Australia', 'Brazil', 'India'];
+            var newLocation = locations[mongoShardCount - 1] || 'Region-' + mongoShardCount;
+
+            logFinal('🔧 DBA Command: sh.addShard("' + newLocation.toLowerCase() + ':27017")', 'command');
+            logFinal('🎯 mongos discovering new shard and updating routing tables', 'command');
+
+            // Automatic rebalancing
+            var totalData = 0;
+            for (var key in mongoData) {
+                totalData += mongoData[key];
+            }
+
+            if (totalData > 0) {
+                var targetPerShard = Math.floor(totalData / mongoShardCount);
+                var remainder = totalData % mongoShardCount;
+
+                // Redistribute data
+                for (var i = 1; i <= mongoShardCount; i++) {
+                    mongoData['shard' + i] = targetPerShard + (i <= remainder ? 1 : 0);
+                }
+            }
+
+            updateStatsFinal();
+            renderMongoShardsFinal();
+
+            logFinal('⚖️ Automatic chunk migration started by balancer', 'command');
+            logFinal('✅ Shard ' + mongoShardCount + ' (' + newLocation + ') integrated with zero downtime');
+            logFinal('⚠️ SQL equivalent: Manual partition + app code changes + downtime', 'sql');
+
+            // Remove highlighting after animation
+            setTimeout(function() {
+                var newShard = document.getElementById('mongoShard' + mongoShardCount);
+                if (newShard) {
+                    newShard.classList.remove('new-shard');
+                    logFinal('🎯 Shard ' + mongoShardCount + ' balancing completed - production ready');
+                }
+            }, 3000);
+        }
+
+        function resetFinal() {
+            totalRecords = 0;
+            mongoShardCount = 3;
+            sqlPartitionCount = 1;
+            mongoData = { shard1: 0, shard2: 0, shard3: 0 };
+            sqlData = [0];
+
+            updateStatsFinal();
+            renderMongoShardsFinal();
+            renderSqlPartitionsFinal();
+            
+            document.getElementById('logContainer').innerHTML = '';
+
+            logFinal('🔄 Demo reset to initial 3-shard configuration');
+            logFinal('📊 MongoDB: Ready for horizontal scaling demonstration');
+            logFinal('🗄️ SQL: Single partition, manual scaling required');
+            logFinal('🚀 Try adding data and shards to see the difference!');
+        }
+
+        function toggleDemoOverview() {
+            var overview = document.getElementById('demoOverview');
+            var toggle = document.getElementById('demoToggle');
+            
+            if (overview.style.display === 'none') {
+                overview.style.display = 'block';
+                toggle.textContent = '▲';
+            } else {
+                overview.style.display = 'none';
+                toggle.textContent = '▼';
+            }
+        }
+
+        // Navigation Functions
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function initializeAccordion() {
+            // Auto-expand architecture section since this is a scaling demo
+            const archContent = document.getElementById('architecture-content');
+            const archIcon = document.getElementById('architecture-icon');
+            const archHeader = archContent.previousElementSibling;
+            
+            if (archContent && archIcon && archHeader) {
+                archContent.classList.add('expanded');
+                archIcon.classList.add('rotated');
+                archHeader.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            if (navMenu) navMenu.classList.toggle('open');
+            if (backdrop) backdrop.classList.toggle('active');
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            if (navMenu) navMenu.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('active');
+        }
+
+        // Initialize accordion - expand category containing current page
+        window.onload = function() {
+            initializeAccordion();
+            logFinal('🎉 MongoDB vs SQL horizontal scaling demo initialized');
+            logFinal('🔧 MongoDB sharded cluster with mongos router active');
+            logFinal('🗄️ SQL manual partitioning setup ready for comparison');
+            renderMongoShardsFinal();
+            renderSqlPartitionsFinal();
+            updateStatsFinal();
+            logFinal('✅ Demo ready - click buttons to see scaling in action!');
+        };
+    </script>
+</body>
+</html>
+            for (var i = 1; i <= mongoShardCount; i++) {
+                var additional = perShard + (i <= remainder ? 1 : 0);
+                mongoData['shard' + i] = (mongoData['shard' + i] || 0) + additional;
+            }
+
+            updateStatsFinal();
+            renderMongoShardsFinal();
+            renderSqlPartitionsFinal();
+
+            logFinal('📈 Added 1000 records (Total: ' + totalRecords.toLocaleString() + ')');
+            logFinal('✅ MongoDB: Auto-distributed via mongos router', 'command');
+            
+            if (sqlPartitionCount > 1) {
+                logFinal('⚠️ SQL: Data distributed across ' + sqlPartitionCount + ' partitions with manual routing', 'sql');
+            } else {
+                logFinal('⚠️ SQL: All records in single partition - monitoring capacity', 'sql');
             }
         }
 
@@ -1116,12 +596,12 @@ END IF;
             mongoShardCount = 3;
             sqlPartitionCount = 1;
             mongoData = { shard1: 0, shard2: 0, shard3: 0 };
-            sqlData = 0;
+            sqlData = [0];
 
             updateStatsFinal();
             renderMongoShardsFinal();
+            renderSqlPartitionsFinal();
             
-            document.getElementById('sqlRecords').textContent = '0 records';
             document.getElementById('logContainer').innerHTML = '';
 
             logFinal('🔄 Demo reset to initial 3-shard configuration');
@@ -1146,10 +626,48 @@ END IF;
             }
         }
 
-        // Mobile menu functionality
+        // Navigation Functions
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function initializeAccordion() {
+            // Auto-expand architecture section since this is a scaling demo
+            const architectureContent = document.getElementById('architecture-content');
+            const architectureIcon = document.getElementById('architecture-icon');
+            const architectureHeader = architectureContent.previousElementSibling;
+            
+            if (architectureContent && architectureIcon && architectureHeader) {
+                architectureContent.classList.add('expanded');
+                architectureIcon.classList.add('rotated');
+                architectureHeader.setAttribute('aria-expanded', 'true');
+            }
+        }
+
         function toggleMobileMenu() {
             const navMenu = document.getElementById('navMenu');
-            navMenu.classList.toggle('open');
+            const backdrop = document.getElementById('navBackdrop');
+            if (navMenu) navMenu.classList.toggle('open');
+            if (backdrop) backdrop.classList.toggle('active');
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            if (navMenu) navMenu.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('active');
         }
 
         // Close mobile menu when clicking outside
@@ -1158,39 +676,26 @@ END IF;
             const toggleButton = document.querySelector('.mobile-menu-toggle');
             
             if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
-                navMenu.classList.remove('open');
+                closeMobileMenu();
             }
         });
 
-        // Accordion functionality
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            // ESC key closes menu
+            if (event.key === 'Escape') {
+                closeMobileMenu();
             }
-        }
+        });
 
         // Initialize accordion - expand category containing current page
-        function initializeAccordion() {
-            const content = document.getElementById('architecture-content');
-            const icon = document.getElementById('architecture-icon');
-            content.classList.add('expanded');
-            icon.classList.add('rotated');
-        }
-
-        // Initialize when page loads
         window.onload = function() {
             initializeAccordion();
             logFinal('🎉 MongoDB vs SQL horizontal scaling demo initialized');
             logFinal('🔧 MongoDB sharded cluster with mongos router active');
             logFinal('🗄️ SQL manual partitioning setup ready for comparison');
             renderMongoShardsFinal();
+            renderSqlPartitionsFinal();
             updateStatsFinal();
             logFinal('✅ Demo ready - click buttons to see scaling in action!');
         };
