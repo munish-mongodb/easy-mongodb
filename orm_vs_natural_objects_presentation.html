@@ -7,13 +7,13 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-YCV5KGB8ES');
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ORM Complexity vs Natural Object Storage</title>
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -21,37 +21,60 @@
         }
 
         body {
-            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
             color: #001E2B;
             line-height: 1.6;
             min-height: 100vh;
-            display: flex;
+            overflow-x: hidden;
         }
 
+        /* Navigation Menu */
         .nav-menu {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
             position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
             height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px;
             overflow-y: auto;
-            border-right: 1px solid rgba(0, 237, 100, 0.2);
+            border-right: 1px solid rgba(0, 104, 74, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
+        }
+
+        .nav-menu.open {
+            left: 0;
         }
 
         .nav-menu h2 {
-            margin-bottom: 25px;
             color: #00684A;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            font-weight: 700;
             text-align: center;
             padding-bottom: 15px;
             border-bottom: 3px solid #00ED64;
-            font-size: 1.4em;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            position: relative;
+        }
+
+        .nav-menu h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+            border-radius: 2px;
         }
 
         .nav-menu ul {
@@ -59,95 +82,298 @@
         }
 
         .nav-menu li {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .nav-menu a {
-            display: block;
-            padding: 12px 18px;
+        .nav-menu > ul > li > a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
             text-decoration: none;
             color: #001E2B;
             background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid transparent;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-menu a:hover, .nav-menu a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+        .nav-menu > ul > li > a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu > ul > li > a:hover::before,
+        .nav-menu > ul > li > a.active::before {
+            opacity: 1;
+        }
+
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li > a.active {
             border-left: 4px solid #00ED64;
             transform: translateX(8px);
             color: #00684A;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
         }
 
-        .nav-category {
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 10px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 700;
             color: #00684A;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding: 10px 18px;
-            font-size: 0.85em;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 6px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 104, 74, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-category:first-of-type {
-            margin-top: 20px;
+        .nav-category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .mobile-menu-toggle {
-            display: none;
+        .nav-category-header:hover::before {
+            opacity: 1;
         }
 
-        .container {
-            flex: 1;
-            margin-left: 300px;
-            max-width: none;
-            padding: 30px;
+        .nav-category-header:hover {
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        .accordion-icon {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            color: #00684A;
+            z-index: 1;
+            position: relative;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 400px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 6px;
+            margin-left: 20px;
+        }
+
+        .nav-accordion-content a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-accordion-content a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-accordion-content a:hover::before,
+        .nav-accordion-content a.active::before {
+            opacity: 1;
+        }
+
+        .nav-accordion-content a:hover,
+        .nav-accordion-content a.active {
+            border-left: 3px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1001;
+            background: rgba(0, 104, 74, 0.95);
+            border: none;
             color: white;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-toggle:hover {
+            background: #00ED64;
+            color: #001E2B;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
+        }
+
+        .menu-toggle.menu-open {
+            background: #00ED64;
+            color: #001E2B;
+            transform: rotate(90deg);
+        }
+
+        /* Backdrop */
+        .nav-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 40px;
+            padding-left: 100px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 30, 43, 0.15);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #00ED64, #00B84D, #00684A);
+            border-radius: 20px 20px 0 0;
         }
 
         .header h1 {
-            font-size: 3em;
+            color: #00684A;
             margin-bottom: 15px;
+            font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: none;
         }
 
-        .header p {
-            font-size: 1.3em;
-            opacity: 0.9;
-            font-weight: 400;
+        .subtitle {
+            font-size: 1.2rem;
+            color: #001E2B;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-bottom: 30px;
         }
 
+        /* So What Section */
         .so-what-section {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
             padding: 30px;
-            margin: 25px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .so-what-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .so-what-title {
             color: #00684A;
             margin-bottom: 20px;
-            font-size: 1.5em;
+            font-size: 1.5rem;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -156,66 +382,80 @@
 
         .so-what-text {
             color: #001E2B;
-            font-size: 1.1em;
+            font-size: 1.1rem;
             line-height: 1.7;
             margin-bottom: 20px;
-            font-weight: 400;
+            opacity: 0.9;
         }
 
         .real-impact-box {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #00ED64;
+            background: linear-gradient(135deg, #00684A 0%, #001E2B 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
             margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .real-impact-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .real-impact-text {
-            color: #001E2B;
             font-weight: 600;
-            font-size: 1.05em;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
 
+        /* Demo Overview */
         .demo-overview-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 25px;
-            margin: 25px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
         .demo-toggle-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             cursor: pointer;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            border-bottom: 1px solid rgba(0, 104, 74, 0.1);
             transition: all 0.3s ease;
         }
 
         .demo-toggle-header:hover {
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.05) 0%, rgba(0, 184, 77, 0.02) 100%);
         }
 
         .demo-toggle-title {
-            color: #001E2B;
-            margin: 0;
-            font-size: 1.4em;
-            font-weight: 600;
+            font-size: 1.4rem;
+            color: #00684A;
+            font-weight: 700;
         }
 
         .demo-toggle-icon {
-            color: #00684A;
-            font-size: 1.2em;
+            font-size: 1.2rem;
             transition: transform 0.3s ease;
+            color: #00684A;
         }
 
         .demo-content {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px solid #E8F5E8;
+            padding: 30px;
         }
 
         .scenario-grid {
@@ -226,25 +466,27 @@
         }
 
         .scenario-card {
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid;
+            position: relative;
+            overflow: hidden;
         }
 
         .mongo-scenario {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border: 1px solid #00ED64;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            border-left-color: #00ED64;
         }
 
         .sql-scenario {
-            background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
-            border: 1px solid #FF6B6B;
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-left-color: #D32F2F;
         }
 
         .scenario-title {
-            margin-bottom: 15px;
-            font-weight: 600;
-            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
         }
 
         .mongo-title {
@@ -256,36 +498,40 @@
         }
 
         .scenario-list {
-            color: #001E2B;
-            line-height: 1.7;
-            margin: 0;
-            padding-left: 20px;
+            list-style: none;
         }
 
         .scenario-list li {
-            margin-bottom: 8px;
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            line-height: 1.6;
         }
 
-        .scenario-list strong {
+        .scenario-list li::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
             color: #00684A;
+            font-size: 0.8rem;
         }
 
-        .sql-scenario .scenario-list strong {
+        .sql-scenario .scenario-list li::before {
             color: #D32F2F;
         }
 
         .learning-points {
-            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.05) 0%, rgba(0, 30, 43, 0.02) 100%);
             padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #E8F5E8;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
         .learning-title {
-            color: #001E2B;
+            color: #00684A;
             margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 1.2em;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
 
         .points-grid {
@@ -295,25 +541,32 @@
         }
 
         .learning-point {
-            padding: 15px;
+            padding: 20px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
-            border-left: 3px solid #00ED64;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.1);
+            border-left: 4px solid #00ED64;
+            transition: transform 0.3s ease;
+        }
+
+        .learning-point:hover {
+            transform: translateY(-5px);
         }
 
         .point-title {
             color: #00684A;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
         }
 
         .point-description {
             color: #001E2B;
-            font-size: 0.95em;
             opacity: 0.8;
+            line-height: 1.6;
         }
 
+        /* Comparison Section */
         .comparison {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -322,13 +575,14 @@
         }
 
         .side {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 104, 74, 0.1);
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(0, 237, 100, 0.2);
         }
 
         .side::before {
@@ -341,58 +595,63 @@
             background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
-        .side.relational::before {
-            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+        .side.sql::before {
+            background: linear-gradient(90deg, #D32F2F, #B71C1C);
         }
 
         .side h2 {
             color: #00684A;
-            margin-bottom: 20px;
-            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 600;
+            gap: 15px;
+            font-weight: 700;
         }
 
-        .side.relational h2 {
+        .side.sql h2 {
             color: #D32F2F;
         }
 
-        .logo {
-            width: 40px;
-            height: 40px;
-            background: #00684A;
-            border-radius: 8px;
+        .logo-medium {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00ED64, #00B84D);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2em;
+            color: #001E2B;
+            font-weight: 700;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.3);
         }
 
-        .logo.relational {
-            background: #D32F2F;
+        .side.sql .logo-medium {
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            color: white;
         }
 
         .layer-section {
             margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            border-radius: 15px;
             border-left: 4px solid #00ED64;
+            position: relative;
+            overflow: hidden;
         }
 
         .layer-section.relational {
-            border-left-color: #FF6B6B;
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-left-color: #D32F2F;
         }
 
         .layer-title {
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.3rem;
+            font-weight: 700;
             color: #00684A;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -403,124 +662,265 @@
         }
 
         .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            margin: 10px 0;
+            font-size: 0.9rem;
+            margin: 15px 0;
             overflow-x: auto;
             position: relative;
+            line-height: 1.6;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .code-label {
             position: absolute;
-            top: 5px;
-            right: 10px;
-            background: #4a5568;
-            color: #e2e8f0;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7em;
+            top: 8px;
+            right: 15px;
+            background: rgba(0, 104, 74, 0.8);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 1;
         }
 
-        .simulation-container {
-            background: #f8f9fa;
-            border-radius: 10px;
+        .side.sql .code-label {
+            background: rgba(211, 47, 47, 0.8);
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 25px 0;
             padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.1);
+        }
+
+        .flow-step {
+            text-align: center;
+            flex: 1;
+            padding: 15px;
+        }
+
+        .flow-step strong {
+            display: block;
+            color: #00684A;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .flow-step small {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: #00684A;
+            margin: 0 15px;
+            font-weight: 700;
+        }
+
+        .impedance-mismatch {
+            padding: 20px;
+            border-radius: 12px;
             margin: 20px 0;
-            border: 2px solid #e9ecef;
+            font-weight: 600;
+            font-size: 1.05rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .impedance-mismatch.success {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            border-left: 4px solid #00ED64;
+            color: #00684A;
+        }
+
+        .impedance-mismatch.error {
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(255, 107, 107, 0.1) 100%);
+            border-left: 4px solid #D32F2F;
+            color: #D32F2F;
+        }
+
+        .complexity-meter {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.1);
+        }
+
+        .complexity-meter span {
+            font-weight: 700;
+            color: #00684A;
+        }
+
+        .meter-bar {
+            flex: 1;
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .meter-fill {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .meter-fill.low {
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+        }
+
+        .meter-fill.high {
+            background: linear-gradient(90deg, #D32F2F, #B71C1C);
+        }
+
+        /* Interactive Demo */
+        .simulation-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.1);
+        }
+
+        .simulation-container h4 {
+            color: #00684A;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.3rem;
         }
 
         .simulation-controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 700;
             transition: all 0.3s ease;
-            font-size: 14px;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
-            background: #00684A;
-            color: white;
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
+            color: #001E2B;
         }
 
         .btn-primary:hover {
-            background: #00543A;
+            background: linear-gradient(135deg, #00B84D 0%, #00684A 100%);
+            color: white;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.4);
         }
 
         .btn-danger {
-            background: #FF6B6B;
+            background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
             color: white;
         }
 
         .btn-danger:hover {
-            background: #ff5252;
+            background: linear-gradient(135deg, #B71C1C 0%, #8E0000 100%);
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(211, 47, 47, 0.4);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
         }
 
         .btn-secondary:hover {
-            background: #5a6268;
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+            transform: translateY(-2px);
         }
 
         .data-display {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
+            font-size: 0.85rem;
             min-height: 200px;
-            overflow-y: auto;
             max-height: 400px;
+            overflow-y: auto;
             white-space: pre-wrap;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .impedance-mismatch {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #ffc107;
-            margin: 15px 0;
+        .table-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #4a5568;
         }
 
-        .impedance-mismatch.error {
-            background: #f8d7da;
-            border-left-color: #dc3545;
+        .table-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
         }
 
-        .impedance-mismatch.success {
-            background: #d4edda;
-            border-left-color: #00ED64;
+        .table-title {
+            color: #00ED64;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1rem;
         }
 
         .log-entry {
-            margin: 5px 0;
-            padding: 5px;
+            margin: 8px 0;
+            padding: 8px 12px;
             border-left: 3px solid #00ED64;
             background: rgba(0, 237, 100, 0.1);
-            font-size: 0.9em;
+            font-size: 0.9rem;
+            border-radius: 4px;
         }
 
         .log-entry.error {
-            border-left-color: #FF6B6B;
-            background: rgba(255, 107, 107, 0.1);
+            border-left-color: #D32F2F;
+            background: rgba(211, 47, 47, 0.1);
         }
 
         .log-entry.warning {
@@ -529,128 +929,190 @@
         }
 
         .benefits {
-            background: #e8f5e8;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 104, 74, 0.2);
         }
 
         .benefits.relational {
-            background: #fde8e8;
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-color: rgba(211, 47, 47, 0.2);
         }
 
         .benefits h4 {
             color: #00684A;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
 
         .benefits.relational h4 {
             color: #D32F2F;
         }
 
-        .icon {
-            display: inline-block;
-            margin-right: 5px;
+        .benefits ul {
+            list-style: none;
+            padding: 0;
         }
 
-        .complexity-meter {
+        .benefits li {
+            margin: 12px 0;
+            padding: 8px 0;
             display: flex;
             align-items: center;
-            margin: 10px 0;
             gap: 10px;
+            line-height: 1.6;
         }
 
-        .meter-bar {
-            flex: 1;
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
+        .icon {
+            font-size: 1.2rem;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            position: relative;
             overflow: hidden;
         }
 
-        .meter-fill {
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        .meter-fill.low {
+        .summary-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
             background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
-        .meter-fill.high {
-            background: linear-gradient(90deg, #FF6B6B, #ff5252);
+        .summary-section h2 {
+            text-align: center;
+            color: #00684A;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
         }
 
-        .flow-diagram {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 20px 0;
-            padding: 15px;
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .summary-card {
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 30, 43, 0.1);
+        }
+
+        .mongo-summary {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            border: 1px solid rgba(0, 104, 74, 0.2);
+        }
+
+        .sql-summary {
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border: 1px solid rgba(211, 47, 47, 0.2);
+        }
+
+        .summary-card h3 {
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .mongo-summary h3 {
+            color: #00684A;
+        }
+
+        .sql-summary h3 {
+            color: #D32F2F;
+        }
+
+        .summary-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .summary-card li {
+            margin: 12px 0;
+            padding: 12px 15px;
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
+            line-height: 1.6;
         }
 
-        .flow-step {
+        .summary-card strong {
+            color: #00684A;
+        }
+
+        .sql-summary strong {
+            color: #D32F2F;
+        }
+
+        .key-insight {
             text-align: center;
-            flex: 1;
-            padding: 10px;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
-        .flow-arrow {
-            font-size: 1.5em;
-            color: #666;
-            margin: 0 10px;
+        .key-insight h4 {
+            color: #00684A;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .key-insight p {
+            font-size: 1.1rem;
+            color: #001E2B;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .content {
+                padding: 30px;
+                padding-left: 100px;
+            }
+            
+            .comparison,
+            .scenario-grid,
+            .points-grid,
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
 
         @media (max-width: 768px) {
-            .nav-menu {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-            }
-            
-            .nav-menu.open {
-                transform: translateX(0);
-            }
-            
-            .container {
-                margin-left: 0;
+            .content {
                 padding: 20px;
+                padding-left: 80px;
+            }
+            
+            .header {
+                padding: 30px 25px;
             }
             
             .header h1 {
-                font-size: 2em;
+                font-size: 2rem;
             }
             
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                background: linear-gradient(135deg, #00ED64, #00B84D);
-                color: #001E2B;
-                border: none;
-                padding: 12px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 1.2em;
-                box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
-            }
-
-            .comparison {
-                grid-template-columns: 1fr;
-            }
-            
-            .scenario-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .side {
-                padding: 20px;
+            .subtitle {
+                font-size: 1rem;
             }
             
             .simulation-controls {
@@ -663,107 +1125,73 @@
             
             .flow-diagram {
                 flex-direction: column;
+                gap: 15px;
             }
             
             .flow-arrow {
                 transform: rotate(90deg);
-                margin: 10px 0;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .nav-menu {
-                width: 280px;
+                margin: 15px 0;
             }
             
-            .container {
-                margin-left: 280px;
-                padding: 25px;
+            .complexity-meter {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .menu-toggle {
+                top: 20px;
+                left: 20px;
+                padding: 12px;
+                font-size: 1.2rem;
             }
         }
 
-        /* Accordion Styles */
-        .nav-accordion {
-            margin-bottom: 8px;
+        @media (max-width: 480px) {
+            .content {
+                padding: 15px;
+                padding-left: 70px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .so-what-section,
+            .demo-content,
+            .side,
+            .summary-section {
+                padding: 20px;
+            }
         }
 
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
+        /* Accessibility */
+        button:focus,
+        a:focus {
+            outline: 3px solid #00ED64;
+            outline-offset: 2px;
         }
 
-        .nav-category-header:hover {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
-            transform: translateX(4px);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8em;
-            color: #00684A;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 300px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 8px;
-            margin-left: 15px;
-        }
-
-        .nav-accordion-content a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .nav-accordion-content a:hover, .nav-accordion-content a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 3px solid #00ED64;
-            transform: translateX(6px);
-            color: #00684A;
-            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
+        ☰
+    </button>
     
-    <div class="nav-menu" id="navMenu">
-        <h2>MongoDB vs PostgreSQL</h2>
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+    
+    <nav class="nav-menu" id="navMenu" role="navigation">
+        <h2>MongoDB vs SQL</h2>
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
@@ -812,7 +1240,7 @@
             <li class="nav-accordion">
                 <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="true">
                     <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
+                    <span class="accordion-icon rotated" id="development-icon">▼</span>
                 </div>
                 <ul class="nav-accordion-content expanded" id="development-content" role="region">
                     <li><a href="orm_vs_natural_objects_presentation.html" class="active">🔧 ORM vs Natural Objects</a></li>  
@@ -825,78 +1253,78 @@
         </ul>
     </nav>
 
-    <div class="container">
-        <div class="header">
+    <main class="content">
+        <header class="header">
             <h1>ORM Complexity vs Natural Object Storage</h1>
-            <p>Object-Relational Impedance Mismatch vs Document-Native Approach</p>
-            
-            <!-- So What Section -->
-            <div class="so-what-section">
-                <h2 class="so-what-title">🚀 Why This Matters: The Development Productivity Crisis</h2>
-                <p class="so-what-text">
-                    Traditional applications spend <strong>60-80% of development time</strong> wrestling with ORM configuration, managing complex relationships, and bridging the gap between object-oriented code and relational tables. This "impedance mismatch" forces developers to think in two different paradigms simultaneously.
-                </p>
-                <p class="so-what-text">
-                    <strong>MongoDB's differentiator:</strong> Objects in your application code map directly to documents in the database. No ORM layer, no relationship management, no translation overhead. You think in objects, you store objects.
-                </p>
-                <div class="real-impact-box">
-                    <div class="real-impact-text">
-                        <strong>Real Impact:</strong> Teams report 3-5x faster development cycles, 70% less boilerplate code, and developers who can focus on business logic instead of database plumbing.
-                    </div>
+            <p class="subtitle">Object-Relational Impedance Mismatch vs Document-Native Approach</p>
+        </header>
+
+        <!-- So What Section -->
+        <div class="so-what-section">
+            <h2 class="so-what-title">🚀 Why This Matters: The Object-Relational Impedance Mismatch</h2>
+            <p class="so-what-text">
+                <strong>The Problem:</strong> Object-oriented applications struggle with relational databases because objects and tables are fundamentally different. Developers spend significant time configuring ORMs, managing relationships, and translating between object models and normalized table structures.
+            </p>
+            <p class="so-what-text">
+                <strong>MongoDB's solution:</strong> Objects in your application code map directly to documents in the database. No ORM complexity, no relationship juggling, no impedance mismatch. You think in objects, you store objects.
+            </p>
+            <div class="real-impact-box">
+                <div class="real-impact-text">
+                    <strong>Real Impact:</strong> Teams building document-centric applications report dramatically faster development cycles, significantly less boilerplate code, and developers who can focus on business logic instead of database mapping complexity.
                 </div>
             </div>
+        </div>
 
-            <!-- Expandable Demo Overview -->
-            <div class="demo-overview-section">
-                <div class="demo-toggle-header" onclick="toggleDemoOverview()">
-                    <h3 class="demo-toggle-title">📋 What This Demo Demonstrates</h3>
-                    <span id="demoToggle" class="demo-toggle-icon">▼</span>
-                </div>
-                
-                <div id="demoOverview" style="display: none;" class="demo-content">
-                    <div class="scenario-grid">
-                        <div class="scenario-card mongo-scenario">
-                            <h4 class="scenario-title mongo-title">🍃 MongoDB Approach</h4>
-                            <ul class="scenario-list">
-                                <li>Create complex nested objects in your application</li>
-                                <li>Store them directly as documents</li>
-                                <li>Query and update using natural object paths</li>
-                                <li>Arrays and nested objects work natively</li>
-                                <li><strong>Zero impedance mismatch</strong></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="scenario-card sql-scenario">
-                            <h4 class="scenario-title sql-title">🗄️ SQL + ORM Approach</h4>
-                            <ul class="scenario-list">
-                                <li>Same complex objects need extensive ORM mapping</li>
-                                <li>Decompose into multiple normalized tables</li>
-                                <li>Manage foreign key relationships</li>
-                                <li>Complex JOINs to reconstruct objects</li>
-                                <li><strong>High impedance mismatch overhead</strong></li>
-                            </ul>
-                        </div>
+        <!-- Expandable Demo Overview -->
+        <div class="demo-overview-section">
+            <div class="demo-toggle-header" onclick="toggleDemoOverview()">
+                <h3 class="demo-toggle-title">📋 What This Demo Demonstrates</h3>
+                <span id="demoToggle" class="demo-toggle-icon">▼</span>
+            </div>
+            
+            <div id="demoOverview" style="display: none;" class="demo-content">
+                <div class="scenario-grid">
+                    <div class="scenario-card mongo-scenario">
+                        <h4 class="scenario-title mongo-title">🍃 MongoDB Approach</h4>
+                        <ul class="scenario-list">
+                            <li>Create complex nested objects in your application</li>
+                            <li>Store them directly as documents</li>
+                            <li>Query and update using natural object paths</li>
+                            <li>Arrays and nested objects work natively</li>
+                            <li><strong>Zero impedance mismatch</strong></li>
+                        </ul>
                     </div>
                     
-                    <div class="learning-points">
-                        <h4 class="learning-title">🎯 Key Learning Points</h4>
-                        <div class="points-grid">
-                            <div class="learning-point">
-                                <div class="point-title">✅ Direct Object Mapping</div>
-                                <div class="point-description">See how MongoDB stores objects exactly as you create them</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">✅ Code Simplicity</div>
-                                <div class="point-description">Compare simple MongoDB operations vs complex ORM configurations</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">✅ Performance Impact</div>
-                                <div class="point-description">Understand the overhead of object-relational translation</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">✅ Developer Experience</div>
-                                <div class="point-description">Experience the productivity difference firsthand</div>
-                            </div>
+                    <div class="scenario-card sql-scenario">
+                        <h4 class="scenario-title sql-title">🗄️ SQL + ORM Approach</h4>
+                        <ul class="scenario-list">
+                            <li>Same complex objects need extensive ORM mapping</li>
+                            <li>Decompose into multiple normalized tables</li>
+                            <li>Manage foreign key relationships</li>
+                            <li>Complex JOINs to reconstruct objects</li>
+                            <li><strong>High impedance mismatch overhead</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="learning-points">
+                    <h4 class="learning-title">🎯 Key Learning Points</h4>
+                    <div class="points-grid">
+                        <div class="learning-point">
+                            <div class="point-title">✅ Direct Object Mapping</div>
+                            <div class="point-description">See how MongoDB stores objects exactly as you create them</div>
+                        </div>
+                        <div class="learning-point">
+                            <div class="point-title">✅ Code Simplicity</div>
+                            <div class="point-description">Compare simple MongoDB operations vs complex ORM configurations</div>
+                        </div>
+                        <div class="learning-point">
+                            <div class="point-title">✅ Performance Impact</div>
+                            <div class="point-description">Understand the overhead of object-relational translation</div>
+                        </div>
+                        <div class="learning-point">
+                            <div class="point-title">✅ Developer Experience</div>
+                            <div class="point-description">Experience the productivity difference firsthand</div>
                         </div>
                     </div>
                 </div>
@@ -907,7 +1335,7 @@
             <!-- MongoDB Side -->
             <div class="side mongodb">
                 <h2>
-                    <span class="mongodb-logo-icon logo-medium"></span>
+                    <div class="logo-medium">M</div>
                     MongoDB: Objects Stored As-Is
                 </h2>
 
@@ -938,17 +1366,16 @@ class User {
       {id: 2, name: "Blog Platform", status: "completed"}
     ];
   }
-}
-                    </div>
+}</div>
 
                     <div class="flow-diagram">
                         <div class="flow-step">
-                            <strong>🎯 Application Object</strong><br>
+                            <strong>🎯 Application Object</strong>
                             <small>Complex nested structure</small>
                         </div>
                         <div class="flow-arrow">→</div>
                         <div class="flow-step">
-                            <strong>📦 MongoDB Document</strong><br>
+                            <strong>📦 MongoDB Document</strong>
                             <small>Exact same structure</small>
                         </div>
                     </div>
@@ -976,8 +1403,7 @@ class User {
     {"id": 1, "name": "E-commerce App", "status": "active"},
     {"id": 2, "name": "Blog Platform", "status": "completed"}
   ]
-}
-                    </div>
+}</div>
 
                     <div class="impedance-mismatch success">
                         <strong>✅ Zero Impedance Mismatch:</strong> Objects map directly to documents with no transformation required.
@@ -1008,16 +1434,15 @@ await db.users.updateOne(
 // Query nested data - natural syntax
 const darkThemeUsers = await db.users.find({
   "profile.preferences.theme": "dark"
-}).toArray();
-                    </div>
+}).toArray();</div>
                 </div>
 
                 <div class="complexity-meter">
                     <span>Code Complexity:</span>
                     <div class="meter-bar">
-                        <div class="meter-fill low" style="width: 25%"></div>
+                        <div class="meter-fill low" style="width: 20%"></div>
                     </div>
-                    <span>Low</span>
+                    <span>Lower (direct object mapping)</span>
                 </div>
 
                 <div class="simulation-container">
@@ -1047,32 +1472,22 @@ const darkThemeUsers = await db.users.find({
             <!-- PostgreSQL Side -->
             <div class="side sql">
                 <h2>
-                    <span class="postgresql-logo-icon logo-medium"></span>
+                    <div class="logo-medium">SQL</div>
                     PostgreSQL: Complex ORM Mapping
                 </h2>
 
-                <div class="layer-section">
-                    <div class="layer-title">🔧 Object-Relational Mapping (ORM)</div>
+                <div class="layer-section relational">
+                    <div class="layer-title relational">🔧 Traditional Normalized Schema</div>
                     
                     <div class="code-block">
 <span class="code-label">PostgreSQL Schema</span>
--- Normalized PostgreSQL tables
+-- Traditional normalized approach
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100),
-    email VARCHAR(100)
-);
-
-CREATE TABLE user_profiles (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    email VARCHAR(100),
     avatar VARCHAR(255),
-    bio TEXT
-);
-
-CREATE TABLE user_preferences (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    bio TEXT,
     theme VARCHAR(20),
     notifications BOOLEAN
 );
@@ -1083,100 +1498,195 @@ CREATE TABLE user_skills (
     skill_name VARCHAR(100),
     skill_level VARCHAR(20)
 );
-                    </div>
+
+CREATE TABLE user_projects (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    project_name VARCHAR(200),
+    status VARCHAR(50)
+);</div>
 
                     <div class="impedance-mismatch error">
-                        <strong>❌ Object-Relational Impedance Mismatch:</strong> Complex mapping between objects and normalized tables requires heavy ORM configuration.
+                        <strong>⚠️ Object-Relational Impedance Mismatch:</strong> Complex mapping between objects and normalized tables requires ORM configuration, relationship management, and translation layers.
                     </div>
                 </div>
 
                 <div class="layer-section relational">
-                    <div class="layer-title relational">🔧 ORM Configuration</div>
+                    <div class="layer-title relational">🔧 ORM Configuration (Node.js + Sequelize)</div>
                     
                     <div class="code-block">
-<span class="code-label">ORM Models (e.g., Hibernate/JPA)</span>
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String name;
-    private String email;
-    private String avatar;
-    private String bio;
-    private String theme;
-    private Boolean notifications;
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set&lt;UserSkill&gt; skills;
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set&lt;UserProject&gt; projects;
-    
-    // Getters, setters, constructors...
-}
+<span class="code-label">ORM Models Configuration</span>
+// User model with relationships
+const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    name: DataTypes.STRING,
+    email: DataTypes.STRING,
+    avatar: DataTypes.STRING,
+    bio: DataTypes.TEXT,
+    theme: DataTypes.STRING,
+    notifications: DataTypes.BOOLEAN
+});
 
-@Entity
-@Table(name = "user_skills")
-public class UserSkill {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-    
-    private String skillName;
-    private String skillLevel;
-    
-    // More boilerplate...
-}
-                    </div>
+// Separate Skills model
+const UserSkill = sequelize.define('UserSkill', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    user_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,
+            key: 'id'
+        }
+    },
+    skill_name: DataTypes.STRING,
+    skill_level: DataTypes.STRING
+});
+
+// Separate Projects model
+const UserProject = sequelize.define('UserProject', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    user_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,
+            key: 'id'
+        }
+    },
+    project_name: DataTypes.STRING,
+    status: DataTypes.STRING
+});
+
+// Define relationships
+User.hasMany(UserSkill, { foreignKey: 'user_id' });
+User.hasMany(UserProject, { foreignKey: 'user_id' });
+UserSkill.belongsTo(User, { foreignKey: 'user_id' });
+UserProject.belongsTo(User, { foreignKey: 'user_id' });</div>
                 </div>
 
                 <div class="layer-section relational">
                     <div class="layer-title relational">💔 Complex Operations</div>
                     
                     <div class="code-block">
-<span class="code-label">ORM Operations</span>
-// Create user - requires multiple inserts
-User user = new User("John", "john@example.com");
-user.setTheme("dark");
-user.setNotifications(true);
+<span class="code-label">ORM Operations (Sequelize)</span>
+// Create user - requires multiple operations and relationship management
+const user = await User.create({
+    name: "John Doe",
+    email: "john@example.com",
+    avatar: "avatar.jpg",
+    bio: "Software developer",
+    theme: "dark",
+    notifications: true
+});
 
-UserSkill skill1 = new UserSkill("JavaScript", "expert");
-skill1.setUser(user);
-user.getSkills().add(skill1);
+// Create related skills (separate inserts)
+await UserSkill.bulkCreate([
+    {
+        user_id: user.id,
+        skill_name: "JavaScript",
+        skill_level: "expert"
+    },
+    {
+        user_id: user.id,
+        skill_name: "MongoDB",
+        skill_level: "advanced"
+    }
+]);
 
-UserProject project = new UserProject(1, "E-commerce App", "active");
-project.setUser(user);
-user.getProjects().add(project);
+// Create related projects (separate inserts)
+await UserProject.bulkCreate([
+    {
+        user_id: user.id,
+        project_name: "E-commerce App",
+        status: "active"
+    },
+    {
+        user_id: user.id,
+        project_name: "Blog Platform",
+        status: "completed"
+    }
+]);
 
-entityManager.persist(user); // Cascades to related tables
+// Update nested preference - requires loading full object
+const userToUpdate = await User.findByPk(userId);
+userToUpdate.theme = "light";
+await userToUpdate.save();
 
-// Update nested preference - requires object loading
-User user = entityManager.find(User.class, userId);
-user.setTheme("light");
-entityManager.merge(user);
+// Add skill - requires creating new relationship
+await UserSkill.create({
+    user_id: userId,
+    skill_name: "Python",
+    skill_level: "intermediate"
+});
 
-// Add skill - requires creating new object and managing relationships
-User user = entityManager.find(User.class, userId);
-UserSkill newSkill = new UserSkill("Python", "intermediate");
-newSkill.setUser(user);
-user.getSkills().add(newSkill);
-entityManager.merge(user);
+// Query users with specific theme - simple enough
+const darkThemeUsers = await User.findAll({
+    where: { theme: "dark" },
+    include: [UserSkill, UserProject] // Need includes for full object
+});</div>
+                </div>
+
+                <div class="layer-section relational">
+                    <div class="layer-title relational">🆕 Modern PostgreSQL Alternative (JSONB)</div>
+                    
+                    <div class="code-block">
+<span class="code-label">PostgreSQL with JSONB</span>
+-- Modern approach: Store JSON directly
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100),
+    profile JSONB,
+    skills JSONB,
+    projects JSONB
+);
+
+// Insert user object
+await pool.query(`
+    INSERT INTO users (name, email, profile, skills, projects)
+    VALUES ($1, $2, $3, $4, $5)
+`, [
+    'John Doe',
+    'john@example.com', 
+    JSON.stringify({avatar: "avatar.jpg", bio: "Software developer", preferences: {theme: "dark", notifications: true}}),
+    JSON.stringify([{name: "JavaScript", level: "expert"}, {name: "MongoDB", level: "advanced"}]),
+    JSON.stringify([{id: 1, name: "E-commerce App", status: "active"}])
+]);
+
+// Update nested field
+await pool.query(`
+    UPDATE users 
+    SET profile = jsonb_set(profile, '{preferences,theme}', '"light"')
+    WHERE id = $1
+`, [userId]);
+
+// Query nested data
+const result = await pool.query(`
+    SELECT * FROM users 
+    WHERE profile->'preferences'->>'theme' = 'dark'
+`);</div>
+
+                    <div class="impedance-mismatch error">
+                        <strong>⚠️ Still Complex:</strong> While JSONB reduces the impedance mismatch, you still need to learn PostgreSQL's JSON operators, handle JSON serialization/deserialization manually, and manage the hybrid relational-document approach.
                     </div>
                 </div>
 
                 <div class="complexity-meter">
                     <span>Code Complexity:</span>
                     <div class="meter-bar">
-                        <div class="meter-fill high" style="width: 85%"></div>
+                        <div class="meter-fill high" style="width: 65%"></div>
                     </div>
-                    <span>High</span>
+                    <span>Higher (ORM setup + relationships)</span>
                 </div>
 
                 <div class="simulation-container">
@@ -1192,71 +1702,143 @@ entityManager.merge(user);
                 </div>
 
                 <div class="benefits relational">
-                    <h4>⚠️ Complexity & Overhead</h4>
+                    <h4>⚖️ Trade-offs to Consider</h4>
                     <ul>
-                        <li><span class="icon">🔧</span> Extensive ORM configuration required</li>
-                        <li><span class="icon">🗄️</span> Objects split across multiple tables</li>
-                        <li><span class="icon">🔄</span> Complex relationship management</li>
-                        <li><span class="icon">⚡</span> Performance overhead from joins</li>
-                        <li><span class="icon">📚</span> Steep learning curve for ORM tools</li>
+                        <li><span class="icon">🔧</span> Requires ORM configuration and relationship management</li>
+                        <li><span class="icon">🗄️</span> Objects decomposed across multiple tables</li>
+                        <li><span class="icon">⚡</span> More complex for document-like data structures</li>
+                        <li><span class="icon">💪</span> Referential integrity with foreign key constraints</li>
+                        <li><span class="icon">📊</span> Powerful analytical and reporting capabilities</li>
                     </ul>
                 </div>
             </div>
         </div>
 
         <!-- Summary Section -->
-        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Object-Relational Impedance Mismatch</h2>
+        <div class="summary-section">
+            <h2>When Natural Object Storage Wins</h2>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                <div>
-                    <h3 style="color: #00684A; margin-bottom: 15px;">🍃 MongoDB: Natural Object Storage</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
-                            <strong>Direct Mapping:</strong> Application objects stored as-is
+            <div class="summary-grid">
+                <div class="summary-card mongo-summary">
+                    <h3>🍃 MongoDB: Ideal for Object-Centric Apps</h3>
+                    <ul>
+                        <li>
+                            <strong>Direct Mapping:</strong> Application objects stored as-is, zero impedance mismatch
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
-                            <strong>No ORM Layer:</strong> Direct database operations
+                        <li>
+                            <strong>Rapid Development:</strong> No ORM configuration, focus on business logic
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
-                            <strong>Native Operations:</strong> Work with objects naturally
+                        <li>
+                            <strong>Flexible Schema:</strong> Easy evolution as requirements change
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
-                            <strong>Rapid Development:</strong> Less boilerplate, more productivity
+                        <li>
+                            <strong>Best for:</strong> Content management, catalogs, user profiles, document-based workflows
                         </li>
                     </ul>
                 </div>
                 
-                <div>
-                    <h3 style="color: #D32F2F; margin-bottom: 15px;">🗄️ SQL + ORM: Complex Mapping</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
-                            <strong>ORM Configuration:</strong> Extensive mapping definitions
+                <div class="summary-card sql-summary">
+                    <h3>🗄️ SQL: Strengths & Complexities</h3>
+                    <ul>
+                        <li>
+                            <strong>Referential Integrity:</strong> Foreign key constraints and enforced relationships
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
-                            <strong>Multiple Tables:</strong> Objects decomposed across relations
+                        <li>
+                            <strong>Analytical Power:</strong> Complex queries, reporting, JOINs
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
-                            <strong>Relationship Management:</strong> Complex foreign key handling
+                        <li>
+                            <strong>Trade-off:</strong> ORM complexity for object-oriented applications
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
-                            <strong>Performance Overhead:</strong> JOINs and lazy loading issues
+                        <li>
+                            <strong>Best for:</strong> Systems requiring enforced referential integrity, complex reporting across normalized data, established SQL ecosystems
                         </li>
                     </ul>
                 </div>
             </div>
             
-            <div style="text-align: center; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                <h4 style="color: #333; margin-bottom: 10px;">💡 Key Insight</h4>
-                <p style="font-size: 1.1em; color: #666;">
-                    MongoDB eliminates the object-relational impedance mismatch by storing objects as documents, 
-                    while SQL databases require complex ORM layers to bridge the gap between objects and relational tables.
+            <div class="key-insight">
+                <h4>💡 Key Insight</h4>
+                <p>
+                    For applications where your data naturally fits an object model (user profiles, content, catalogs), 
+                    MongoDB eliminates the object-relational impedance mismatch entirely. Choose SQL when you need 
+                    enforced referential integrity or complex analytical queries across normalized data.
                 </p>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
+        // Navigation Functions
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.toggle('open');
+            backdrop.classList.toggle('active');
+            toggleBtn.classList.toggle('menu-open');
+            
+            // Update ARIA attributes
+            const isOpen = navMenu.classList.contains('open');
+            toggleBtn.setAttribute('aria-expanded', isOpen);
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            toggleBtn.classList.remove('menu-open');
+            
+            // Update ARIA attributes
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function initializeAccordion() {
+            // Auto-expand development section since this is an ORM vs objects demo
+            const devContent = document.getElementById('development-content');
+            const devIcon = document.getElementById('development-icon');
+            const devHeader = devContent.previousElementSibling;
+            
+            if (devContent && devIcon && devHeader) {
+                devContent.classList.add('expanded');
+                devIcon.classList.add('rotated');
+                devHeader.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // Toggle demo overview section
+        function toggleDemoOverview() {
+            var overview = document.getElementById('demoOverview');
+            var toggle = document.getElementById('demoToggle');
+            
+            if (overview.style.display === 'none') {
+                overview.style.display = 'block';
+                toggle.textContent = '▲';
+            } else {
+                overview.style.display = 'none';
+                toggle.textContent = '▼';
+            }
+        }
+
         // MongoDB Simulation State
         let mongoUsers = [];
         let mongoUserId = 1;
@@ -1273,22 +1855,6 @@ entityManager.merge(user);
         function init() {
             mongoReset();
             sqlReset();
-        }
-
-        // Toggle demo overview section
-        function toggleDemoOverview() {
-            var overview = document.getElementById('demoOverview');
-            var toggle = document.getElementById('demoToggle');
-            
-            if (overview.style.display === 'none') {
-                overview.style.display = 'block';
-                toggle.textContent = '▲';
-                toggle.style.transform = 'rotate(180deg)';
-            } else {
-                overview.style.display = 'none';
-                toggle.textContent = '▼';
-                toggle.style.transform = 'rotate(0deg)';
-            }
         }
 
         // MongoDB Functions
@@ -1538,7 +2104,7 @@ entityManager.merge(user);
             }
             
             // Show the complexity
-            html += '<div class="table-section" style="color: #ff6b6b;">';
+            html += '<div class="table-section" style="color: #D32F2F;">';
             html += '<div class="table-title">⚠️ ORM COMPLEXITY</div>';
             html += `Total Tables: ${3}\n`;
             html += `Total Records: ${sqlUsers.length + sqlUserSkills.length + sqlUserProjects.length}\n`;
@@ -1558,45 +2124,25 @@ entityManager.merge(user);
             log.scrollTop = log.scrollHeight;
         }
 
-        // Mobile menu functionality
-        function toggleMobileMenu() {
+        // Handle outside clicks
+        document.addEventListener('click', (e) => {
             const navMenu = document.getElementById('navMenu');
-            navMenu.classList.toggle('open');
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const navMenu = document.getElementById('navMenu');
-            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            const menuToggle = document.getElementById('menuToggle');
             
-            if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
-                navMenu.classList.remove('open');
+            // Close menu if clicking outside
+            if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                closeMobileMenu();
             }
         });
 
-        // Accordion functionality
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
             }
-        }
+        });
 
-        // Initialize accordion - expand category containing current page
-        function initializeAccordion() {
-            const content = document.getElementById('development-content');
-            const icon = document.getElementById('development-icon');
-            content.classList.add('expanded');
-            icon.classList.add('rotated');
-        }
-
-        // Initialize on page load
+        // Initialize everything when DOM is ready
         window.addEventListener('load', function() {
             initializeAccordion();
             init();

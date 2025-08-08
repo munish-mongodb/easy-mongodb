@@ -1,18 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCV5KGB8ES"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-YCV5KGB8ES');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MongoDB vs PostgreSQL: Strategic Technology Decision for Executive Leadership</title>
+    <title>MongoDB: Strategic Technology Investment for Executive Leadership</title>
     
     <style>
         * {
@@ -265,7 +256,7 @@
         }
         
         h1 {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 700;
             margin-bottom: 1rem;
             background: linear-gradient(45deg, #4ade80, #06b6d4);
@@ -276,7 +267,7 @@
         }
         
         h2 {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
             color: #4ade80;
@@ -297,7 +288,7 @@
         }
         
         .subtitle {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #94a3b8;
             margin-bottom: 3rem;
             max-width: 900px;
@@ -362,14 +353,14 @@
             font-size: 1.3rem;
         }
         
-        .postgres-feature:before {
-            content: "⚠";
+        .consideration:before {
+            content: "⚡";
             color: #fbbf24;
         }
 
-        .risk-indicator:before {
-            content: "⚠";
-            color: #ef4444;
+        .trade-off:before {
+            content: "⚖";
+            color: #06b6d4;
         }
         
         .stats-container {
@@ -459,14 +450,14 @@
             text-align: center;
         }
 
-        .risk-card {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .balanced-card {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
-        .risk-card:hover {
-            border-color: #ef4444;
-            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2);
+        .balanced-card:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 20px 40px rgba(251, 191, 36, 0.2);
         }
         
         .cta-section {
@@ -557,30 +548,35 @@
             font-weight: 600;
         }
 
-        /* TCO Breakdown */
-        .tco-breakdown {
+        /* Business Impact Cards */
+        .business-metric {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin: 2rem 0;
         }
 
-        .tco-item {
+        .metric-item {
             background: rgba(255, 255, 255, 0.1);
             padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid rgba(74, 222, 128, 0.3);
         }
 
-        .tco-amount {
+        .metric-value {
             font-size: 2rem;
             font-weight: 700;
             color: #4ade80;
         }
 
-        .tco-savings {
-            color: #4ade80;
-            font-weight: 600;
+        .context-note {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            color: #f59e0b;
+            font-size: 0.95rem;
         }
 
         /* Case Study Cards */
@@ -726,6 +722,22 @@
             </li>
             
             <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Architecture Patterns</span>
+                    <span class="accordion-icon" id="patterns-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="patterns-content" role="region">
+                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
+                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
+                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
+                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
+                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
+                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
+                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
                 <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
                     <span>Application Development</span>
                     <span class="accordion-icon" id="development-icon">▼</span>
@@ -743,429 +755,366 @@
 
     <div class="presentation-container">
         <div class="slide-indicator">
-            <span id="slide-counter">1 / 9</span>
+            <span id="slide-counter">1 / 8</span>
         </div>
         
         <!-- Slide 1: Executive Summary -->
         <div class="slide" id="slide1">
-            <h1>MongoDB vs PostgreSQL</h1>
-            <p class="subtitle">Strategic Technology Decision for Executive Leadership: Accelerating Innovation While Reducing Risk and Total Cost of Ownership</p>
+            <h1>MongoDB: Strategic Database Investment</h1>
+            <p class="subtitle">Accelerating digital transformation through modern data architecture while mitigating operational risk and improving competitive positioning</p>
             <div class="stats-container">
                 <div class="stat-card">
-                    <span class="stat-number">70%</span>
-                    <span class="stat-label">of Fortune 100 trust MongoDB</span>
+                    <span class="stat-number">54,500+</span>
+                    <span class="stat-label">global customers including major enterprises</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number">3-5x</span>
-                    <span class="stat-label">faster time-to-market</span>
+                    <span class="stat-number">99.995%</span>
+                    <span class="stat-label">Atlas uptime SLA for mission-critical workloads</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-number">40-60%</span>
-                    <span class="stat-label">reduction in development costs</span>
+                    <span class="stat-label">reduction in development cycles*</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number">50%</span>
-                    <span class="stat-label">lower infrastructure costs</span>
+                    <span class="stat-number">Linear</span>
+                    <span class="stat-label">horizontal scaling to global scale</span>
                 </div>
+            </div>
+            <div class="context-note">
+                * Results vary by application complexity and team experience. Based on customer-reported development velocity improvements for document-centric applications.
             </div>
         </div>
 
-        <!-- Slide 2: Business Risk Assessment -->
+        <!-- Slide 2: Business Drivers -->
         <div class="slide" id="slide2">
-            <h2>Risk Assessment: PostgreSQL vs MongoDB</h2>
-            <div class="comparison-grid">
-                <div class="db-column risk-card">
-                    <h3>🐘 PostgreSQL Business Risks</h3>
-                    <ul class="feature-list">
-                        <li class="risk-indicator">Complex scaling requires significant engineering investment</li>
-                        <li class="risk-indicator">Schema migrations cause application downtime</li>
-                        <li class="risk-indicator">Developer productivity bottlenecks slow innovation</li>
-                        <li class="risk-indicator">ORM complexity increases technical debt</li>
-                        <li class="risk-indicator">Limited cloud-native scalability options</li>
-                        <li class="risk-indicator">Higher DBA and operational overhead</li>
-                    </ul>
+            <h2>Market Forces Driving Database Strategy</h2>
+            <div class="advantage-grid">
+                <div class="advantage-card">
+                    <span class="advantage-icon">🚀</span>
+                    <h4>Speed to Market Pressure</h4>
+                    <p><strong>Reality:</strong> Digital-first competitors launch features in weeks, not quarters</p>
+                    <p>• Rapid prototyping and iteration requirements</p>
+                    <p>• Schema evolution without downtime</p>
+                    <p>• Developer velocity as competitive advantage</p>
                 </div>
-                <div class="db-column mongodb-highlight">
-                    <h3>🍃 MongoDB Risk Mitigation</h3>
-                    <ul class="feature-list">
-                        <li>Native horizontal scaling eliminates performance bottlenecks</li>
-                        <li>Zero-downtime schema evolution reduces deployment risk</li>
-                        <li>Faster development cycles accelerate competitive advantage</li>
-                        <li>Document model reduces architectural complexity</li>
-                        <li>Enterprise Atlas provides managed cloud reliability</li>
-                        <li>Automated operations reduce human error and costs</li>
-                    </ul>
+                <div class="advantage-card">
+                    <span class="advantage-icon">🌍</span>
+                    <h4>Global Scale Requirements</h4>
+                    <p><strong>Challenge:</strong> Traditional databases struggle with multi-region, multi-cloud deployment</p>
+                    <p>• Data sovereignty and compliance across regions</p>
+                    <p>• Sub-100ms response times globally</p>
+                    <p>• Elastic scaling during traffic spikes</p>
+                </div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">🧠</span>
+                    <h4>AI Integration Imperative</h4>
+                    <p><strong>Opportunity:</strong> AI-powered applications require flexible data models</p>
+                    <p>• Vector search for semantic analysis</p>
+                    <p>• Real-time data for ML model training</p>
+                    <p>• Unstructured data from IoT and sensors</p>
+                </div>
+                <div class="advantage-card balanced-card">
+                    <span class="advantage-icon">⚖️</span>
+                    <h4>Operational Complexity</h4>
+                    <p><strong>Trade-off:</strong> Choose between innovation speed and operational simplicity</p>
+                    <p>• Database administrator skill scarcity</p>
+                    <p>• Multi-technology stack complexity</p>
+                    <p>• Infrastructure management overhead</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 3: Total Cost of Ownership Analysis -->
+        <!-- Slide 3: Strategic Comparison -->
         <div class="slide" id="slide3">
-            <h2>3-Year Total Cost of Ownership Comparison</h2>
-            <p class="subtitle">Enterprise-scale deployment: 50TB data, 1000+ concurrent users, high availability requirements</p>
+            <h2>MongoDB vs PostgreSQL: Strategic Analysis</h2>
+            <div class="comparison-grid">
+                <div class="db-column mongodb-highlight">
+                    <h3>🍃 MongoDB Advantages</h3>
+                    <ul class="feature-list">
+                        <li><strong>Native horizontal scaling</strong> - no sharding complexity</li>
+                        <li><strong>Document model alignment</strong> with modern app development</li>
+                        <li><strong>Schema flexibility</strong> for rapid iteration</li>
+                        <li><strong>Atlas managed service</strong> reduces operational overhead</li>
+                        <li><strong>Built-in vector search</strong> for AI applications</li>
+                        <li><strong>Global clusters</strong> with automatic data distribution</li>
+                    </ul>
+                </div>
+                <div class="db-column postgres-column">
+                    <h3>🐘 PostgreSQL Considerations</h3>
+                    <ul class="feature-list">
+                        <li class="consideration">Strong for complex relational queries and analytics</li>
+                        <li class="consideration">Mature ecosystem with extensive tooling</li>
+                        <li class="consideration">Open source with no licensing costs</li>
+                        <li class="trade-off">Horizontal scaling requires significant engineering effort</li>
+                        <li class="trade-off">Schema changes can require application downtime</li>
+                        <li class="trade-off">ORM complexity increases development time</li>
+                    </ul>
+                </div>
+            </div>
             
-            <div class="tco-breakdown">
-                <div class="tco-item">
-                    <h4>Development Costs</h4>
-                    <div class="tco-amount">$1.2M</div>
-                    <div>MongoDB vs $1.8M PostgreSQL</div>
-                    <div class="tco-savings">33% savings: $600K</div>
+            <div class="context-note">
+                <strong>Strategic Context:</strong> Both are excellent databases. PostgreSQL excels for analytical workloads and applications with stable, well-defined schemas. MongoDB provides advantages for applications requiring rapid development, global scale, and flexible data models.
+            </div>
+        </div>
+
+        <!-- Slide 4: Innovation Advantage -->
+        <div class="slide" id="slide4">
+            <h2>Accelerating Innovation Cycles</h2>
+            <div class="advantage-grid">
+                <div class="advantage-card">
+                    <span class="advantage-icon">⚡</span>
+                    <h4>Development Velocity</h4>
+                    <p><strong>Business Impact:</strong> Faster feature delivery and market response</p>
+                    <p>• Natural object-document mapping reduces code</p>
+                    <p>• No ORM impedance mismatch</p>
+                    <p>• Zero-downtime schema evolution</p>
+                    <p>• Rich aggregation pipeline for analytics</p>
                 </div>
-                <div class="tco-item">
-                    <h4>Infrastructure</h4>
-                    <div class="tco-amount">$720K</div>
-                    <div>MongoDB vs $900K PostgreSQL</div>
-                    <div class="tco-savings">20% savings: $180K</div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">🔄</span>
+                    <h4>Operational Agility</h4>
+                    <p><strong>Benefit:</strong> Reduced infrastructure management burden</p>
+                    <p>• Atlas automates 95% of database operations</p>
+                    <p>• Automatic scaling based on workload</p>
+                    <p>• Built-in monitoring and performance optimization</p>
+                    <p>• Multi-cloud deployment flexibility</p>
                 </div>
-                <div class="tco-item">
-                    <h4>Operations & DBA</h4>
-                    <div class="tco-amount">$180K</div>
-                    <div>MongoDB vs $450K PostgreSQL</div>
-                    <div class="tco-savings">60% savings: $270K</div>
+                <div class="advantage-card">
+                    <span class="advantage-icon">🎯</span>
+                    <h4>Time-to-Value</h4>
+                    <p><strong>Outcome:</strong> Faster proof-of-concepts and market validation</p>
+                    <p>• Rapid prototyping without upfront schema design</p>
+                    <p>• Easy integration with modern development stacks</p>
+                    <p>• Comprehensive APIs and drivers</p>
+                    <p>• Cloud-native architecture from day one</p>
                 </div>
-                <div class="tco-item">
-                    <h4>Total 3-Year TCO</h4>
-                    <div class="tco-amount">$2.1M</div>
-                    <div>MongoDB vs $3.15M PostgreSQL</div>
-                    <div class="tco-savings">Total savings: $1.05M</div>
+                <div class="advantage-card balanced-card">
+                    <span class="advantage-icon">📚</span>
+                    <h4>Learning Curve Consideration</h4>
+                    <p><strong>Trade-off:</strong> New query language vs SQL familiarity</p>
+                    <p>• MQL learning curve for SQL-experienced teams</p>
+                    <p>• Document thinking vs relational modeling</p>
+                    <p>• MongoDB University provides training resources</p>
+                    <p>• Generally shorter ramp-up for new developers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Business Impact -->
+        <div class="slide" id="slide5">
+            <h2>Total Business Impact Analysis</h2>
+            <p class="subtitle">Based on customer-reported outcomes and third-party studies for mid-to-large enterprise deployments</p>
+            
+            <div class="business-metric">
+                <div class="metric-item">
+                    <h4>Development Efficiency</h4>
+                    <div class="metric-value">30-50%</div>
+                    <div>reduction in application development time for document-centric applications</div>
+                </div>
+                <div class="metric-item">
+                    <h4>Operational Overhead</h4>
+                    <div class="metric-value">60-80%</div>
+                    <div>reduction in database administration effort with Atlas managed service</div>
+                </div>
+                <div class="metric-item">
+                    <h4>Infrastructure Flexibility</h4>
+                    <div class="metric-value">Linear</div>
+                    <div>scaling performance without architectural rewrites</div>
+                </div>
+                <div class="metric-item">
+                    <h4>Time to Scale</h4>
+                    <div class="metric-value">Minutes</div>
+                    <div>to add capacity vs weeks for traditional database scaling</div>
                 </div>
             </div>
 
             <div class="advantage-grid">
                 <div class="advantage-card">
-                    <span class="advantage-icon">📊</span>
-                    <h4>Hidden PostgreSQL Costs</h4>
-                    <p>• Complex ORM licensing and training</p>
-                    <p>• Extended development cycles</p>
-                    <p>• Manual scaling engineering effort</p>
-                    <p>• Downtime during schema changes</p>
-                    <p>• Higher DBA staffing requirements</p>
-                </div>
-                <div class="advantage-card">
                     <span class="advantage-icon">💰</span>
-                    <h4>MongoDB Cost Advantages</h4>
-                    <p>• Native drivers eliminate ORM costs</p>
-                    <p>• Faster feature delivery</p>
-                    <p>• Automatic scaling reduces engineering</p>
-                    <p>• Zero-downtime deployments</p>
-                    <p>• Managed Atlas reduces operational overhead</p>
+                    <h4>Cost Structure Comparison</h4>
+                    <p><strong>MongoDB:</strong> Higher per-unit database cost, lower total application cost</p>
+                    <p>• Reduced development team size requirements</p>
+                    <p>• Lower operational overhead</p>
+                    <p>• Faster time-to-market revenue</p>
                 </div>
+                <div class="advantage-card balanced-card">
+                    <span class="advantage-icon">⚖️</span>
+                    <h4>PostgreSQL Cost Profile</h4>
+                    <p><strong>PostgreSQL:</strong> Lower licensing cost, higher operational investment</p>
+                    <p>• No database licensing fees</p>
+                    <p>• Higher DBA and infrastructure management costs</p>
+                    <p>• Potentially longer development cycles</p>
+                </div>
+            </div>
+
+            <div class="context-note">
+                <strong>Important:</strong> Total cost of ownership depends heavily on application type, team expertise, and scale requirements. For applications with complex relational queries, PostgreSQL may offer better economics. For modern, rapidly-evolving applications, MongoDB typically provides better ROI.
             </div>
         </div>
 
-        <!-- Slide 4: Customer Success Stories -->
-        <div class="slide" id="slide4">
-            <h2>Proven Enterprise Results</h2>
-            <p class="subtitle">Real customer outcomes from PostgreSQL to MongoDB migrations</p>
+        <!-- Slide 6: Enterprise Success Stories -->
+        <div class="slide" id="slide6">
+            <h2>Proven Enterprise Outcomes</h2>
+            <p class="subtitle">Real customer results from strategic database modernization initiatives</p>
             
             <div class="case-study">
-                <div class="company-logo">🏦 Major Financial Services Firm</div>
-                <p><strong>Challenge:</strong> PostgreSQL couldn't handle real-time fraud detection at scale</p>
-                <p><strong>Solution:</strong> Migrated to MongoDB Atlas with vector search for ML models</p>
+                <div class="company-logo">🏦 Major Financial Services Institution</div>
+                <p><strong>Challenge:</strong> Legacy systems couldn't support real-time fraud detection and customer personalization</p>
+                <p><strong>Solution:</strong> Migrated critical workloads to MongoDB Atlas with vector search capabilities</p>
                 <div class="case-metrics">
                     <div class="case-metric">
-                        <div class="case-metric-value">90%</div>
+                        <div class="case-metric-value">85%</div>
                         <div class="case-metric-label">faster fraud detection</div>
                     </div>
                     <div class="case-metric">
-                        <div class="case-metric-value">$2.3M</div>
-                        <div class="case-metric-label">annual cost savings</div>
+                        <div class="case-metric-value">40%</div>
+                        <div class="case-metric-label">reduction in false positives</div>
                     </div>
                     <div class="case-metric">
-                        <div class="case-metric-value">6 months</div>
-                        <div class="case-metric-label">ROI payback period</div>
+                        <div class="case-metric-value">12 months</div>
+                        <div class="case-metric-label">full ROI payback</div>
                     </div>
                 </div>
             </div>
 
             <div class="case-study">
-                <div class="company-logo">🛒 Global E-commerce Platform</div>
-                <p><strong>Challenge:</strong> PostgreSQL scaling bottlenecks during peak traffic</p>
-                <p><strong>Solution:</strong> Implemented MongoDB sharding for global customer base</p>
+                <div class="company-logo">🛒 Global Retail Platform</div>
+                <p><strong>Challenge:</strong> Traditional database architecture couldn't handle seasonal traffic spikes and global expansion</p>
+                <p><strong>Solution:</strong> Implemented MongoDB global clusters for inventory and customer management</p>
                 <div class="case-metrics">
                     <div class="case-metric">
-                        <div class="case-metric-value">10x</div>
-                        <div class="case-metric-label">traffic capacity increase</div>
+                        <div class="case-metric-value">5x</div>
+                        <div class="case-metric-label">peak traffic handling</div>
                     </div>
                     <div class="case-metric">
-                        <div class="case-metric-value">50%</div>
-                        <div class="case-metric-label">faster page load times</div>
+                        <div class="case-metric-value">65%</div>
+                        <div class="case-metric-label">faster page loads</div>
                     </div>
                     <div class="case-metric">
-                        <div class="case-metric-value">40%</div>
-                        <div class="case-metric-label">development time reduction</div>
+                        <div class="case-metric-value">8 regions</div>
+                        <div class="case-metric-label">simultaneous deployment</div>
                     </div>
                 </div>
             </div>
 
             <div class="case-study">
-                <div class="company-logo">🏥 Healthcare Technology Leader</div>
-                <p><strong>Challenge:</strong> HIPAA compliance with PostgreSQL required extensive custom development</p>
-                <p><strong>Solution:</strong> MongoDB Enterprise with field-level encryption</p>
+                <div class="company-logo">🏥 Healthcare Technology Company</div>
+                <p><strong>Challenge:</strong> Complex compliance requirements and need for real-time patient data access</p>
+                <p><strong>Solution:</strong> MongoDB Enterprise with field-level encryption and audit capabilities</p>
                 <div class="case-metrics">
                     <div class="case-metric">
                         <div class="case-metric-value">99.99%</div>
-                        <div class="case-metric-label">uptime achieved</div>
+                        <div class="case-metric-label">system availability</div>
                     </div>
                     <div class="case-metric">
-                        <div class="case-metric-value">70%</div>
+                        <div class="case-metric-value">50%</div>
                         <div class="case-metric-label">compliance effort reduction</div>
                     </div>
                     <div class="case-metric">
                         <div class="case-metric-value">3x</div>
-                        <div class="case-metric-label">faster feature deployment</div>
+                        <div class="case-metric-label">faster feature releases</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 5: Competitive Advantage & Innovation -->
-        <div class="slide" id="slide5">
-            <h2>Strategic Advantages: Beyond Technology</h2>
+        <!-- Slide 7: Future Readiness -->
+        <div class="slide" id="slide7">
+            <h2>Future-Proofing Your Data Architecture</h2>
             <div class="advantage-grid">
                 <div class="advantage-card">
-                    <span class="advantage-icon">🚀</span>
-                    <h4>Accelerated Innovation</h4>
-                    <p><strong>3-5x faster time-to-market</strong> for new features and products</p>
-                    <p>• Rapid prototyping with flexible schema</p>
-                    <p>• Zero-downtime deployments enable continuous delivery</p>
-                    <p>• Native A/B testing and feature flag support</p>
-                    <p>• Modern API-first architecture</p>
+                    <span class="advantage-icon">🤖</span>
+                    <h4>AI-Ready Architecture</h4>
+                    <p><strong>Strategic Value:</strong> Built-in capabilities for next-generation applications</p>
+                    <p>• Native vector search for semantic queries</p>
+                    <p>• Integration with major AI/ML platforms</p>
+                    <p>• Real-time data processing for model training</p>
+                    <p>• Support for unstructured data from IoT and sensors</p>
                 </div>
                 <div class="advantage-card">
-                    <span class="advantage-icon">🌍</span>
-                    <h4>Global Scale & Performance</h4>
-                    <p><strong>Linear scaling</strong> to hundreds of thousands of operations per second</p>
-                    <p>• Multi-region deployment with automatic failover</p>
-                    <p>• Edge computing and CDN integration</p>
-                    <p>• Global sharding with data sovereignty compliance</p>
-                    <p>• Sub-50ms response times globally</p>
+                    <span class="advantage-icon">🌐</span>
+                    <h4>Multi-Cloud Strategy</h4>
+                    <p><strong>Risk Mitigation:</strong> Avoid vendor lock-in with portable architecture</p>
+                    <p>• Consistent experience across AWS, Azure, GCP</p>
+                    <p>• Cross-cloud disaster recovery</p>
+                    <p>• Hybrid deployment flexibility</p>
+                    <p>• Easy migration between cloud providers</p>
                 </div>
                 <div class="advantage-card">
-                    <span class="advantage-icon">🧠</span>
-                    <h4>AI/ML Integration</h4>
-                    <p><strong>Native vector search</strong> for next-generation AI applications</p>
-                    <p>• Real-time recommendation engines</p>
-                    <p>• Semantic search and similarity matching</p>
-                    <p>• Integration with OpenAI, Hugging Face, etc.</p>
-                    <p>• Streaming analytics and real-time ML inference</p>
+                    <span class="advantage-icon">📊</span>
+                    <h4>Modern Analytics</h4>
+                    <p><strong>Business Intelligence:</strong> Operational and analytical workloads unified</p>
+                    <p>• Real-time aggregation and reporting</p>
+                    <p>• Integration with BI tools and data lakes</p>
+                    <p>• Time-series data optimization</p>
+                    <p>• Streaming analytics capabilities</p>
                 </div>
                 <div class="advantage-card">
                     <span class="advantage-icon">🛡️</span>
-                    <h4>Future-Proof Security</h4>
-                    <p><strong>Quantum-safe encryption</strong> ready for 2025+ threats</p>
+                    <h4>Enterprise Security</h4>
+                    <p><strong>Compliance Ready:</strong> Advanced security for regulated industries</p>
                     <p>• Client-side field-level encryption</p>
                     <p>• Queryable encryption (industry-first)</p>
-                    <p>• LDAP/Kerberos enterprise integration</p>
-                    <p>• SOC 2, HIPAA, GDPR compliance built-in</p>
+                    <p>• RBAC with fine-grained permissions</p>
+                    <p>• Comprehensive audit trails</p>
                 </div>
+            </div>
+
+            <div class="context-note">
+                <strong>Technology Evolution:</strong> MongoDB continues to invest heavily in AI integration, with recent acquisition of Voyage AI for advanced embedding models. PostgreSQL also has strong AI capabilities through extensions like pgvector.
             </div>
         </div>
 
-        <!-- Slide 6: Team Productivity & Talent -->
-        <div class="slide" id="slide6">
-            <h2>Developer Productivity & Talent Acquisition</h2>
-            <div class="comparison-grid">
-                <div class="db-column mongodb-highlight">
-                    <h3>MongoDB Developer Benefits</h3>
-                    <ul class="feature-list">
-                        <li><strong>60% less code</strong> required vs PostgreSQL + ORM</li>
-                        <li><strong>Native JSON/JavaScript</strong> support - no impedance mismatch</li>
-                        <li><strong>Intuitive document model</strong> matches application objects</li>
-                        <li><strong>Rich ecosystem</strong> with 100+ native drivers</li>
-                        <li><strong>Strong developer community</strong> and learning resources</li>
-                        <li><strong>Modern tooling</strong> with Atlas UI, Compass, VS Code integration</li>
-                    </ul>
-                </div>
-                <div class="db-column">
-                    <h3>🎯 Talent Strategy Impact</h3>
-                    <ul class="feature-list">
-                        <li><strong>Easier recruitment:</strong> MongoDB skills in high demand</li>
-                        <li><strong>Faster onboarding:</strong> Intuitive document model</li>
-                        <li><strong>Higher satisfaction:</strong> Less boilerplate, more innovation</li>
-                        <li><strong>Retention advantage:</strong> Modern technology stack</li>
-                        <li><strong>Cross-functional teams:</strong> Frontend developers can contribute to backend</li>
-                        <li><strong>Reduced training costs:</strong> Shorter learning curve</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="stats-container">
-                <div class="stat-card">
-                    <span class="stat-number">85%</span>
-                    <span class="stat-label">developer satisfaction with MongoDB</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">2-3 weeks</span>
-                    <span class="stat-label">typical onboarding time</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">40%</span>
-                    <span class="stat-label">improvement in feature velocity</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 7: Migration Strategy & Timeline -->
-        <div class="slide" id="slide7">
-            <h2>Executive Migration Strategy</h2>
-            <p class="subtitle">Structured approach to minimize risk and maximize business value</p>
-            
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 1: Assessment & Planning</div>
-                    <div class="timeline-duration">Weeks 1-4</div>
-                    <p>• Current PostgreSQL architecture audit</p>
-                    <p>• Application dependency mapping</p>
-                    <p>• MongoDB pilot project selection</p>
-                    <p>• Team training and certification planning</p>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 2: Pilot Implementation</div>
-                    <div class="timeline-duration">Weeks 5-12</div>
-                    <p>• Non-critical application migration</p>
-                    <p>• Performance benchmarking</p>
-                    <p>• Developer training and enablement</p>
-                    <p>• Operational procedures development</p>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 3: Production Migration</div>
-                    <div class="timeline-duration">Weeks 13-24</div>
-                    <p>• Critical application migration with parallel running</p>
-                    <p>• Automated testing and validation</p>
-                    <p>• Performance monitoring and optimization</p>
-                    <p>• Gradual traffic shifting and cutover</p>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 4: Optimization & Scale</div>
-                    <div class="timeline-duration">Weeks 25-36</div>
-                    <p>• Advanced feature implementation (AI/ML, analytics)</p>
-                    <p>• Global scaling and multi-region deployment</p>
-                    <p>• Team capability maturation</p>
-                    <p>• ROI measurement and optimization</p>
-                </div>
-            </div>
-
-            <div class="advantage-grid">
-                <div class="advantage-card">
-                    <span class="advantage-icon">🛠️</span>
-                    <h4>MongoDB Professional Services</h4>
-                    <p>• Dedicated migration architects</p>
-                    <p>• 24/7 enterprise support during transition</p>
-                    <p>• Best practices consulting</p>
-                    <p>• Performance optimization guidance</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🎯</span>
-                    <h4>Risk Mitigation Tools</h4>
-                    <p>• Automated migration utilities</p>
-                    <p>• Parallel running capabilities</p>
-                    <p>• Rollback procedures and safeguards</p>
-                    <p>• Comprehensive testing frameworks</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 8: Vendor Partnership & Support -->
+        <!-- Slide 8: Decision Framework -->
         <div class="slide" id="slide8">
-            <h2>Strategic Partnership Value</h2>
-            <div class="advantage-grid">
-                <div class="advantage-card">
-                    <span class="advantage-icon">🤝</span>
-                    <h4>MongoDB Enterprise Partnership</h4>
-                    <p><strong>Dedicated success management</strong> for enterprise accounts</p>
-                    <p>• Named technical account manager</p>
-                    <p>• Quarterly business reviews and planning</p>
-                    <p>• Priority access to new features and betas</p>
-                    <p>• Direct engineering team engagement</p>
-                    <p>• Custom SLA agreements available</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">📚</span>
-                    <h4>Training & Certification</h4>
-                    <p><strong>MongoDB University</strong> enterprise training programs</p>
-                    <p>• Role-based certification paths</p>
-                    <p>• Virtual and on-site training options</p>
-                    <p>• Hands-on labs and real-world scenarios</p>
-                    <p>• Progress tracking and team dashboards</p>
-                    <p>• Continuing education and updates</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🏗️</span>
-                    <h4>Solution Architecture Support</h4>
-                    <p><strong>Expert guidance</strong> for optimal implementation</p>
-                    <p>• Initial architecture design review</p>
-                    <p>• Performance optimization consulting</p>
-                    <p>• Security and compliance guidance</p>
-                    <p>• Scaling strategy planning</p>
-                    <p>• Integration pattern recommendations</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">⚡</span>
-                    <h4>24/7 Enterprise Support</h4>
-                    <p><strong>Global support</strong> with guaranteed response times</p>
-                    <p>• 15-minute response for critical issues</p>
-                    <p>• Proactive monitoring and alerting</p>
-                    <p>• Direct escalation to engineering</p>
-                    <p>• Health check and optimization reviews</p>
-                    <p>• Multi-language support capabilities</p>
-                </div>
-            </div>
-
-            <div class="stats-container">
-                <div class="stat-card">
-                    <span class="stat-number">99.995%</span>
-                    <span class="stat-label">MongoDB Atlas uptime SLA</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">15 min</span>
-                    <span class="stat-label">critical issue response time</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">95%</span>
-                    <span class="stat-label">customer satisfaction score</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 9: Executive Decision Framework -->
-        <div class="slide" id="slide9">
             <div class="cta-section">
-                <h2 style="color: #0a1628; margin-bottom: 1.5rem;">Executive Decision Framework</h2>
-                <p style="font-size: 1.4rem; margin-bottom: 2.5rem; color: #1e293b;">
-                    The strategic choice for competitive advantage, risk mitigation, and sustainable growth
+                <h2 style="color: #0a1628; margin-bottom: 1.5rem;">Strategic Decision Framework</h2>
+                <p style="font-size: 1.3rem; margin-bottom: 2.5rem; color: #1e293b;">
+                    Choose the database architecture that aligns with your business strategy and competitive requirements
                 </p>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin: 2rem 0; text-align: left;">
-                    <div style="background: rgba(10, 22, 40, 0.3); padding: 1.5rem; border-radius: 12px;">
-                        <h4 style="color: #0a1628; margin-bottom: 0.5rem;">✅ Choose MongoDB If:</h4>
-                        <p style="color: #334155;">• Rapid innovation is critical</p>
-                        <p style="color: #334155;">• Global scale is required</p>
-                        <p style="color: #334155;">• AI/ML integration is planned</p>
-                        <p style="color: #334155;">• Developer productivity matters</p>
-                        <p style="color: #334155;">• Cloud-first strategy</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0; text-align: left;">
+                    <div style="background: rgba(10, 22, 40, 0.3); padding: 1.8rem; border-radius: 12px;">
+                        <h4 style="color: #0a1628; margin-bottom: 1rem;">✅ Choose MongoDB When:</h4>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Rapid development cycles are critical</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Global scale and multi-region deployment needed</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• AI/ML integration is a strategic priority</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Data models evolve frequently</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Developer productivity drives competitive advantage</p>
+                        <p style="color: #334155;">• Operational simplicity reduces risk</p>
                     </div>
-                    <div style="background: rgba(10, 22, 40, 0.3); padding: 1.5rem; border-radius: 12px;">
-                        <h4 style="color: #0a1628; margin-bottom: 0.5rem;">📈 Expected Outcomes:</h4>
-                        <p style="color: #334155;">• 40-60% development cost reduction</p>
-                        <p style="color: #334155;">• 3-5x faster time-to-market</p>
-                        <p style="color: #334155;">• $1M+ annual cost savings</p>
-                        <p style="color: #334155;">• Enhanced competitive position</p>
-                        <p style="color: #334155;">• Future-ready architecture</p>
+                    <div style="background: rgba(10, 22, 40, 0.3); padding: 1.8rem; border-radius: 12px;">
+                        <h4 style="color: #0a1628; margin-bottom: 1rem;">⚖️ Consider PostgreSQL When:</h4>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Complex relational queries dominate workload</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Data model is stable and well-defined</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Strong SQL expertise on team</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Budget constraints prioritize low licensing costs</p>
+                        <p style="color: #334155; margin-bottom: 0.5rem;">• Analytical workloads are primary use case</p>
+                        <p style="color: #334155;">• Existing PostgreSQL infrastructure investment</p>
+                    </div>
+                </div>
+
+                <div style="background: rgba(10, 22, 40, 0.2); padding: 1.5rem; border-radius: 12px; margin: 2rem 0;">
+                    <h4 style="color: #0a1628; margin-bottom: 0.8rem;">🎯 Expected MongoDB Outcomes:</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <p style="color: #334155; font-size: 0.95rem;">40-60% faster development cycles</p>
+                        <p style="color: #334155; font-size: 0.95rem;">60-80% operational overhead reduction</p>
+                        <p style="color: #334155; font-size: 0.95rem;">Linear scaling to global requirements</p>
+                        <p style="color: #334155; font-size: 0.95rem;">Future-ready for AI integration</p>
                     </div>
                 </div>
 
                 <div style="margin: 3rem 0;">
                     <button class="cta-button" onclick="window.open('https://www.mongodb.com/atlas/database', '_blank')">
-                        Start MongoDB Atlas Free Tier
+                        Start 30-Day Atlas Trial
                     </button>
                     <button class="cta-button" onclick="window.open('https://www.mongodb.com/contact', '_blank')">
-                        Schedule Executive Briefing
+                        Request Architecture Consultation
                     </button>
                 </div>
                 
-                <p style="margin-top: 2rem; font-size: 1.2rem; color: #475569; position: relative; z-index: 1;">
-                    <strong>Next Steps:</strong> 30-day proof of concept • Architecture consultation • Migration planning
+                <p style="margin-top: 2rem; font-size: 1.1rem; color: #475569; position: relative; z-index: 1;">
+                    <strong>Recommended Next Steps:</strong> Technical proof-of-concept • Architecture review • Migration planning • Team training assessment
                 </p>
             </div>
         </div>
@@ -1178,7 +1127,7 @@
 
     <script>
         let currentSlide = 1;
-        const totalSlides = 9;
+        const totalSlides = 8;
 
         function updateSlideCounter() {
             document.getElementById('slide-counter').textContent = `${currentSlide} / ${totalSlides}`;
@@ -1191,6 +1140,7 @@
             if (n > totalSlides) currentSlide = 1;
             if (n < 1) currentSlide = totalSlides;
             
+            currentSlide = n;
             document.getElementById(`slide${currentSlide}`).style.display = 'flex';
             updateSlideCounter();
         }
@@ -1272,9 +1222,6 @@
                 previousSlide();
             } else if (e.key === 'Escape') {
                 closeMobileMenu();
-            } else if (e.altKey && e.key === 'm') {
-                e.preventDefault();
-                toggleMobileMenu();
             }
         });
 
@@ -1300,9 +1247,6 @@
             showSlide(1);
             initializeAccordion();
         });
-
-        // Auto-advance slides (optional - uncomment if desired)
-        // setInterval(nextSlide, 45000); // 45 seconds
     </script>
 </body>
 </html>

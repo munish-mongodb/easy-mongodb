@@ -7,13 +7,13 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-YCV5KGB8ES');
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrays & Embedded Documents: MongoDB vs Relational</title>
+    <title>Arrays & Embedded Documents: MongoDB vs PostgreSQL</title>
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -21,37 +21,60 @@
         }
 
         body {
-            font-family: 'Akzidenz', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
             color: #001E2B;
             line-height: 1.6;
             min-height: 100vh;
-            display: flex;
+            overflow-x: hidden;
         }
 
+        /* Navigation Menu */
         .nav-menu {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            box-shadow: 4px 0 20px rgba(0, 30, 43, 0.15);
             position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
             height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px;
             overflow-y: auto;
-            border-right: 1px solid rgba(0, 237, 100, 0.2);
+            border-right: 1px solid rgba(0, 104, 74, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
+        }
+
+        .nav-menu.open {
+            left: 0;
         }
 
         .nav-menu h2 {
-            margin-bottom: 25px;
             color: #00684A;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            font-weight: 700;
             text-align: center;
             padding-bottom: 15px;
             border-bottom: 3px solid #00ED64;
-            font-size: 1.4em;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            position: relative;
+        }
+
+        .nav-menu h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+            border-radius: 2px;
         }
 
         .nav-menu ul {
@@ -59,95 +82,298 @@
         }
 
         .nav-menu li {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .nav-menu a {
-            display: block;
-            padding: 12px 18px;
+        .nav-menu > ul > li > a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
             text-decoration: none;
             color: #001E2B;
             background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid transparent;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-menu a:hover, .nav-menu a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
+        .nav-menu > ul > li > a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu > ul > li > a:hover::before,
+        .nav-menu > ul > li > a.active::before {
+            opacity: 1;
+        }
+
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li > a.active {
             border-left: 4px solid #00ED64;
             transform: translateX(8px);
             color: #00684A;
-            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
         }
 
-        .nav-category {
+        /* Accordion Styles */
+        .nav-accordion {
+            margin-bottom: 10px;
+        }
+
+        .nav-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 700;
             color: #00684A;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding: 10px 18px;
-            font-size: 0.85em;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid rgba(0, 237, 100, 0.3);
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 6px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 104, 74, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-category:first-of-type {
-            margin-top: 20px;
+        .nav-category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .mobile-menu-toggle {
-            display: none;
+        .nav-category-header:hover::before {
+            opacity: 1;
         }
 
-        .container {
-            flex: 1;
-            margin-left: 300px;
-            max-width: none;
-            padding: 30px;
+        .nav-category-header:hover {
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        .accordion-icon {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            color: #00684A;
+            z-index: 1;
+            position: relative;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .nav-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-accordion-content.expanded {
+            max-height: 400px;
+        }
+
+        .nav-accordion-content li {
+            margin-bottom: 6px;
+            margin-left: 20px;
+        }
+
+        .nav-accordion-content a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #001E2B;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-accordion-content a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-accordion-content a:hover::before,
+        .nav-accordion-content a.active::before {
+            opacity: 1;
+        }
+
+        .nav-accordion-content a:hover,
+        .nav-accordion-content a.active {
+            border-left: 3px solid #00ED64;
+            transform: translateX(8px);
+            color: #00684A;
+            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1001;
+            background: rgba(0, 104, 74, 0.95);
+            border: none;
             color: white;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-toggle:hover {
+            background: #00ED64;
+            color: #001E2B;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
+        }
+
+        .menu-toggle.menu-open {
+            background: #00ED64;
+            color: #001E2B;
+            transform: rotate(90deg);
+        }
+
+        /* Backdrop */
+        .nav-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 30, 43, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 40px;
+            padding-left: 100px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 30, 43, 0.15);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #00ED64, #00B84D, #00684A);
+            border-radius: 20px 20px 0 0;
         }
 
         .header h1 {
-            font-size: 3em;
+            color: #00684A;
             margin-bottom: 15px;
+            font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: none;
         }
 
-        .header p {
-            font-size: 1.3em;
-            opacity: 0.9;
-            font-weight: 400;
+        .subtitle {
+            font-size: 1.2rem;
+            color: #001E2B;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-bottom: 30px;
         }
 
+        /* So What Section */
         .so-what-section {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
             padding: 30px;
-            margin: 25px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .so-what-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .so-what-title {
             color: #00684A;
             margin-bottom: 20px;
-            font-size: 1.5em;
+            font-size: 1.5rem;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -156,66 +382,80 @@
 
         .so-what-text {
             color: #001E2B;
-            font-size: 1.1em;
+            font-size: 1.1rem;
             line-height: 1.7;
             margin-bottom: 20px;
-            font-weight: 400;
+            opacity: 0.9;
         }
 
         .real-impact-box {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #00ED64;
+            background: linear-gradient(135deg, #00684A 0%, #001E2B 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
             margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .real-impact-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
         }
 
         .real-impact-text {
-            color: #001E2B;
             font-weight: 600;
-            font-size: 1.05em;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
 
+        /* Demo Overview */
         .demo-overview-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 25px;
-            margin: 25px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
-            border: 1px solid rgba(0, 237, 100, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
         .demo-toggle-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             cursor: pointer;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            border-bottom: 1px solid rgba(0, 104, 74, 0.1);
             transition: all 0.3s ease;
         }
 
         .demo-toggle-header:hover {
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.05) 0%, rgba(0, 184, 77, 0.02) 100%);
         }
 
         .demo-toggle-title {
-            color: #001E2B;
-            margin: 0;
-            font-size: 1.4em;
-            font-weight: 600;
+            font-size: 1.4rem;
+            color: #00684A;
+            font-weight: 700;
         }
 
         .demo-toggle-icon {
-            color: #00684A;
-            font-size: 1.2em;
+            font-size: 1.2rem;
             transition: transform 0.3s ease;
+            color: #00684A;
         }
 
         .demo-content {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px solid #E8F5E8;
+            padding: 30px;
         }
 
         .scenario-grid {
@@ -226,25 +466,27 @@
         }
 
         .scenario-card {
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid;
+            position: relative;
+            overflow: hidden;
         }
 
         .mongo-scenario {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border: 1px solid #00ED64;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            border-left-color: #00ED64;
         }
 
         .sql-scenario {
-            background: linear-gradient(135deg, #FDE8E8 0%, #FFF0F0 100%);
-            border: 1px solid #FF6B6B;
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-left-color: #D32F2F;
         }
 
         .scenario-title {
-            margin-bottom: 15px;
-            font-weight: 600;
-            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
         }
 
         .mongo-title {
@@ -256,36 +498,40 @@
         }
 
         .scenario-list {
-            color: #001E2B;
-            line-height: 1.7;
-            margin: 0;
-            padding-left: 20px;
+            list-style: none;
         }
 
         .scenario-list li {
-            margin-bottom: 8px;
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            line-height: 1.6;
         }
 
-        .scenario-list strong {
+        .scenario-list li::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
             color: #00684A;
+            font-size: 0.8rem;
         }
 
-        .sql-scenario .scenario-list strong {
+        .sql-scenario .scenario-list li::before {
             color: #D32F2F;
         }
 
         .learning-points {
-            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+            background: linear-gradient(135deg, rgba(0, 104, 74, 0.05) 0%, rgba(0, 30, 43, 0.02) 100%);
             padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #E8F5E8;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 104, 74, 0.1);
         }
 
         .learning-title {
-            color: #001E2B;
+            color: #00684A;
             margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 1.2em;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
 
         .points-grid {
@@ -295,25 +541,32 @@
         }
 
         .learning-point {
-            padding: 15px;
+            padding: 20px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
-            border-left: 3px solid #00ED64;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.1);
+            border-left: 4px solid #00ED64;
+            transition: transform 0.3s ease;
+        }
+
+        .learning-point:hover {
+            transform: translateY(-5px);
         }
 
         .point-title {
             color: #00684A;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
         }
 
         .point-description {
             color: #001E2B;
-            font-size: 0.95em;
             opacity: 0.8;
+            line-height: 1.6;
         }
 
+        /* Comparison Section */
         .comparison {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -322,13 +575,14 @@
         }
 
         .side {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.15);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 104, 74, 0.1);
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(0, 237, 100, 0.2);
         }
 
         .side::before {
@@ -342,17 +596,17 @@
         }
 
         .side.relational::before {
-            background: linear-gradient(90deg, #FF6B6B, #D32F2F);
+            background: linear-gradient(90deg, #D32F2F, #B71C1C);
         }
 
         .side h2 {
             color: #00684A;
-            margin-bottom: 20px;
-            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 600;
+            gap: 15px;
+            font-weight: 700;
         }
 
         .side.relational h2 {
@@ -360,20 +614,22 @@
         }
 
         .logo {
-            width: 40px;
-            height: 40px;
-            background: #00684A;
-            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00ED64, #00B84D);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2em;
+            color: #001E2B;
+            font-weight: 700;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.3);
         }
 
         .logo.relational {
-            background: #D32F2F;
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            color: white;
         }
 
         .feature-section {
@@ -381,171 +637,146 @@
         }
 
         .feature-title {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            padding: 18px 25px;
+            border-radius: 12px;
             margin-bottom: 20px;
             border-left: 4px solid #00ED64;
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #00684A;
         }
 
         .feature-title.relational {
-            border-left-color: #FF6B6B;
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-left-color: #D32F2F;
+            color: #D32F2F;
         }
 
         .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-
-        .simulation-container {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: #1e1e1e;
+            color: #f8f8f2;
             padding: 20px;
-            margin: 20px 0;
-            border: 2px solid #e9ecef;
-        }
-
-        .simulation-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background: #00684A;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #00523A;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: #FF6B6B;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .data-display {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            min-height: 200px;
-            overflow-y: auto;
-            max-height: 400px;
-            white-space: pre-wrap;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            overflow-x: auto;
+            line-height: 1.6;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .query-demo {
-            background: #e8f5e8;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
             border-left: 4px solid #00ED64;
         }
 
         .query-demo.relational {
-            background: #fde8e8;
-            border-left-color: #FF6B6B;
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-left-color: #D32F2F;
         }
 
         .query-demo h4 {
             color: #00684A;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
         }
 
         .query-demo.relational h4 {
             color: #D32F2F;
         }
 
-        .log-entry {
-            margin: 5px 0;
-            padding: 5px;
-            border-left: 3px solid #00ED64;
-            background: rgba(0, 237, 100, 0.1);
-            font-size: 0.9em;
+        /* Interactive Demo */
+        .simulation-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.1);
         }
 
-        .log-entry.error {
-            border-left-color: #FF6B6B;
-            background: rgba(255, 107, 107, 0.1);
-        }
-
-        .benefits {
-            background: #e8f5e8;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .benefits.relational {
-            background: #fde8e8;
-        }
-
-        .benefits h4 {
+        .simulation-container h4 {
             color: #00684A;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.3rem;
         }
 
-        .benefits.relational h4 {
-            color: #D32F2F;
+        .simulation-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
-        .icon {
-            display: inline-block;
-            margin-right: 5px;
-        }
-
-        .table-display {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
+        .btn {
+            padding: 12px 24px;
+            border: none;
             border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
+            color: #001E2B;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00B84D 0%, #00684A 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #B71C1C 0%, #8E0000 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(211, 47, 47, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+            transform: translateY(-2px);
+        }
+
+        .data-display, .table-display {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-            margin: 10px 0;
-            overflow-x: auto;
+            font-size: 0.85rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .table-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
             border-bottom: 1px solid #4a5568;
         }
 
@@ -555,53 +786,188 @@
         }
 
         .table-title {
-            color: #81c784;
-            font-weight: bold;
-            margin-bottom: 10px;
+            color: #00ED64;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .log-entry {
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-left: 3px solid #00ED64;
+            background: rgba(0, 237, 100, 0.1);
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
+
+        .log-entry.error {
+            border-left-color: #D32F2F;
+            background: rgba(211, 47, 47, 0.1);
+        }
+
+        .benefits {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 104, 74, 0.2);
+        }
+
+        .benefits.relational {
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border-color: rgba(211, 47, 47, 0.2);
+        }
+
+        .benefits h4 {
+            color: #00684A;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .benefits.relational h4 {
+            color: #D32F2F;
+        }
+
+        .benefits ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits li {
+            margin: 10px 0;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.6;
+        }
+
+        .icon {
+            font-size: 1.2rem;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.15);
+            border: 1px solid rgba(0, 104, 74, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ED64, #00B84D);
+        }
+
+        .summary-section h2 {
+            text-align: center;
+            color: #00684A;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .summary-card {
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 30, 43, 0.1);
+        }
+
+        .mongo-summary {
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+            border: 1px solid rgba(0, 104, 74, 0.2);
+        }
+
+        .sql-summary {
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border: 1px solid rgba(211, 47, 47, 0.2);
+        }
+
+        .summary-card h3 {
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .mongo-summary h3 {
+            color: #00684A;
+        }
+
+        .sql-summary h3 {
+            color: #D32F2F;
+        }
+
+        .summary-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .summary-card li {
+            margin: 12px 0;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 30, 43, 0.05);
+            line-height: 1.6;
+        }
+
+        .summary-card strong {
+            color: #00684A;
+        }
+
+        .sql-summary strong {
+            color: #D32F2F;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .content {
+                padding: 30px;
+                padding-left: 100px;
+            }
+            
+            .comparison,
+            .scenario-grid,
+            .points-grid,
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
 
         @media (max-width: 768px) {
-            .nav-menu {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-            }
-            
-            .nav-menu.open {
-                transform: translateX(0);
-            }
-            
-            .container {
-                margin-left: 0;
+            .content {
                 padding: 20px;
+                padding-left: 80px;
+            }
+            
+            .header {
+                padding: 30px 25px;
             }
             
             .header h1 {
-                font-size: 2em;
+                font-size: 2rem;
             }
             
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                background: linear-gradient(135deg, #00ED64, #00B84D);
-                color: #001E2B;
-                border: none;
-                padding: 12px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 1.2em;
-                box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
-            }
-
-            .comparison {
-                grid-template-columns: 1fr;
-            }
-            
-            .side {
-                padding: 20px;
+            .subtitle {
+                font-size: 1rem;
             }
             
             .simulation-controls {
@@ -611,109 +977,60 @@
             .btn {
                 width: 100%;
             }
-
-            .scenario-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .points-grid {
-                grid-template-columns: 1fr;
+            
+            .menu-toggle {
+                top: 20px;
+                left: 20px;
+                padding: 12px;
+                font-size: 1.2rem;
             }
         }
 
-        @media (max-width: 1024px) {
-            .nav-menu {
-                width: 280px;
+        @media (max-width: 480px) {
+            .content {
+                padding: 15px;
+                padding-left: 70px;
             }
             
-            .container {
-                margin-left: 280px;
-                padding: 25px;
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .so-what-section,
+            .demo-content,
+            .side,
+            .summary-section {
+                padding: 20px;
             }
         }
 
-        /* Accordion Styles */
-        .nav-accordion {
-            margin-bottom: 8px;
+        /* Accessibility */
+        button:focus,
+        a:focus {
+            outline: 3px solid #00ED64;
+            outline-offset: 2px;
         }
 
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1), rgba(0, 184, 77, 0.1));
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-category-header:hover {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.2), rgba(0, 184, 77, 0.2));
-            transform: translateX(4px);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8em;
-            color: #00684A;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 300px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 8px;
-            margin-left: 15px;
-        }
-
-        .nav-accordion-content a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .nav-accordion-content a:hover, .nav-accordion-content a.active {
-            background: linear-gradient(135deg, #E8F5E8 0%, #F0FFF0 100%);
-            border-left: 3px solid #00ED64;
-            transform: translateX(6px);
-            color: #00684A;
-            box-shadow: 0 3px 10px rgba(0, 237, 100, 0.2);
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
+        ☰
+    </button>
     
-    <div class="nav-menu" id="navMenu">
-        <h2>MongoDB vs PostgreSQL</h2>
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+    
+    <nav class="nav-menu" id="navMenu" role="navigation">
+        <h2>MongoDB vs SQL</h2>
         <ul>
             <li><a href="index.html">🏠 Home</a></li>
             
@@ -762,7 +1079,7 @@
             <li class="nav-accordion">
                 <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="true">
                     <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
+                    <span class="accordion-icon rotated" id="development-icon">▼</span>
                 </div>
                 <ul class="nav-accordion-content expanded" id="development-content" role="region">
                     <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
@@ -775,78 +1092,78 @@
         </ul>
     </nav>
 
-    <div class="container">
-        <div class="header">
+    <main class="content">
+        <header class="header">
             <h1>Arrays & Embedded Documents vs PostgreSQL JOINs</h1>
-            <p>Natural Data Relationships vs Normalized Complexity</p>
-            
-            <!-- So What Section -->
-            <div class="so-what-section">
-                <h2 class="so-what-title">🚀 Why This Matters: The Natural Data Advantage</h2>
-                <p class="so-what-text">
-                    Most applications deal with <strong>complex, nested data</strong> - users with multiple skills, orders with line items, blog posts with tags. Relational databases force you to break these natural relationships into separate tables, requiring complex JOINs that hurt performance and complicate your code.
-                </p>
-                <p class="so-what-text">
-                    <strong>MongoDB's differentiator:</strong> Store data the way your application thinks about it. Arrays and embedded documents let you model real-world relationships naturally, eliminate JOINs, and retrieve complete objects in a single query.
-                </p>
-                <div class="real-impact-box">
-                    <div class="real-impact-text">
-                        <strong>Real Impact:</strong> 50-80% fewer database queries, simpler application code, and blazing-fast performance for complex data relationships that would require multiple JOINs in SQL.
-                    </div>
+            <p class="subtitle">Natural Data Relationships vs Normalized Complexity</p>
+        </header>
+
+        <!-- So What Section -->
+        <div class="so-what-section">
+            <h2 class="so-what-title">🚀 Why This Matters: The Natural Data Advantage</h2>
+            <p class="so-what-text">
+                Most applications deal with <strong>complex, nested data</strong> - users with multiple skills, orders with line items, blog posts with tags. Relational databases force you to break these natural relationships into separate tables, requiring complex JOINs that hurt performance and complicate your code.
+            </p>
+            <p class="so-what-text">
+                <strong>MongoDB's differentiator:</strong> Store data the way your application thinks about it. Arrays and embedded documents let you model real-world relationships naturally, eliminate JOINs, and retrieve complete objects in a single query.
+            </p>
+            <div class="real-impact-box">
+                <div class="real-impact-text">
+                    <strong>Real Impact:</strong> 50-80% fewer database queries, simpler application code, and blazing-fast performance for complex data relationships that would require multiple JOINs in SQL.
                 </div>
             </div>
+        </div>
 
-            <!-- Expandable Demo Overview -->
-            <div class="demo-overview-section">
-                <div class="demo-toggle-header" onclick="toggleDemoOverview()">
-                    <h3 class="demo-toggle-title">📋 What This Demo Shows</h3>
-                    <span id="demoToggle" class="demo-toggle-icon">▼</span>
-                </div>
-                
-                <div id="demoOverview" style="display: none;" class="demo-content">
-                    <div class="scenario-grid">
-                        <div class="scenario-card mongo-scenario">
-                            <h4 class="scenario-title mongo-title">🍃 MongoDB Scenario</h4>
-                            <ul class="scenario-list">
-                                <li>Blog post with multiple tags stored as <strong>native array</strong></li>
-                                <li>E-commerce order with customer data and line items <strong>embedded</strong></li>
-                                <li>Single query retrieves complete objects</li>
-                                <li>Rich query operators for arrays and nested documents</li>
-                                <li><strong>No JOINs, maximum performance</strong></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="scenario-card sql-scenario">
-                            <h4 class="scenario-title sql-title">🗄️ SQL Scenario</h4>
-                            <ul class="scenario-list">
-                                <li>Blog tags require <strong>separate junction table</strong></li>
-                                <li>Order data split across <strong>4+ tables</strong></li>
-                                <li>Complex JOINs needed for simple queries</li>
-                                <li>Foreign key management overhead</li>
-                                <li><strong>Performance penalty, code complexity</strong></li>
-                            </ul>
-                        </div>
+        <!-- Expandable Demo Overview -->
+        <div class="demo-overview-section">
+            <div class="demo-toggle-header" onclick="toggleDemoOverview()">
+                <h3 class="demo-toggle-title">📋 What This Demo Shows</h3>
+                <span id="demoToggle" class="demo-toggle-icon">▼</span>
+            </div>
+            
+            <div id="demoOverview" style="display: none;" class="demo-content">
+                <div class="scenario-grid">
+                    <div class="scenario-card mongo-scenario">
+                        <h4 class="scenario-title mongo-title">🍃 MongoDB Scenario</h4>
+                        <ul class="scenario-list">
+                            <li>Blog post with multiple tags stored as <strong>native array</strong></li>
+                            <li>E-commerce order with customer data and line items <strong>embedded</strong></li>
+                            <li>Single query retrieves complete objects</li>
+                            <li>Rich query operators for arrays and nested documents</li>
+                            <li><strong>No JOINs, maximum performance</strong></li>
+                        </ul>
                     </div>
                     
-                    <div class="learning-points">
-                        <h4 class="learning-title">🎯 Key Learning Points</h4>
-                        <div class="points-grid">
-                            <div class="learning-point">
-                                <div class="point-title">📊 Data Modeling</div>
-                                <div class="point-description">See how MongoDB mirrors real-world object relationships</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">⚡ Query Performance</div>
-                                <div class="point-description">Compare single queries vs. complex JOINs</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">🔍 Query Operators</div>
-                                <div class="point-description">Explore MongoDB's rich array and object query capabilities</div>
-                            </div>
-                            <div class="learning-point">
-                                <div class="point-title">🏗️ Schema Complexity</div>
-                                <div class="point-description">Simple documents vs. normalized table structures</div>
-                            </div>
+                    <div class="scenario-card sql-scenario">
+                        <h4 class="scenario-title sql-title">🗄️ SQL Scenario</h4>
+                        <ul class="scenario-list">
+                            <li>Blog tags require <strong>separate junction table</strong></li>
+                            <li>Order data split across <strong>4+ tables</strong></li>
+                            <li>Complex JOINs needed for simple queries</li>
+                            <li>Foreign key management overhead</li>
+                            <li><strong>Performance penalty, code complexity</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="learning-points">
+                    <h4 class="learning-title">🎯 Key Learning Points</h4>
+                    <div class="points-grid">
+                        <div class="learning-point">
+                            <div class="point-title">📊 Data Modeling</div>
+                            <div class="point-description">See how MongoDB mirrors real-world object relationships</div>
+                        </div>
+                        <div class="learning-point">
+                            <div class="point-title">⚡ Query Performance</div>
+                            <div class="point-description">Compare single queries vs. complex JOINs</div>
+                        </div>
+                        <div class="learning-point">
+                            <div class="point-title">🔍 Query Operators</div>
+                            <div class="point-description">Explore MongoDB's rich array and object query capabilities</div>
+                        </div>
+                        <div class="learning-point">
+                            <div class="point-title">🏗️ Schema Complexity</div>
+                            <div class="point-description">Simple documents vs. normalized table structures</div>
                         </div>
                     </div>
                 </div>
@@ -865,8 +1182,7 @@
                 <div class="feature-section">
                     <div class="feature-title">📊 Native Array Support</div>
                     
-                    <div class="code-block">
-// Blog post with tags (array of strings)
+                    <div class="code-block">// Blog post with tags (array of strings)
 {
   "_id": ObjectId("..."),
   "title": "MongoDB Best Practices",
@@ -883,21 +1199,18 @@
     {"name": "Python", "level": "intermediate"},
     {"name": "MongoDB", "level": "advanced"}
   ]
-}
-                    </div>
+}</div>
 
                     <div class="query-demo">
                         <h4>🔍 Querying Arrays</h4>
-                        <div class="code-block">
-// Find posts with specific tag
+                        <div class="code-block">// Find posts with specific tag
 db.posts.find({"tags": "mongodb"})
 
 // Find users with JavaScript skills
 db.users.find({"skills.name": "JavaScript"})
 
 // Find expert level skills
-db.users.find({"skills.level": "expert"})
-                        </div>
+db.users.find({"skills.level": "expert"})</div>
                     </div>
                 </div>
 
@@ -905,8 +1218,7 @@ db.users.find({"skills.level": "expert"})
                 <div class="feature-section">
                     <div class="feature-title">🗂️ Embedded Documents</div>
                     
-                    <div class="code-block">
-// E-commerce order with embedded data
+                    <div class="code-block">// E-commerce order with embedded data
 {
   "_id": ObjectId("..."),
   "order_id": "ORD-001",
@@ -935,21 +1247,18 @@ db.users.find({"skills.level": "expert"})
   ],
   "total": 1059.97,
   "status": "shipped"
-}
-                    </div>
+}</div>
 
                     <div class="query-demo">
                         <h4>🔍 Querying Embedded Documents</h4>
-                        <div class="code-block">
-// Find orders by customer city
+                        <div class="code-block">// Find orders by customer city
 db.orders.find({"customer.address.city": "San Francisco"})
 
 // Find orders with specific product
 db.orders.find({"items.product_id": "PROD-1"})
 
 // Find high-value orders
-db.orders.find({"total": {$gt: 1000}})
-                        </div>
+db.orders.find({"total": {$gt: 1000}})</div>
                     </div>
                 </div>
 
@@ -981,15 +1290,14 @@ db.orders.find({"total": {$gt: 1000}})
             <div class="side relational">
                 <h2>
                     <div class="logo relational">SQL</div>
-                    Relational Database Approach
+                    PostgreSQL Approach
                 </h2>
 
                 <!-- Junction Tables Section -->
                 <div class="feature-section">
                     <div class="feature-title relational">🔗 Junction Tables for Arrays</div>
                     
-                    <div class="code-block">
--- Posts table
+                    <div class="code-block">-- Posts table
 CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255),
@@ -1015,13 +1323,11 @@ CREATE TABLE user_skills (
     skill_name VARCHAR(100),
     skill_level VARCHAR(50),
     PRIMARY KEY (user_id, skill_name)
-);
-                    </div>
+);</div>
 
                     <div class="query-demo relational">
                         <h4>🔍 Complex JOINs Required</h4>
-                        <div class="code-block">
--- Find posts with specific tag
+                        <div class="code-block">-- Find posts with specific tag
 SELECT p.* FROM posts p
 JOIN post_tags pt ON p.id = pt.post_id
 JOIN tags t ON pt.tag_id = t.id
@@ -1030,8 +1336,7 @@ WHERE t.name = 'mongodb';
 -- Find users with JavaScript skills
 SELECT u.* FROM users u
 JOIN user_skills us ON u.id = us.user_id
-WHERE us.skill_name = 'JavaScript';
-                        </div>
+WHERE us.skill_name = 'JavaScript';</div>
                     </div>
                 </div>
 
@@ -1039,8 +1344,7 @@ WHERE us.skill_name = 'JavaScript';
                 <div class="feature-section">
                     <div class="feature-title relational">📋 Normalized Tables</div>
                     
-                    <div class="code-block">
--- Orders table
+                    <div class="code-block">-- Orders table
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
     order_id VARCHAR(50),
@@ -1072,21 +1376,18 @@ CREATE TABLE order_items (
     name VARCHAR(255),
     price DECIMAL(8,2),
     quantity INTEGER
-);
-                    </div>
+);</div>
 
                     <div class="query-demo relational">
                         <h4>🔍 Multi-table JOINs</h4>
-                        <div class="code-block">
--- Get complete order information
+                        <div class="code-block">-- Get complete order information
 SELECT o.order_id, c.name, a.city, 
        oi.name as item_name, oi.quantity
 FROM orders o
 JOIN customers c ON o.customer_id = c.id
 JOIN addresses a ON c.id = a.customer_id
 JOIN order_items oi ON o.id = oi.order_id
-WHERE o.order_id = 'ORD-001';
-                        </div>
+WHERE o.order_id = 'ORD-001';</div>
                     </div>
                 </div>
 
@@ -1116,42 +1417,42 @@ WHERE o.order_id = 'ORD-001';
         </div>
 
         <!-- Summary Section -->
-        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Performance & Complexity Comparison</h2>
+        <div class="summary-section">
+            <h2>Performance & Complexity Comparison</h2>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                <div>
-                    <h3 style="color: #00684A; margin-bottom: 15px;">🍃 MongoDB: Atomic Operations</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+            <div class="summary-grid">
+                <div class="summary-card mongo-summary">
+                    <h3>🍃 MongoDB: Atomic Operations</h3>
+                    <ul>
+                        <li>
                             <strong>Single Query:</strong> Retrieve complete nested objects
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                        <li>
                             <strong>Array Operations:</strong> $push, $pull, $addToSet directly on arrays
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                        <li>
                             <strong>Data Locality:</strong> Related data stored together
                         </li>
                     </ul>
                 </div>
                 
-                <div>
-                    <h3 style="color: #D32F2F; margin-bottom: 15px;">🗄️ SQL: Normalized Approach</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                <div class="summary-card sql-summary">
+                    <h3>🗄️ SQL: Normalized Approach</h3>
+                    <ul>
+                        <li>
                             <strong>Multiple Queries:</strong> JOINs across several tables
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                        <li>
                             <strong>Junction Tables:</strong> Extra tables for simple arrays
                         </li>
-                        <li style="margin: 10px 0; padding: 10px; background: #fde8e8; border-radius: 5px;">
+                        <li>
                             <strong>Referential Integrity:</strong> Strong consistency guarantees
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         // MongoDB Simulation State
@@ -1172,6 +1473,77 @@ WHERE o.order_id = 'ORD-001';
         let sqlTagId = 1;
         let sqlOrderId = 1;
         let sqlCustomerId = 1;
+
+        // Navigation Functions
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.toggle('open');
+            backdrop.classList.toggle('active');
+            toggleBtn.classList.toggle('menu-open');
+            
+            // Update ARIA attributes
+            const isOpen = navMenu.classList.contains('open');
+            toggleBtn.setAttribute('aria-expanded', isOpen);
+        }
+
+        function closeMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const backdrop = document.getElementById('navBackdrop');
+            const toggleBtn = document.getElementById('menuToggle');
+            
+            navMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            toggleBtn.classList.remove('menu-open');
+            
+            // Update ARIA attributes
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleAccordion(categoryId) {
+            const content = document.getElementById(categoryId + '-content');
+            const icon = document.getElementById(categoryId + '-icon');
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function initializeAccordion() {
+            // Auto-expand development section since this is an arrays/embedded docs demo
+            const devContent = document.getElementById('development-content');
+            const devIcon = document.getElementById('development-icon');
+            const devHeader = devContent.previousElementSibling;
+            
+            if (devContent && devIcon && devHeader) {
+                devContent.classList.add('expanded');
+                devIcon.classList.add('rotated');
+                devHeader.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // Toggle demo overview section
+        function toggleDemoOverview() {
+            var overview = document.getElementById('demoOverview');
+            var toggle = document.getElementById('demoToggle');
+            
+            if (overview.style.display === 'none') {
+                overview.style.display = 'block';
+                toggle.textContent = '▲';
+            } else {
+                overview.style.display = 'none';
+                toggle.textContent = '▼';
+            }
+        }
 
         // Initialize displays
         function init() {
@@ -1515,61 +1887,25 @@ WHERE o.order_id = 'ORD-001';
             log.scrollTop = log.scrollHeight;
         }
 
-        // Toggle demo overview section
-        function toggleDemoOverview() {
-            var overview = document.getElementById('demoOverview');
-            var toggle = document.getElementById('demoToggle');
-            
-            if (overview.style.display === 'none') {
-                overview.style.display = 'block';
-                toggle.textContent = '▲';
-                toggle.style.transform = 'rotate(180deg)';
-            } else {
-                overview.style.display = 'none';
-                toggle.textContent = '▼';
-                toggle.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        // Mobile menu functionality
-        function toggleMobileMenu() {
+        // Handle outside clicks
+        document.addEventListener('click', (e) => {
             const navMenu = document.getElementById('navMenu');
-            navMenu.classList.toggle('open');
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const navMenu = document.getElementById('navMenu');
-            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            const menuToggle = document.getElementById('menuToggle');
             
-            if (!navMenu.contains(event.target) && !toggleButton.contains(event.target)) {
-                navMenu.classList.remove('open');
+            // Close menu if clicking outside
+            if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                closeMobileMenu();
             }
         });
 
-        // Accordion functionality
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
             }
-        }
+        });
 
-        // Initialize accordion - expand category containing current page
-        function initializeAccordion() {
-            const content = document.getElementById('development-content');
-            const icon = document.getElementById('development-icon');
-            content.classList.add('expanded');
-            icon.classList.add('rotated');
-        }
-
-        // Initialize on page load
+        // Initialize everything when DOM is ready
         window.addEventListener('load', function() {
             initializeAccordion();
             init();

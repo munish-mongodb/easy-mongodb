@@ -248,6 +248,15 @@
             box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
         }
 
+        /* Section dividers in navigation */
+        .nav-accordion-content li strong {
+            color: #00684A !important;
+            font-size: 0.8rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            opacity: 0.8;
+        }
+
         /* Menu Toggle Button */
         .menu-toggle {
             position: fixed;
@@ -272,12 +281,6 @@
             color: #001E2B;
             transform: scale(1.1) rotate(90deg);
             box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
-        }
-
-        .menu-toggle.menu-open {
-            background: #00ED64;
-            color: #001E2B;
-            transform: rotate(90deg);
         }
 
         /* Backdrop */
@@ -305,7 +308,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px;
-            padding-left: 100px; /* Space for menu button */
+            padding-left: 100px;
         }
 
         /* Slide Styles */
@@ -323,7 +326,6 @@
             position: relative;
         }
 
-        /* Staggered animation delays */
         .slide:nth-child(1) { animation-delay: 0.1s; }
         .slide:nth-child(2) { animation-delay: 0.2s; }
         .slide:nth-child(3) { animation-delay: 0.3s; }
@@ -334,8 +336,6 @@
         .slide:nth-child(8) { animation-delay: 0.8s; }
         .slide:nth-child(9) { animation-delay: 0.9s; }
         .slide:nth-child(10) { animation-delay: 1.0s; }
-        .slide:nth-child(11) { animation-delay: 1.1s; }
-        .slide:nth-child(12) { animation-delay: 1.2s; }
 
         @keyframes slideIn {
             to {
@@ -393,8 +393,8 @@
 
         /* Logo Icons */
         .mongodb-logo-icon {
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2313AA52" d="M12 2C8.5 2 5.7 4.8 5.7 8.3c0 2.5 1.5 5.2 3.8 7.8c1.2 1.3 2.5 2.6 2.5 4.9v1h0v-1c0-2.3 1.3-3.6 2.5-4.9c2.3-2.6 3.8-5.3 3.8-7.8C18.3 4.8 15.5 2 12 2z"/></svg>') no-repeat center;
             background-size: contain;
             display: inline-block;
@@ -403,8 +403,8 @@
         }
 
         .postgresql-logo-icon {
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23336791" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.6 0 3.1-.4 4.4-1.1-.2-.1-.4-.3-.6-.4-1 .5-2.1.8-3.3.8-4.1 0-7.5-3.4-7.5-7.5S7.9 6.3 12 6.3s7.5 3.4 7.5 7.5c0 1.2-.3 2.3-.8 3.3.1.2.3.4.4.6.7-1.3 1.1-2.8 1.1-4.4C22 6.5 17.5 2 12 2z"/></svg>') no-repeat center;
             background-size: contain;
             display: inline-block;
@@ -483,20 +483,28 @@
             background: rgba(0, 237, 100, 0.05);
         }
 
-        .comparison-table tr:last-child td {
-            border-bottom: none;
-        }
-
         .advantage {
             background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(19, 170, 82, 0.05) 100%);
             color: #00684A;
             font-weight: 600;
-            position: relative;
         }
 
         .advantage::before {
             content: '✓';
             color: #00ED64;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .postgres-strength {
+            background: linear-gradient(135deg, rgba(51, 103, 145, 0.1) 0%, rgba(51, 103, 145, 0.05) 100%);
+            color: #336791;
+            font-weight: 600;
+        }
+
+        .postgres-strength::before {
+            content: '✓';
+            color: #336791;
             font-weight: bold;
             margin-right: 5px;
         }
@@ -520,18 +528,9 @@
             margin: 25px 0;
         }
 
-        .cloud-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
-        }
-
         /* Cards */
         .tech-card,
-        .cloud-feature,
-        .enterprise-feature,
-        .ai-framework {
+        .use-case-card {
             background: white;
             border-radius: 12px;
             padding: 24px;
@@ -543,9 +542,7 @@
         }
 
         .tech-card:hover,
-        .cloud-feature:hover,
-        .enterprise-feature:hover,
-        .ai-framework:hover {
+        .use-case-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 16px 48px rgba(0, 30, 43, 0.15);
         }
@@ -593,11 +590,6 @@
             font-weight: 600;
         }
 
-        .code-block pre {
-            margin: 0;
-            padding: 0;
-        }
-
         /* Highlight Boxes */
         .highlight-box,
         .acid-highlight {
@@ -620,13 +612,76 @@
             font-size: 20px;
         }
 
-        .acid-highlight {
-            background: linear-gradient(135deg, #E8F8E8 0%, #F5FFF5 100%);
+        .balance-box {
+            background: linear-gradient(135deg, #F5F5F5 0%, #FAFAFA 100%);
+            border: 2px solid #9E9E9E;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 25px 0;
+            position: relative;
         }
 
-        .acid-highlight h3 {
+        .balance-box::before {
+            content: '⚖️';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 0 10px;
+            font-size: 20px;
+        }
+
+        .context-box {
+            background: linear-gradient(135deg, #F5F5F5 0%, #FAFAFA 100%);
+            border: 2px solid #9E9E9E;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .context-box::before {
+            content: '🎯';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 0 10px;
+            font-size: 20px;
+        }
+
+        /* Architecture Diagrams */
+        .architecture-diagram {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 30, 43, 0.1);
+            border: 1px solid rgba(0, 104, 74, 0.1);
+        }
+
+        .diagram-element {
+            display: inline-block;
+            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
+            color: white;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0, 104, 74, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .diagram-element:hover {
+            transform: translateY(-3px);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
             color: #00684A;
-            margin-bottom: 10px;
+            margin: 0 10px;
+            vertical-align: middle;
         }
 
         /* Performance Metrics */
@@ -673,161 +728,14 @@
             font-size: 1rem;
         }
 
-        /* Security Badges */
-        .security-badge {
-            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 4px 16px rgba(0, 104, 74, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .security-badge:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Architecture Diagrams */
-        .architecture-diagram {
+        /* Enterprise Feature Cards */
+        .enterprise-feature {
             background: white;
             border-radius: 12px;
-            padding: 30px;
-            margin: 25px 0;
-            text-align: center;
+            padding: 24px;
             box-shadow: 0 8px 32px rgba(0, 30, 43, 0.1);
-            border: 1px solid rgba(0, 104, 74, 0.1);
-        }
-
-        .diagram-element {
-            display: inline-block;
-            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
-            color: white;
-            padding: 15px 25px;
-            margin: 10px;
-            border-radius: 25px;
-            font-weight: 600;
-            box-shadow: 0 4px 16px rgba(0, 104, 74, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .diagram-element:hover {
-            transform: translateY(-3px);
-        }
-
-        .arrow {
-            font-size: 1.5rem;
-            color: #00684A;
-            margin: 0 10px;
-            vertical-align: middle;
-        }
-
-        /* Architecture Comparison */
-        .architecture-comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
-        }
-
-        .arch-column h4 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #001E2B;
-            font-size: 1.4rem;
-        }
-
-        .arch-layer {
-            margin-bottom: 15px;
-            padding: 20px;
-            border-radius: 10px;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-
-        .arch-layer:hover {
-            transform: translateX(5px);
-        }
-
-        .arch-layer.mongodb {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(19, 170, 82, 0.05) 100%);
-            border-left: 4px solid #00ED64;
-        }
-
-        .arch-layer.postgres {
-            background: linear-gradient(135deg, rgba(51, 103, 145, 0.1) 0%, rgba(51, 103, 145, 0.05) 100%);
-            border-left: 4px solid #336791;
-        }
-
-        .advantage-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #00ED64;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Expandable Sections */
-        .expandable-section {
-            margin: 30px 0;
-            border: 1px solid rgba(0, 104, 74, 0.2);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0, 30, 43, 0.1);
-        }
-
-        .expandable-header {
-            background: linear-gradient(135deg, #F0FFF0 0%, #E8F5E8 100%);
-            padding: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            color: #00684A;
-            transition: background-color 0.3s ease;
-        }
-
-        .expandable-header:hover {
-            background: linear-gradient(135deg, #E8F5E8 0%, #D0F0D0 100%);
-        }
-
-        .expandable-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease;
-        }
-
-        .expandable-content.expanded {
-            max-height: 2000px;
-        }
-
-        .expandable-inner {
-            padding: 30px;
-            background: white;
-        }
-
-        /* Source Links */
-        .source-link {
-            color: #00684A;
-            text-decoration: none;
-            font-weight: 600;
-            margin-right: 15px;
-            font-size: 0.9rem;
-            display: inline-block;
-            margin-bottom: 5px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .source-link:hover {
-            color: #00ED64;
-            text-decoration: underline;
+            border: 1px solid rgba(232, 245, 232, 0.5);
+            margin: 20px 0;
         }
 
         /* Navigation */
@@ -858,13 +766,6 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 1200px) {
-            .presentation-container {
-                padding: 30px;
-                padding-left: 100px;
-            }
-        }
-
         @media (max-width: 768px) {
             .presentation-container {
                 padding: 20px;
@@ -888,12 +789,7 @@
                 font-size: 1.8rem;
             }
 
-            .tech-grid,
-            .cloud-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .architecture-comparison {
+            .tech-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -945,9 +841,7 @@
             }
 
             .tech-card,
-            .cloud-feature,
-            .enterprise-feature,
-            .ai-framework {
+            .use-case-card {
                 padding: 16px;
             }
 
@@ -955,51 +849,6 @@
                 width: 250px;
                 left: -250px;
             }
-        }
-
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-            }
-
-            .slide {
-                background: white;
-                box-shadow: none;
-                border: 1px solid #ddd;
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-
-            .nav-menu,
-            .menu-toggle,
-            .navigation {
-                display: none;
-            }
-
-            .presentation-container {
-                padding: 0;
-            }
-
-            .expandable-content {
-                max-height: none;
-                overflow: visible;
-            }
-        }
-
-        /* Scroll Animations */
-        .slide {
-            scroll-margin-top: 100px;
-        }
-
-        /* Loading Animation */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .loading {
-            animation: pulse 1.5s ease-in-out infinite;
         }
     </style>
 </head>
@@ -1016,17 +865,22 @@
             <li><a href="index.html">🏠 Home</a></li>
             
             <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="true">
+                <div class="nav-category-header" onclick="toggleAccordion('comparison')" role="button" tabindex="0" aria-expanded="false">
                     <span>Comparative Analysis</span>
-                    <span class="accordion-icon" id="competition-icon">▼</span>
+                    <span class="accordion-icon" id="comparison-icon">▼</span>
                 </div>
-                <ul class="nav-accordion-content expanded" id="competition-content" role="region">
+                <ul class="nav-accordion-content" id="comparison-content" role="region">
                     <li><a href="mongodb_vs_postgres_presentation.html">
                         <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
                     </a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html" class="active">
+                    <li><a href="mongodb_postgres_technical_presentation.html">
                         <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
                     </a></li>
+                    <li style="margin-top: 10px; border-top: 1px solid rgba(0,104,74,0.2); padding-top: 10px;"><strong style="color: #00684A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 16px;">Current Page Sections:</strong></li>
+                    <li><a href="#executive-overview" class="active">🎯 Executive Overview</a></li>
+                    <li><a href="#use-case-matrix">📊 Use Case Decision Matrix</a></li>
+                    <li><a href="#acid-compliance">🔒 ACID Compliance</a></li>
+                    <li><a href="#core-architecture">🏗️ Core Architecture</a></li>
                 </ul>
             </li>
             
@@ -1038,6 +892,9 @@
                 <ul class="nav-accordion-content" id="architecture-content" role="region">
                     <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
                     <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
+                    <li style="margin-top: 10px; border-top: 1px solid rgba(0,104,74,0.2); padding-top: 10px;"><strong style="color: #00684A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 16px;">Current Page Sections:</strong></li>
+                    <li><a href="#performance-analysis">⚡ Performance Analysis</a></li>
+                    <li><a href="#horizontal-scaling">📈 Horizontal Scaling Deep Dive</a></li>
                 </ul>
             </li>
             
@@ -1068,6 +925,10 @@
                     <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
                     <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
                     <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
+                    <li style="margin-top: 10px; border-top: 1px solid rgba(0,104,74,0.2); padding-top: 10px;"><strong style="color: #00684A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 16px;">Current Page Sections:</strong></li>
+                    <li><a href="#ai-integration">🤖 AI Integration</a></li>
+                    <li><a href="#tco-framework">💰 TCO Framework</a></li>
+                    <li><a href="#executive-summary">🎯 Executive Summary</a></li>
                 </ul>
             </li>
         </ul>
@@ -1088,42 +949,97 @@
         </section>
 
         <!-- Executive Overview -->
-        <section class="slide">
+        <section class="slide" id="executive-overview">
             <h2>🎯 Executive Overview</h2>
-            <p>Modern applications demand databases that can handle complex data structures, scale horizontally, integrate with AI/ML pipelines, and deploy seamlessly in cloud-native environments.</p>
+            <p>Modern applications demand databases that can handle complex data structures, scale horizontally, integrate with AI/ML pipelines, and deploy seamlessly in cloud-native environments. Both MongoDB and PostgreSQL offer compelling capabilities, but excel in different scenarios.</p>
+            
+            <div class="context-box">
+                <h4>Key Decision Framework</h4>
+                <p>Choose the right database based on your specific use case: MongoDB excels for document-heavy workloads, rapid scaling needs, and AI integration, while PostgreSQL provides mature SQL capabilities, strong consistency, and analytical query performance.</p>
+            </div>
             
             <div class="tech-grid">
                 <div class="tech-card mongodb-advantage">
                     <h4>🏗️ Document-Oriented Architecture</h4>
-                    <p>Native JSON/BSON storage eliminates object-relational impedance mismatch and reduces application complexity by 40-60%</p>
+                    <p>Native JSON/BSON storage eliminates object-relational impedance mismatch for applications with complex, nested data structures</p>
                 </div>
                 <div class="tech-card mongodb-advantage">
                     <h4>📈 Built-in Horizontal Scaling</h4>
-                    <p>Native sharding scales to 1000+ nodes with automatic rebalancing, vs PostgreSQL's extension-dependent scaling</p>
+                    <p>Native sharding scales to 1000+ nodes with automatic rebalancing, ideal for applications requiring linear scale-out</p>
                 </div>
                 <div class="tech-card mongodb-advantage">
                     <h4>🤖 AI-First Database Design</h4>
-                    <p>Vector search, semantic similarity, and hybrid queries built into the core platform</p>
+                    <p>Vector search, semantic similarity, and hybrid queries built into the core platform for modern AI applications</p>
                 </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>☁️ Cloud-Native by Design</h4>
-                    <p>Multi-cloud Atlas platform with serverless, auto-scaling, and edge deployment capabilities</p>
+                <div class="tech-card postgres-feature">
+                    <h4>🔍 Mature SQL Ecosystem</h4>
+                    <p>30+ years of SQL optimization, extensive tooling, and deep analytical query capabilities with rich extension support</p>
                 </div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>Key Decision Factors</h4>
-                <p>Technical architects should evaluate: Performance at scale, developer productivity, operational complexity, AI integration readiness, and cloud-native architecture support.</p>
             </div>
         </section>
 
-        <!-- ACID Compliance Highlight -->
-        <section class="slide">
+        <!-- Use Case Guidance -->
+        <section class="slide" id="use-case-matrix">
+            <h2>🎯 Use Case Decision Matrix</h2>
+            
+            <h3>When MongoDB Excels</h3>
+            <div class="tech-grid">
+                <div class="use-case-card mongodb-advantage">
+                    <h4>📱 Rapid Application Development</h4>
+                    <p>• Evolving data schemas</p>
+                    <p>• Nested JSON documents</p>
+                    <p>• Microservices architectures</p>
+                    <p>• Time-to-market pressure</p>
+                </div>
+                <div class="use-case-card mongodb-advantage">
+                    <h4>📈 Horizontal Scale Requirements</h4>
+                    <p>• Growth beyond single-server limits</p>
+                    <p>• Global data distribution needs</p>
+                    <p>• Auto-scaling workloads</p>
+                    <p>• Unpredictable traffic patterns</p>
+                </div>
+                <div class="use-case-card mongodb-advantage">
+                    <h4>🤖 AI/ML Integration</h4>
+                    <p>• Vector similarity search</p>
+                    <p>• RAG architectures</p>
+                    <p>• Semantic search capabilities</p>
+                    <p>• Hybrid query patterns</p>
+                </div>
+            </div>
+
+            <h3>When PostgreSQL May Be Better</h3>
+            <div class="tech-grid">
+                <div class="use-case-card postgres-feature">
+                    <h4>📊 Complex Analytical Workloads</h4>
+                    <p>• Heavy JOIN operations</p>
+                    <p>• Window functions and CTEs</p>
+                    <p>• Business intelligence reporting</p>
+                    <p>• Data warehousing patterns</p>
+                </div>
+                <div class="use-case-card postgres-feature">
+                    <h4>🏛️ Strong Consistency Requirements</h4>
+                    <p>• Financial transactions</p>
+                    <p>• Regulatory compliance</p>
+                    <p>• Referential integrity critical</p>
+                    <p>• ACID guarantees essential</p>
+                </div>
+                <div class="use-case-card postgres-feature">
+                    <h4>👥 Existing SQL Expertise</h4>
+                    <p>• Deep SQL knowledge in team</p>
+                    <p>• Extensive existing tooling</p>
+                    <p>• Legacy system integration</p>
+                    <p>• Conservative technology choices</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACID Compliance -->
+        <section class="slide" id="acid-compliance">
             <h2>🔒 ACID Compliance & Transactions</h2>
             
             <div class="acid-highlight">
-                <h3>✅ MongoDB is Fully ACID Compliant</h3>
-                <p>MongoDB provides complete ACID guarantees at the document level since v2.0 and multi-document ACID transactions since v4.0, making it suitable for ANY workload requiring transactional integrity.</p>
+                <h3>✅ Both Databases are Fully ACID Compliant</h3>
+                <p>MongoDB provides complete ACID guarantees at the document level since v2.0 and multi-document ACID transactions since v4.0, making it suitable for ANY workload requiring transactional integrity, just like PostgreSQL.</p>
             </div>
 
             <table class="comparison-table">
@@ -1132,33 +1048,33 @@
                         <th>ACID Property</th>
                         <th>MongoDB Implementation</th>
                         <th>PostgreSQL Implementation</th>
-                        <th>MongoDB Advantage</th>
+                        <th>Key Differences</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td><strong>Atomicity</strong></td>
                         <td class="advantage">Document-level + Multi-document transactions</td>
-                        <td>Row-level transactions</td>
-                        <td>Natural atomicity for complex objects</td>
+                        <td class="postgres-strength">Row-level transactions</td>
+                        <td>MongoDB: Natural atomicity for complex objects</td>
                     </tr>
                     <tr>
                         <td><strong>Consistency</strong></td>
                         <td class="advantage">Tunable consistency (strong by default)</td>
-                        <td>Strong consistency</td>
-                        <td>Flexible consistency models for scale</td>
+                        <td class="postgres-strength">Strong consistency always</td>
+                        <td>MongoDB: Flexible consistency models for scale</td>
                     </tr>
                     <tr>
                         <td><strong>Isolation</strong></td>
                         <td class="advantage">Snapshot isolation + Read/Write concerns</td>
-                        <td>MVCC with multiple isolation levels</td>
-                        <td>Optimistic concurrency control</td>
+                        <td class="postgres-strength">MVCC with multiple isolation levels</td>
+                        <td>Both provide excellent isolation guarantees</td>
                     </tr>
                     <tr>
                         <td><strong>Durability</strong></td>
                         <td class="advantage">Write concerns + Replica sets</td>
-                        <td>WAL + fsync</td>
-                        <td>Distributed durability guarantees</td>
+                        <td class="postgres-strength">WAL + fsync</td>
+                        <td>MongoDB: Distributed durability options</td>
                     </tr>
                 </tbody>
             </table>
@@ -1179,59 +1095,46 @@ with session.start_transaction():
         session=session
     )
     # Automatic rollback if any operation fails
-    
-# Write concern ensures durability
-result = collection.insert_one(
-    document,
-    write_concern=WriteConcern(w="majority", j=True)
-)
-            </div>
-
-            <div class="highlight-box">
-                <h4>Enterprise Readiness</h4>
-                <p>MongoDB's ACID compliance makes it suitable for financial services, healthcare, e-commerce, and any mission-critical application requiring transactional integrity - while maintaining the flexibility and performance advantages of the document model.</p>
             </div>
         </section>
 
-        <!-- Core Database Architecture -->
-        <section class="slide">
+        <!-- Core Architecture -->
+        <section class="slide" id="core-architecture">
             <h2>🏗️ Core Database Architecture Comparison</h2>
-            
-            <h3>Storage Engine & Data Model</h3>
             
             <table class="comparison-table">
                 <thead>
                     <tr>
                         <th>Architecture Aspect</th>
-                        <th><span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB (WiredTiger)</th>
-                        <th><span class="postgresql-logo-icon" aria-hidden="true"></span>PostgreSQL (Heap-based)</th>
-                        <th>Impact</th>
+                        <th>MongoDB (WiredTiger)</th>
+                        <th>PostgreSQL (Heap-based)</th>
+                        <th>Workload Impact</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td><strong>Data Storage</strong></td>
                         <td class="advantage">BSON documents with compression</td>
-                        <td>Row-based heap files</td>
-                        <td>30-50% better storage efficiency</td>
+                        <td class="postgres-strength">Row-based heap files with TOAST</td>
+                        <td>MongoDB: Better for nested data; PG: Better for normalized data</td>
                     </tr>
                     <tr>
                         <td><strong>Schema Evolution</strong></td>
                         <td class="advantage">Dynamic schema, instant changes</td>
                         <td class="challenge">ALTER TABLE migrations required</td>
-                        <td>Zero-downtime schema updates</td>
+                        <td>MongoDB: Zero-downtime schema updates</td>
                     </tr>
                     <tr>
                         <td><strong>Complex Queries</strong></td>
                         <td class="advantage">Aggregation pipeline</td>
-                        <td>SQL with complex JOINs</td>
-                        <td>60% fewer lines of code</td>
+                        <td class="postgres-strength">SQL with advanced features (CTEs, window functions)</td>
+                        <td>Context-dependent: MongoDB for document queries, PG for analytical</td>
                     </tr>
                     <tr>
                         <td><strong>Index Types</strong></td>
                         <td class="advantage">Compound, multikey, text, geo, vector</td>
-                        <td>B-tree, GIN, GiST (extensions)</td>
-                        <td>Native specialized indexing</td>
+                        <td class="postgres-strength">B-tree, GIN, GiST, BRIN + extensions</td>
+                        <td>Both offer rich indexing; MongoDB better for vector search</td>
                     </tr>
                 </tbody>
             </table>
@@ -1251,161 +1154,73 @@ db.customers.aggregate([
 ]);
             </div>
 
-            <div class="code-block" data-lang="PostgreSQL SQL">
--- PostgreSQL: Equivalent query requires multiple JOINs
-SELECT c.id, SUM(o.amount) as total_spent, AVG(o.amount) as avg_order
-FROM customers c
-JOIN addresses a ON c.address_id = a.id
-JOIN orders o ON c.id = o.customer_id
-WHERE a.country = 'USA'
-GROUP BY c.id
-HAVING SUM(o.amount) > 1000
-ORDER BY total_spent DESC;
-            </div>
-
-            <div class="expandable-section">
-                <div class="expandable-header" onclick="toggleExpandable('detailed-architecture')" role="button" tabindex="0">
-                    <span>🏗️ Detailed Architecture Comparison</span>
-                    <span>▼</span>
-                </div>
-                <div id="detailed-architecture" class="expandable-content">
-                    <div class="expandable-inner">
-                        <div class="architecture-comparison">
-                            <div class="arch-column">
-                                <h4><span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB Architecture</h4>
-                                <div class="arch-layer mongodb">
-                                    <strong>Application Layer</strong>
-                                    <p>Direct object mapping, no ORM overhead</p>
-                                    <span class="advantage-badge">60% less code</span>
-                                </div>
-                                <div class="arch-layer mongodb">
-                                    <strong>Query Processing</strong>
-                                    <p>Aggregation pipeline, parallel processing</p>
-                                    <span class="advantage-badge">Native JSON queries</span>
-                                </div>
-                                <div class="arch-layer mongodb">
-                                    <strong>Storage Engine (WiredTiger)</strong>
-                                    <p>Document-level locking, compression, snappy/zlib</p>
-                                    <span class="advantage-badge">50% less storage</span>
-                                </div>
-                                <div class="arch-layer mongodb">
-                                    <strong>Data Organization</strong>
-                                    <p>BSON documents, embedded arrays/objects</p>
-                                    <span class="advantage-badge">Zero JOINs</span>
-                                </div>
-                                <div class="arch-layer mongodb">
-                                    <strong>Distribution Layer</strong>
-                                    <p>Native sharding, automatic balancing</p>
-                                    <span class="advantage-badge">Linear scaling</span>
-                                </div>
-                            </div>
-                            
-                            <div class="arch-column">
-                                <h4><span class="postgresql-logo-icon" aria-hidden="true"></span>PostgreSQL Architecture</h4>
-                                <div class="arch-layer postgres">
-                                    <strong>Application Layer</strong>
-                                    <p>ORM required, object-relational mapping overhead</p>
-                                </div>
-                                <div class="arch-layer postgres">
-                                    <strong>Query Processing</strong>
-                                    <p>SQL parser, planner, executor with JOIN operations</p>
-                                </div>
-                                <div class="arch-layer postgres">
-                                    <strong>Storage Engine (Heap)</strong>
-                                    <p>Row-level locking, MVCC, vacuum required</p>
-                                </div>
-                                <div class="arch-layer postgres">
-                                    <strong>Data Organization</strong>
-                                    <p>Normalized tables, foreign key relationships</p>
-                                </div>
-                                <div class="arch-layer postgres">
-                                    <strong>Distribution Layer</strong>
-                                    <p>Extensions required (Citus), manual partitioning</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="highlight-box">
-                            <h4>Architecture Impact on Performance</h4>
-                            <p><strong>MongoDB's document-centric architecture eliminates:</strong> Complex JOINs (2-5x query performance), ORM overhead (40% less application code), normalization complexity (faster development), and manual sharding setup (automatic scaling).</p>
-                        </div>
-                        
-                        <p><em>Sources: </em>
-                            <a href="#" class="source-link" onclick="showSource('MongoDB Architecture Guide: Official MongoDB documentation covering core architecture principles and storage engine design.')">MongoDB Architecture Guide</a>
-                            <a href="#" class="source-link" onclick="showSource('PostgreSQL Internals: Official PostgreSQL documentation on system architecture and internal processes.')">PostgreSQL Internals</a>
-                            <a href="#" class="source-link" onclick="showSource('Performance Benchmarks: Internal MongoDB Labs performance studies conducted in Q4 2024.')">Performance Study</a>
-                        </p>
-                    </div>
-                </div>
+            <div class="balance-box">
+                <h4>Architecture Trade-offs</h4>
+                <p><strong>MongoDB's document model eliminates JOINs</strong> for nested data but may require data duplication. <strong>PostgreSQL's relational model</strong> ensures normalization but requires complex JOINs for object reconstruction. Choose based on your data access patterns.</p>
             </div>
         </section>
 
-        <!-- Performance Benchmarks -->
-        <section class="slide">
+        <!-- Performance Analysis -->
+        <section class="slide" id="performance-analysis">
             <h2>⚡ Performance Analysis</h2>
             
             <div class="benchmark-chart">
-                <h3>Real-World Performance Benchmarks</h3>
-                <p><em>Based on TPC-like workloads with 100M+ documents/rows, 32-core servers</em></p>
+                <h3>Performance Characteristics by Workload</h3>
+                <p><em>Performance varies significantly based on workload patterns and data structure</em></p>
                 
-                <div class="metric-row">
-                    <div class="metric">
-                        <div class="metric-value">3.2x</div>
-                        <div class="metric-label">Faster Writes</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">2.1x</div>
-                        <div class="metric-label">Better Read Performance</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">45%</div>
-                        <div class="metric-label">Less Memory Usage</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">60%</div>
-                        <div class="metric-label">Smaller Storage Footprint</div>
-                    </div>
-                </div>
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>Workload Type</th><th>MongoDB Performance</th><th>PostgreSQL Performance</th><th>Context</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Document-Heavy Reads</strong></td>
+                            <td class="advantage">Excellent (no JOINs)</td>
+                            <td class="challenge">Good (requires JOINs)</td>
+                            <td>MongoDB 2-5x faster for nested data</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Analytical Queries</strong></td>
+                            <td class="challenge">Good (aggregation pipeline)</td>
+                            <td class="postgres-strength">Excellent (mature SQL optimizer)</td>
+                            <td>PostgreSQL advantage for complex analytics</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Write-Heavy Workloads</strong></td>
+                            <td class="advantage">Very Good (document-level locks)</td>
+                            <td class="postgres-strength">Good (row-level locks)</td>
+                            <td>Context-dependent on concurrency patterns</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <h3>Concurrency & ACID Properties</h3>
-            <div class="tech-grid">
-                <div class="tech-card mongodb-advantage">
-                    <h4>🔒 MongoDB Concurrency</h4>
-                    <p><strong>Document-level locking</strong> with optimistic concurrency control</p>
-                    <p>• Multi-document ACID transactions (4.0+)</p>
-                    <p>• Tunable consistency (read/write concerns)</p>
-                    <p>• WiredTiger snapshot isolation</p>
-                </div>
-                <div class="tech-card postgres-feature">
-                    <h4>🔐 PostgreSQL Concurrency</h4>
-                    <p><strong>Row-level locking</strong> with MVCC</p>
-                    <p>• Full ACID compliance</p>
-                    <p>• Serializable isolation level</p>
-                    <p>• Vacuum overhead for cleanup</p>
-                </div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>Performance Insight</h4>
-                <p>MongoDB's document model eliminates JOIN operations that become exponentially expensive at scale. For applications with complex, nested data structures, this architectural advantage translates to 2-5x performance improvements.</p>
+            <div class="context-box">
+                <h4>Performance Reality Check</h4>
+                <p>Performance claims like "3x faster" are highly workload-dependent. MongoDB typically excels for document-centric applications, while PostgreSQL performs better for complex analytical workloads. Always benchmark with your specific use case and data patterns.</p>
             </div>
         </section>
 
-        <!-- Horizontal Scaling Architecture -->
-        <section class="slide">
+        <!-- Horizontal Scaling -->
+        <section class="slide" id="horizontal-scaling">
             <h2>📈 Horizontal Scaling Deep Dive</h2>
             
             <div class="architecture-diagram">
-                <h3>MongoDB Sharding Architecture</h3>
-                <div class="diagram-element">Config Servers</div>
-                <span class="arrow">→</span>
-                <div class="diagram-element">Mongos Router</div>
-                <span class="arrow">→</span>
-                <div class="diagram-element">Shard 1</div>
-                <div class="diagram-element">Shard 2</div>
-                <div class="diagram-element">Shard N</div>
-                <p style="margin-top: 20px;"><strong>Automatic balancing, zero-downtime scaling, built-in failover</strong></p>
+                <h3>Scaling Architecture Comparison</h3>
+                <div style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0;">
+                    <div style="text-align: center;">
+                        <h4>MongoDB Native Sharding</h4>
+                        <div class="diagram-element">Config Servers</div>
+                        <div class="diagram-element">Mongos Router</div>
+                        <div class="diagram-element">Auto-balanced Shards</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4>PostgreSQL + Extensions</h4>
+                        <div class="diagram-element">Application Layer</div>
+                        <div class="diagram-element">Citus Coordinator</div>
+                        <div class="diagram-element">Manual Partitions</div>
+                    </div>
+                </div>
             </div>
 
             <table class="comparison-table">
@@ -1414,6 +1229,7 @@ ORDER BY total_spent DESC;
                         <th>Scaling Aspect</th>
                         <th>MongoDB Native Sharding</th>
                         <th>PostgreSQL Solutions</th>
+                        <th>Operational Impact</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1421,675 +1237,182 @@ ORDER BY total_spent DESC;
                         <td><strong>Setup Complexity</strong></td>
                         <td class="advantage">Single command: sh.enableSharding()</td>
                         <td class="challenge">Manual setup with Citus/pg_partman</td>
+                        <td>MongoDB: Simpler initial setup</td>
                     </tr>
                     <tr>
                         <td><strong>Automatic Rebalancing</strong></td>
                         <td class="advantage">Built-in chunk migration</td>
                         <td class="challenge">Manual rebalancing required</td>
+                        <td>MongoDB: Lower operational overhead</td>
                     </tr>
                     <tr>
                         <td><strong>Cross-Shard Queries</strong></td>
                         <td class="advantage">Transparent via mongos</td>
-                        <td class="challenge">Application-level coordination</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Scaling Limits</strong></td>
-                        <td class="advantage">1000+ shards proven in production</td>
-                        <td class="challenge">Practical limits around 50-100 nodes</td>
+                        <td class="postgres-strength">SQL familiarity (with limitations)</td>
+                        <td>MongoDB: Simpler app development</td>
                     </tr>
                 </tbody>
             </table>
 
-            <div class="benchmark-chart">
-                <h4>Linear Scaling Characteristics</h4>
-                <div class="metric-row">
-                    <div class="metric">
-                        <div class="metric-value">1000+</div>
-                        <div class="metric-label">Nodes at Netflix</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">95%</div>
-                        <div class="metric-label">Linear Scale Efficiency</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">&lt;5min</div>
-                        <div class="metric-label">Rebalancing Time</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="expandable-section">
-                <div class="expandable-header" onclick="toggleExpandable('scaling-case-studies')" role="button" tabindex="0">
-                    <span>📈 Real-World Scaling Case Studies</span>
-                    <span>▼</span>
-                </div>
-                <div id="scaling-case-studies" class="expandable-content">
-                    <div class="expandable-inner">
-                        <h5>Production Scaling Examples</h5>
-                        <div class="tech-grid">
-                            <div class="tech-card mongodb-advantage">
-                                <h6>Netflix</h6>
-                                <p>1000+ node clusters, 2.5PB data, 1M+ ops/sec</p>
-                            </div>
-                            <div class="tech-card mongodb-advantage">
-                                <h6>Uber</h6>
-                                <p>300+ clusters, 100+ sharded collections</p>
-                            </div>
-                            <div class="tech-card mongodb-advantage">
-                                <h6>Coinbase</h6>
-                                <p>600+ nodes, 99.99% uptime during crypto surge</p>
-                            </div>
-                            <div class="tech-card mongodb-advantage">
-                                <h6>Adobe</h6>
-                                <p>500+ collections, 50TB+ per cluster</p>
-                            </div>
-                        </div>
-                        <p><em>Sources: </em>
-                            <a href="#" class="source-link" onclick="showSource('MongoDB World 2024: Customer presentations and case studies from major enterprises.')">MongoDB World 2024</a>
-                            <a href="#" class="source-link" onclick="showSource('Engineering Blogs: Public technical talks and scaling stories from MongoDB users.')">Engineering Blogs</a>
-                        </p>
-                    </div>
-                </div>
+            <div class="balance-box">
+                <h4>Scaling Considerations</h4>
+                <p><strong>MongoDB's native sharding</strong> provides operational simplicity but requires careful shard key design. <strong>PostgreSQL scaling</strong> leverages familiar SQL but introduces complexity through extensions. Consider your team's operational capabilities and scaling timeline.</p>
             </div>
         </section>
 
-        <!-- AI & Vector Search Capabilities -->
-        <section class="slide">
+        <!-- AI Integration -->
+        <section class="slide" id="ai-integration">
             <h2>🤖 AI Framework Integration & Vector Search</h2>
             
-            <div class="ai-showcase">
-                <h3>MongoDB's AI Ecosystem Advantage</h3>
-                
-                <div class="tech-grid">
-                    <div class="ai-framework">
-                        <h5>🔗 LangChain Integration</h5>
-                        <p>• Native MongoDB vector store</p>
-                        <p>• Semantic caching for LLM responses</p>
-                        <p>• Document loaders and memory stores</p>
-                        <p>• RAG pattern implementations</p>
-                        <a href="#" class="source-link" onclick="showSource('LangChain Documentation: Official integration documentation for MongoDB vector store capabilities.')">📚 LangChain Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('MongoDB LangChain Guide: Comprehensive guide for using MongoDB with LangChain framework.')">🔗 MongoDB Integration</a>
-                    </div>
-                    <div class="ai-framework">
-                        <h5>🔍 LlamaIndex Support</h5>
-                        <p>• MongoDB as knowledge base</p>
-                        <p>• Vector and keyword search</p>
-                        <p>• Metadata filtering</p>
-                        <p>• Hierarchical document storage</p>
-                        <a href="#" class="source-link" onclick="showSource('LlamaIndex Documentation: Official MongoDB integration guide for LlamaIndex framework.')">📚 LlamaIndex Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('MongoDB LlamaIndex Guide: Step-by-step guide for MongoDB Atlas vector search with LlamaIndex.')">🔗 MongoDB Guide</a>
-                    </div>
-                    <div class="ai-framework">
-                        <h5>🧠 Haystack Framework</h5>
-                        <p>• MongoDB document store</p>
-                        <p>• Hybrid retrieval pipelines</p>
-                        <p>• Question answering systems</p>
-                        <p>• Semantic search capabilities</p>
-                        <a href="#" class="source-link" onclick="showSource('Haystack Documentation: Official documentation for MongoDB Atlas integration with Haystack.')">📚 Haystack Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('MongoDB Haystack Integration: Complete integration guide for using MongoDB with Haystack framework.')">🔗 MongoDB Integration</a>
-                    </div>
-                    <div class="ai-framework">
-                        <h5>⚡ AutoGen & Crew AI</h5>
-                        <p>• Multi-agent conversation storage</p>
-                        <p>• Tool call and response logging</p>
-                        <p>• Agent memory persistence</p>
-                        <p>• Workflow state management</p>
-                        <a href="#" class="source-link" onclick="showSource('AutoGen Documentation: Microsoft AutoGen framework for multi-agent conversations.')">📚 AutoGen Docs</a>
-                        <a href="#" class="source-link" onclick="showSource('Crew AI Documentation: Official Crew AI framework documentation and examples.')">📚 Crew AI Docs</a>
-                    </div>
-                </div>
-
-                <div class="expandable-section">
-                    <div class="expandable-header" onclick="toggleExpandable('ai-benchmarks')" role="button" tabindex="0">
-                        <span>📊 AI Framework Performance Benchmarks</span>
-                        <span>▼</span>
-                    </div>
-                    <div id="ai-benchmarks" class="expandable-content">
-                        <div class="expandable-inner">
-                            <h5>LangChain + MongoDB vs PostgreSQL Performance</h5>
-                            <table class="comparison-table">
-                                <thead>
-                                    <tr><th>Metric</th><th>MongoDB</th><th>PostgreSQL + pgvector</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>RAG Query Latency</td><td class="advantage">12ms</td><td>45ms</td></tr>
-                                    <tr><td>Vector Index Build Time</td><td class="advantage">2.3 min (1M vectors)</td><td>8.7 min (1M vectors)</td></tr>
-                                    <tr><td>Hybrid Search QPS</td><td class="advantage">50K</td><td>15K</td></tr>
-                                    <tr><td>Memory Usage</td><td class="advantage">40% less</td><td>Baseline</td></tr>
-                                </tbody>
-                            </table>
-                            <p><em>Source: Internal MongoDB benchmarks, December 2024</em></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>AI Capability</th><th>MongoDB Atlas</th><th>PostgreSQL + pgvector</th><th>Maturity</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Vector Index Types</strong></td>
+                        <td class="advantage">HNSW, IVF (native, production-ready)</td>
+                        <td class="postgres-strength">HNSW (extension, growing ecosystem)</td>
+                        <td>MongoDB: More mature vector support</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hybrid Search</strong></td>
+                        <td class="advantage">Vector + text + metadata (unified)</td>
+                        <td class="challenge">Requires complex query coordination</td>
+                        <td>MongoDB: Better integrated experience</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Framework Support</strong></td>
+                        <td class="advantage">Native LangChain, LlamaIndex, Haystack</td>
+                        <td class="postgres-strength">Growing pgvector ecosystem</td>
+                        <td>MongoDB: First-class AI framework support</td>
+                    </tr>
+                </tbody>
+            </table>
 
             <div class="code-block" data-lang="LangChain + MongoDB">
 # LangChain + MongoDB Vector Search Example
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 from langchain.embeddings import OpenAIEmbeddings
-from pymongo import MongoClient
 
-client = MongoClient("mongodb+srv://...")
-collection = client["ai_db"]["documents"]
-
-# Create vector store with hybrid search
+# Unified vector + metadata search
 vector_store = MongoDBAtlasVectorSearch(
     collection=collection,
     embedding=OpenAIEmbeddings(),
-    index_name="vector_index",
-    text_key="content",
-    embedding_key="embedding"
+    index_name="vector_index"
 )
 
-# Semantic search with metadata filtering
+# Hybrid semantic + metadata filtering
 docs = vector_store.similarity_search_with_score(
     query="machine learning algorithms",
     k=5,
-    pre_filter={"department": "research", "confidential": False}
+    pre_filter={"department": "research", "status": "active"}
 )
+            </div>
+
+            <div class="context-box">
+                <h4>AI Integration Reality</h4>
+                <p>MongoDB's AI advantage is real but context-dependent. For new AI applications, MongoDB provides faster development velocity. For existing PostgreSQL environments, pgvector offers a familiar path with growing capabilities. Consider your team's AI maturity and existing infrastructure.</p>
+            </div>
+        </section>
+
+        <!-- TCO Framework -->
+        <section class="slide" id="tco-framework">
+            <h2>💰 Total Cost of Ownership Framework</h2>
+            
+            <div class="context-box">
+                <h4>TCO Evaluation Framework</h4>
+                <p>TCO varies dramatically based on workload, team expertise, and infrastructure requirements. Use this framework to evaluate costs for your specific situation rather than relying on generic estimates.</p>
             </div>
 
             <table class="comparison-table">
                 <thead>
-                    <tr>
-                        <th>AI Capability</th>
-                        <th>MongoDB Atlas</th>
-                        <th>PostgreSQL + pgvector</th>
-                        <th>Advantage</th>
-                    </tr>
+                    <tr><th>Cost Component</th><th>MongoDB Advantages</th><th>PostgreSQL Advantages</th><th>Key Factors</th></tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>Vector Index Types</strong></td>
-                        <td class="advantage">HNSW, IVF (native)</td>
-                        <td>HNSW (extension only)</td>
-                        <td>Production-ready performance</td>
+                        <td><strong>Development</strong></td>
+                        <td class="advantage">Faster for document-heavy apps</td>
+                        <td class="postgres-strength">Leverages existing SQL skills</td>
+                        <td>Team expertise and application type</td>
                     </tr>
                     <tr>
-                        <td><strong>Hybrid Search</strong></td>
-                        <td class="advantage">Vector + text + metadata</td>
-                        <td class="challenge">Limited hybrid capabilities</td>
-                        <td>Rich search experiences</td>
+                        <td><strong>Infrastructure</strong></td>
+                        <td class="advantage">Efficient storage compression</td>
+                        <td class="postgres-strength">Mature optimization patterns</td>
+                        <td>Data characteristics and access patterns</td>
                     </tr>
                     <tr>
-                        <td><strong>Framework Support</strong></td>
-                        <td class="advantage">Native integration (LangChain, LlamaIndex, etc.)</td>
-                        <td class="challenge">Custom implementation required</td>
-                        <td>Faster AI development</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Scale Limits</strong></td>
-                        <td class="advantage">100M+ vectors</td>
-                        <td class="challenge">Performance degrades significantly</td>
-                        <td>Enterprise-scale AI applications</td>
+                        <td><strong>Operations</strong></td>
+                        <td class="advantage">Atlas automation</td>
+                        <td class="postgres-strength">Extensive tooling ecosystem</td>
+                        <td>Cloud vs on-premise preferences</td>
                     </tr>
                 </tbody>
             </table>
 
-            <div class="benchmark-chart">
-                <h4>AI Application Development Speed</h4>
-                <div class="metric-row">
-                    <div class="metric">
-                        <div class="metric-value">5x</div>
-                        <div class="metric-label">Faster RAG Development</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">12ms</div>
-                        <div class="metric-label">Avg Vector Query Latency</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">50K</div>
-                        <div class="metric-label">QPS Sustained</div>
-                    </div>
-                </div>
+            <div class="balance-box">
+                <h4>ROI Evaluation</h4>
+                <p>Organizations typically see faster ROI with MongoDB for new applications requiring rapid development and scaling. PostgreSQL may offer better ROI for analytical workloads and teams with deep SQL expertise. Evaluate based on your specific context, not generic benchmarks.</p>
             </div>
         </section>
 
-        <!-- Migration with Relational Migrator -->
-        <section class="slide">
-            <h2>🔄 Enterprise Migration Strategy</h2>
-            
-            <div class="migration-tool">
-                <h3>🚀 MongoDB Relational Migrator</h3>
-                <p><strong>The industry's most advanced database migration platform</strong> - purpose-built for PostgreSQL to MongoDB migrations with zero code generation.</p>
-            </div>
-
-            <div class="tech-grid">
-                <div class="tech-card mongodb-advantage">
-                    <h4>🎯 Visual Schema Mapping</h4>
-                    <p>• Drag-and-drop interface for table → document mapping</p>
-                    <p>• Automatic relationship detection and embedding suggestions</p>
-                    <p>• Real-time migration preview and validation</p>
-                    <p>• Custom transformation rules and data cleansing</p>
-                </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>⚡ Automated Code Generation</h4>
-                    <p>• Application code conversion for Java, .NET, Node.js</p>
-                    <p>• SQL to aggregation pipeline translation</p>
-                    <p>• ORM to native driver migration</p>
-                    <p>• Unit test generation for validation</p>
-                </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>🔄 Live Migration & Sync</h4>
-                    <p>• Real-time synchronization during migration</p>
-                    <p>• Zero-downtime cutover capabilities</p>
-                    <p>• Bidirectional sync for rollback protection</p>
-                    <p>• Change stream integration for live updates</p>
-                </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>✅ Validation & Testing</h4>
-                    <p>• Data consistency validation</p>
-                    <p>• Performance benchmark comparisons</p>
-                    <p>• Automated regression testing</p>
-                    <p>• Migration progress monitoring</p>
-                </div>
-            </div>
-
-            <div class="code-block" data-lang="Schema Transformation">
-// Relational Migrator - Schema Transformation Example
-// PostgreSQL normalized structure
-Table: customers (id, name, email)
-Table: addresses (id, customer_id, street, city, country)
-Table: orders (id, customer_id, amount, date)
-
-// MongoDB document structure (auto-generated)
-{
-  "_id": ObjectId("..."),
-  "name": "John Doe",
-  "email": "john@example.com",
-  "address": {
-    "street": "123 Main St",
-    "city": "New York",
-    "country": "USA"
-  },
-  "orders": [
-    {
-      "amount": 150.00,
-      "date": ISODate("2024-01-15")
-    }
-  ],
-  "totalSpent": 1500.00,  // Computed field
-  "orderCount": 10         // Computed field
-}
-            </div>
-
-            <div class="architecture-diagram">
-                <h4>Migration Process Flow</h4>
-                <div class="diagram-element">Schema Analysis</div>
-                <span class="arrow">→</span>
-                <div class="diagram-element">Mapping Design</div>
-                <span class="arrow">→</span>
-                <div class="diagram-element">Code Generation</div>
-                <span class="arrow">→</span>
-                <div class="diagram-element">Live Sync</div>
-                <span class="arrow">→</span>
-                <div class="diagram-element">Cutover</div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>Migration Success Metrics</h4>
-                <p>Organizations using Relational Migrator report 80% faster migration timelines, 90% reduction in migration risks, and 70% less custom code required compared to manual migration approaches.</p>
-            </div>
-
-            <div class="expandable-section">
-                <div class="expandable-header" onclick="toggleExpandable('migration-details')" role="button" tabindex="0">
-                    <span>🔧 Relational Migrator Technical Deep Dive</span>
-                    <span>▼</span>
-                </div>
-                <div id="migration-details" class="expandable-content">
-                    <div class="expandable-inner">
-                        <h5>Advanced Migration Features</h5>
-                        <table class="comparison-table">
-                            <thead>
-                                <tr><th>Feature</th><th>Capability</th><th>Benefit</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td><strong>Schema Analysis</strong></td><td>Automatic relationship detection</td><td>Reduces planning time by 60%</td></tr>
-                                <tr><td><strong>Data Transformation</strong></td><td>Custom mapping rules + validation</td><td>Ensures data integrity</td></tr>
-                                <tr><td><strong>Code Generation</strong></td><td>Java, .NET, Node.js, Python</td><td>90% code automation</td></tr>
-                                <tr><td><strong>Live Sync</strong></td><td>Change stream integration</td><td>Zero-downtime migrations</td></tr>
-                                <tr><td><strong>Rollback</strong></td><td>Bidirectional synchronization</td><td>Risk mitigation</td></tr>
-                            </tbody>
-                        </table>
-                        
-                        <div class="code-block" data-lang="Generated Java Code">
-// Auto-generated MongoDB Java code from PostgreSQL
-@Document(collection = "customers")
-public class Customer {
-    @Id
-    private ObjectId id;
-    private String name;
-    private String email;
-    private Address address;  // Embedded document
-    private List&lt;Order&gt; orders; // Embedded array
-    
-    // Generated aggregation queries
-    public static List&lt;Customer&gt; findHighValueCustomers() {
-        return mongoTemplate.aggregate(
-            Aggregation.newAggregation(
-                Aggregation.unwind("orders"),
-                Aggregation.group("_id").sum("orders.amount").as("total"),
-                Aggregation.match(Criteria.where("total").gt(1000))
-            ), Customer.class, Customer.class
-        ).getMappedResults();
-    }
-}
-                        </div>
-                        
-                        <p><em>Sources: </em>
-                            <a href="#" class="source-link" onclick="showSource('MongoDB Relational Migrator Documentation: Comprehensive guide for database migration from relational to MongoDB.')">Relational Migrator Docs</a>
-                            <a href="#" class="source-link" onclick="showSource('Migration success stories and customer case studies from enterprise MongoDB adoptions.')">Customer Case Studies</a>
-                            <a href="#" class="source-link" onclick="showSource('Download Relational Migrator: Free tool for PostgreSQL to MongoDB migration.')">Download Tool</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cloud-Native Architecture -->
-        <section class="slide">
-            <h2>☁️ Cloud-Native Architecture Excellence</h2>
-            
-            <h3>Multi-Cloud & Serverless Deployment</h3>
-            <div class="cloud-grid">
-                <div class="cloud-feature">
-                    <h4>🌍 MongoDB Atlas Global</h4>
-                    <p>• Deploy across 100+ cloud regions</p>
-                    <p>• Multi-cloud clusters (AWS + Azure + GCP)</p>
-                    <p>• Global sharding with zone policies</p>
-                    <p>• Edge-optimized deployments</p>
-                </div>
-                <div class="cloud-feature">
-                    <h4>⚡ Atlas Serverless</h4>
-                    <p>• True pay-per-operation pricing</p>
-                    <p>• Automatic scaling 0→∞</p>
-                    <p>• Sub-second cold starts</p>
-                    <p>• No connection limits</p>
-                </div>
-                <div class="cloud-feature">
-                    <h4>🔄 Event-Driven Architecture</h4>
-                    <p>• Change streams for real-time data</p>
-                    <p>• Native Kafka integration</p>
-                    <p>• Triggers and functions</p>
-                    <p>• Event sourcing patterns</p>
-                </div>
-            </div>
-
-            <div class="benchmark-chart">
-                <h4>Cloud Operations Comparison</h4>
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Capability</th>
-                            <th>MongoDB Atlas</th>
-                            <th>AWS RDS PostgreSQL</th>
-                            <th>Advantage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Auto-scaling</strong></td>
-                            <td class="advantage">Vertical + Horizontal</td>
-                            <td>Vertical only</td>
-                            <td>True elastic scaling</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Global Distribution</strong></td>
-                            <td class="advantage">Built-in multi-region</td>
-                            <td class="challenge">Manual cross-region setup</td>
-                            <td>Simplified global deployment</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Backup & Recovery</strong></td>
-                            <td class="advantage">Continuous, point-in-time</td>
-                            <td>Snapshot-based</td>
-                            <td>Better RPO/RTO</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Monitoring</strong></td>
-                            <td class="advantage">Real-time performance advisor</td>
-                            <td>CloudWatch integration</td>
-                            <td>Proactive optimization</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="code-block" data-lang="Terraform Infrastructure">
-# MongoDB Atlas infrastructure as code
-resource "mongodbatlas_cluster" "production" {
-  project_id   = var.project_id
-  name         = "production-cluster"
-  
-  cluster_type = "REPLICASET"
-  
-  # Multi-cloud deployment
-  replication_specs {
-    num_shards = 3
-    regions_config {
-      region_name     = "US_EAST_1"
-      electable_nodes = 3
-      priority        = 7
-      read_only_nodes = 2
-    }
-    regions_config {
-      region_name     = "EU_WEST_1"
-      electable_nodes = 2
-      priority        = 6
-      read_only_nodes = 1
-    }
-  }
-  
-  # Auto-scaling configuration
-  auto_scaling_disk_gb_enabled = true
-  auto_scaling_compute_enabled = true
-  auto_scaling_compute_scale_down_enabled = true
-}
-            </div>
-        </section>
-
-        <!-- Enterprise Security & Compliance -->
-        <section class="slide">
-            <h2>🔒 Enterprise Security & Compliance</h2>
-            
-            <h3>Security Features Comparison</h3>
-            <div class="tech-grid">
-                <div class="enterprise-feature">
-                    <h5>🔐 MongoDB Enterprise Security</h5>
-                    <p>• Client-Side Field Level Encryption (CSFLE)</p>
-                    <p>• Queryable Encryption (industry-first)</p>
-                    <p>• LDAP/Kerberos integration</p>
-                    <p>• Auditing with 50+ event types</p>
-                    <p>• Network encryption (TLS 1.3)</p>
-                </div>
-                <div class="enterprise-feature">
-                    <h5>🛡️ PostgreSQL Security</h5>
-                    <p>• Row-level security (RLS)</p>
-                    <p>• SSL/TLS encryption</p>
-                    <p>• Role-based access control</p>
-                    <p>• Basic auditing (pgaudit extension)</p>
-                    <p>• Transparent data encryption</p>
-                </div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>Queryable Encryption - Industry First</h4>
-                <p>MongoDB's Queryable Encryption allows searching encrypted data without decryption on the server side, maintaining performance while ensuring compliance with regulations like GDPR, HIPAA, and SOX.</p>
-            </div>
-
-            <div class="code-block" data-lang="MongoDB Encryption">
-// Client-Side Field Level Encryption
-const clientEncryption = new ClientEncryption(keyVault, kmsProviders);
-
-// Encrypt sensitive data before transmission
-const encryptedSSN = await clientEncryption.encrypt(
-  "123-45-6789",
-  {
-    algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic",
-    keyId: dataEncryptionKey
-  }
-);
-
-// Data is encrypted in transit, at rest, and in memory
-db.patients.insertOne({
-  name: "John Doe",
-  ssn: encryptedSSN,  // Encrypted field
-  diagnosis: "..." // Plaintext field
-});
-            </div>
-
-            <div class="benchmark-chart">
-                <h4>Compliance Certifications</h4>
-                <div class="metric-row">
-                    <div class="security-badge">SOC 2 Type II</div>
-                    <div class="security-badge">ISO 27001</div>
-                    <div class="security-badge">HIPAA Eligible</div>
-                    <div class="security-badge">GDPR Compliant</div>
-                    <div class="security-badge">FedRAMP</div>
-                    <div class="security-badge">PCI DSS</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Total Cost of Ownership -->
-        <section class="slide">
-            <h2>💰 Total Cost of Ownership Analysis</h2>
-            
-            <div class="benchmark-chart">
-                <h4>3-Year TCO Comparison (Enterprise Scale)</h4>
-                <p><em>Based on 100TB data, 10K+ concurrent users, high availability requirements</em></p>
-                
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Cost Component</th>
-                            <th>MongoDB Atlas</th>
-                            <th>PostgreSQL (Managed)</th>
-                            <th>Savings</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Infrastructure</strong></td>
-                            <td>$180K/year</td>
-                            <td>$220K/year</td>
-                            <td class="advantage">18% less</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Operations</strong></td>
-                            <td>$50K/year</td>
-                            <td>$120K/year</td>
-                            <td class="advantage">58% less</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Development</strong></td>
-                            <td>$300K/year</td>
-                            <td>$450K/year</td>
-                            <td class="advantage">33% less</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Migration</strong></td>
-                            <td class="advantage">$25K (Relational Migrator)</td>
-                            <td>$150K (Custom development)</td>
-                            <td class="advantage">83% less</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Total 3-Year TCO</strong></td>
-                            <td class="advantage">$1.61M</td>
-                            <td>$2.52M</td>
-                            <td class="advantage">$910K saved</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="tech-grid">
-                <div class="tech-card mongodb-advantage">
-                    <h4>💡 Cost Optimization Factors</h4>
-                    <p>• Reduced infrastructure through efficient storage</p>
-                    <p>• Lower operational overhead with Atlas automation</p>
-                    <p>• Faster development cycles</p>
-                    <p>• Simplified scaling eliminates over-provisioning</p>
-                    <p>• Relational Migrator reduces migration costs by 80%</p>
-                </div>
-                <div class="tech-card postgres-feature">
-                    <h4>💸 Hidden PostgreSQL Costs</h4>
-                    <p>• Complex high-availability setup</p>
-                    <p>• Manual scaling operations</p>
-                    <p>• ORM licensing and complexity</p>
-                    <p>• Schema migration downtime</p>
-                    <p>• Custom migration development</p>
-                </div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>ROI Insight</h4>
-                <p>Organizations typically see 300-400% ROI within 18 months when migrating from PostgreSQL to MongoDB for modern application workloads, primarily driven by reduced development time, operational overhead, and migration costs.</p>
-            </div>
-        </section>
-
-        <!-- Conclusion & Next Steps -->
-        <section class="slide">
-            <h2>🎯 Executive Summary & Recommendations</h2>
+        <!-- Executive Summary -->
+        <section class="slide" id="executive-summary">
+            <h2>🎯 Executive Summary & Decision Framework</h2>
             
             <div class="highlight-box">
                 <h4>Key Decision Points</h4>
-                <p>MongoDB provides compelling advantages for modern applications requiring flexibility, scale, AI integration, and cloud-native deployment. With full ACID compliance, the document-oriented approach, built-in horizontal scaling, and comprehensive cloud platform make it the superior choice for next-generation applications.</p>
+                <p>Both MongoDB and PostgreSQL are excellent databases. MongoDB excels for document-centric applications, horizontal scaling, and AI integration. PostgreSQL excels for analytical workloads, strong consistency requirements, and leveraging existing SQL expertise.</p>
             </div>
 
-            <h3>Strategic Advantages Summary</h3>
+            <h3>Choose MongoDB When:</h3>
             <div class="tech-grid">
                 <div class="tech-card mongodb-advantage">
-                    <h4>🏗️ Architecture</h4>
-                    <p>Document model + full ACID compliance eliminates complexity by 40-60%</p>
+                    <h4>🏗️ Document-Centric Applications</h4>
+                    <p>Complex nested data, rapid schema evolution, microservices architectures</p>
                 </div>
                 <div class="tech-card mongodb-advantage">
-                    <h4>📈 Performance</h4>
-                    <p>3x faster writes, 2x better reads, linear scaling to 1000+ nodes</p>
+                    <h4>📈 Horizontal Scale Requirements</h4>
+                    <p>Growth beyond single servers, global distribution, auto-scaling needs</p>
                 </div>
                 <div class="tech-card mongodb-advantage">
-                    <h4>🤖 AI Integration</h4>
-                    <p>Native vector search, LangChain/LlamaIndex support, 5x faster RAG development</p>
-                </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>☁️ Cloud Native</h4>
-                    <p>Multi-cloud Atlas, serverless scaling, edge deployment capabilities</p>
-                </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>🔄 Migration</h4>
-                    <p>Relational Migrator: 80% faster, 90% less risk, automated code generation</p>
-                </div>
-                <div class="tech-card mongodb-advantage">
-                    <h4>💰 ROI</h4>
-                    <p>$910K savings over 3 years, 300-400% ROI within 18 months</p>
+                    <h4>🤖 AI-First Development</h4>
+                    <p>Vector search, RAG architectures, AI framework integration priority</p>
                 </div>
             </div>
 
-            <h3>Recommended Next Steps</h3>
+            <h3>Choose PostgreSQL When:</h3>
+            <div class="tech-grid">
+                <div class="tech-card postgres-feature">
+                    <h4>📊 Analytical Workloads</h4>
+                    <p>Complex JOINs, BI reporting, data warehousing, advanced SQL features</p>
+                </div>
+                <div class="tech-card postgres-feature">
+                    <h4>🏛️ Strong Consistency</h4>
+                    <p>Financial systems, regulatory compliance, referential integrity critical</p>
+                </div>
+                <div class="tech-card postgres-feature">
+                    <h4>👥 SQL Expertise</h4>
+                    <p>Deep SQL knowledge, existing tooling, conservative technology choices</p>
+                </div>
+            </div>
+
+            <h3>Recommended Evaluation Process</h3>
             <div class="enterprise-feature">
-                <h5>🚀 Immediate Actions</h5>
+                <h5>🚀 Technical Evaluation Steps</h5>
                 <ol style="text-align: left; padding-left: 20px;">
-                    <li><strong>Proof of Concept</strong>: 30-day MongoDB Atlas trial with vector search for your AI use cases</li>
-                    <li><strong>Architecture Review</strong>: Technical deep-dive with MongoDB solutions architects</li>
-                    <li><strong>Migration Assessment</strong>: Relational Migrator evaluation of your PostgreSQL schemas</li>
-                    <li><strong>AI Workshop</strong>: Hands-on session with LangChain + MongoDB integration</li>
-                    <li><strong>Cost Analysis</strong>: Detailed TCO modeling for your specific requirements</li>
-                    <li><strong>Team Training</strong>: MongoDB University certification for development teams</li>
+                    <li><strong>Use Case Analysis</strong>: Map your specific workload patterns to database strengths</li>
+                    <li><strong>Team Assessment</strong>: Evaluate existing skills and learning capacity</li>
+                    <li><strong>Proof of Concept</strong>: Test both databases with representative workloads</li>
+                    <li><strong>Performance Benchmarking</strong>: Measure with your specific data and query patterns</li>
+                    <li><strong>TCO Modeling</strong>: Calculate costs based on your infrastructure and team context</li>
                 </ol>
             </div>
 
-            <div class="benchmark-chart">
-                <h4>Questions for Your Technical Evaluation</h4>
-                <div style="text-align: left; padding: 20px; line-height: 1.8;">
-                    <p><strong>📊 Data Model:</strong> How complex are your nested data structures?</p>
-                    <p><strong>📈 Scale:</strong> What are your 3-year growth projections?</p>
-                    <p><strong>🤖 AI Strategy:</strong> Are you planning AI/ML integration with vector search?</p>
-                    <p><strong>☁️ Cloud:</strong> Multi-cloud or cloud-agnostic requirements?</p>
-                    <p><strong>⚡ Performance:</strong> Current bottlenecks and SLA requirements?</p>
-                    <p><strong>🔄 Migration:</strong> Timeline and risk tolerance for database migration?</p>
-                    <p><strong>👥 Team:</strong> Developer productivity and time-to-market priorities?</p>
-                </div>
+            <div class="balance-box">
+                <h4>Bottom Line</h4>
+                <p>There's no universal "best" database. MongoDB offers compelling advantages for modern application architectures, while PostgreSQL provides mature capabilities for analytical and traditional workloads. Choose based on your specific technical requirements, team capabilities, and business context.</p>
             </div>
         </section>
 
@@ -2097,7 +1420,6 @@ db.patients.insertOne({
 
     <nav class="navigation" aria-label="Presentation navigation">
         <button class="nav-button" onclick="scrollToTop()" aria-label="Scroll to top">↑ Top</button>
-        <button class="nav-button" onclick="scrollToSection('detailed-architecture')" aria-label="Go to architecture section">🏗️ Architecture</button>
         <button class="nav-button" onclick="window.print()" aria-label="Print presentation">🖨️ Print</button>
     </nav>
 
@@ -2108,13 +1430,14 @@ db.patients.insertOne({
             const backdrop = document.getElementById('navBackdrop');
             const toggleBtn = document.getElementById('menuToggle');
             
-            navMenu.classList.toggle('open');
-            backdrop.classList.toggle('active');
-            toggleBtn.classList.toggle('menu-open');
-            
-            // Update ARIA attributes
-            const isOpen = navMenu.classList.contains('open');
-            toggleBtn.setAttribute('aria-expanded', isOpen);
+            if (navMenu && backdrop && toggleBtn) {
+                navMenu.classList.toggle('open');
+                backdrop.classList.toggle('active');
+                toggleBtn.classList.toggle('menu-open');
+                
+                const isOpen = navMenu.classList.contains('open');
+                toggleBtn.setAttribute('aria-expanded', isOpen);
+            }
         }
 
         function closeMobileMenu() {
@@ -2122,12 +1445,12 @@ db.patients.insertOne({
             const backdrop = document.getElementById('navBackdrop');
             const toggleBtn = document.getElementById('menuToggle');
             
-            navMenu.classList.remove('open');
-            backdrop.classList.remove('active');
-            toggleBtn.classList.remove('menu-open');
-            
-            // Update ARIA attributes
-            toggleBtn.setAttribute('aria-expanded', 'false');
+            if (navMenu && backdrop && toggleBtn) {
+                navMenu.classList.remove('open');
+                backdrop.classList.remove('active');
+                toggleBtn.classList.remove('menu-open');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            }
         }
 
         function scrollToTop() {
@@ -2137,37 +1460,10 @@ db.patients.insertOne({
         function scrollToSection(sectionId) {
             const section = document.getElementById(sectionId);
             if (section) {
-                if (!section.classList.contains('expanded')) {
-                    toggleExpandable(sectionId);
-                }
-                setTimeout(() => {
-                    section.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
-                }, 100);
-            }
-        }
-
-        // Expandable Section Functions
-        function toggleExpandable(id) {
-            const content = document.getElementById(id);
-            const header = content.previousElementSibling;
-            const arrow = header.querySelector('span:last-child');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                arrow.textContent = '▼';
-            } else {
-                content.classList.add('expanded');
-                arrow.textContent = '▲';
-                
-                setTimeout(() => {
-                    content.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'nearest' 
-                    });
-                }, 300);
+                section.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
             }
         }
 
@@ -2175,84 +1471,26 @@ db.patients.insertOne({
         function toggleAccordion(categoryId) {
             const content = document.getElementById(categoryId + '-content');
             const icon = document.getElementById(categoryId + '-icon');
-            const header = content.previousElementSibling;
+            const header = content ? content.previousElementSibling : null;
             
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-                header.setAttribute('aria-expanded', 'false');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                header.setAttribute('aria-expanded', 'true');
+            if (content && icon) {
+                if (content.classList.contains('expanded')) {
+                    content.classList.remove('expanded');
+                    icon.classList.remove('rotated');
+                    if (header) header.setAttribute('aria-expanded', 'false');
+                } else {
+                    content.classList.add('expanded');
+                    icon.classList.add('rotated');
+                    if (header) header.setAttribute('aria-expanded', 'true');
+                }
             }
-        }
-
-        // Source Modal Function
-        function showSource(sourceInfo) {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed; 
-                top: 0; 
-                left: 0; 
-                width: 100%; 
-                height: 100%; 
-                background: rgba(0, 30, 43, 0.9); 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                z-index: 10000; 
-                backdrop-filter: blur(5px);
-            `;
-            
-            const content = document.createElement('div');
-            content.style.cssText = `
-                background: white; 
-                padding: 30px; 
-                border-radius: 15px; 
-                max-width: 600px; 
-                max-height: 80vh; 
-                overflow-y: auto; 
-                position: relative; 
-                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-            `;
-            
-            content.innerHTML = `
-                <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" 
-                        style="position: absolute; top: 15px; right: 20px; background: #13AA52; color: white; border: none; padding: 8px 12px; border-radius: 50%; cursor: pointer; font-weight: bold;" 
-                        aria-label="Close modal">✕</button>
-                <h3 style="color: #001E2B; margin-bottom: 20px;">📚 Source Information</h3>
-                <p style="color: #333; line-height: 1.6; font-size: 1.1rem;">${sourceInfo}</p>
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #13AA52;">
-                    <p style="color: #666; font-size: 0.9rem;">
-                        <em>Note: Links are for reference - please access through official documentation sites.</em>
-                    </p>
-                </div>
-            `;
-            
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-
-            // ESC key to close modal
-            const handleEsc = (e) => {
-                if (e.key === 'Escape') {
-                    modal.remove();
-                    document.removeEventListener('keydown', handleEsc);
-                }
-            };
-            document.addEventListener('keydown', handleEsc);
         }
 
         // Initialize Functions
         function initializeAccordion() {
-            const content = document.getElementById('competition-content');
-            const icon = document.getElementById('competition-icon');
+            // Open the "Comparative Analysis" section by default since this is a comparison page
+            const content = document.getElementById('comparison-content');
+            const icon = document.getElementById('comparison-icon');
             const header = content ? content.previousElementSibling : null;
             
             if (content && icon && header) {
@@ -2262,37 +1500,9 @@ db.patients.insertOne({
             }
         }
 
-        // Intersection Observer for animations
-        function initializeAnimations() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animationPlayState = 'running';
-                        
-                        const metrics = entry.target.querySelectorAll('.metric');
-                        metrics.forEach((metric, index) => {
-                            setTimeout(() => {
-                                metric.style.transform = 'scale(1.1)';
-                                setTimeout(() => {
-                                    metric.style.transform = 'scale(1)';
-                                }, 200);
-                            }, index * 100);
-                        });
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '50px'
-            });
-
-            document.querySelectorAll('.slide').forEach((slide) => {
-                observer.observe(slide);
-            });
-        }
-
         // Card Interaction Effects
         function initializeCardEffects() {
-            document.querySelectorAll('.tech-card, .cloud-feature, .enterprise-feature, .ai-framework').forEach((card) => {
+            document.querySelectorAll('.tech-card, .use-case-card').forEach((card) => {
                 card.addEventListener('click', function() {
                     this.style.transform = 'scale(1.02) translateY(-4px)';
                     setTimeout(() => {
@@ -2305,18 +1515,15 @@ db.patients.insertOne({
         // Keyboard Navigation
         function initializeKeyboardNavigation() {
             document.addEventListener('keydown', (e) => {
-                // Alt + M to toggle menu
                 if (e.altKey && e.key === 'm') {
                     e.preventDefault();
                     toggleMobileMenu();
                 }
                 
-                // Escape to close menu
                 if (e.key === 'Escape') {
                     closeMobileMenu();
                 }
                 
-                // Alt + T to scroll to top
                 if (e.altKey && e.key === 't') {
                     e.preventDefault();
                     scrollToTop();
@@ -2348,7 +1555,13 @@ db.patients.insertOne({
         function initializeNavLinkHandlers() {
             const navLinks = document.querySelectorAll('.nav-menu a');
             navLinks.forEach(link => {
-                link.addEventListener('click', function() {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href').substring(1);
+                        scrollToSection(targetId);
+                    }
+                    
                     if (window.innerWidth <= 1024) {
                         setTimeout(() => {
                             closeMobileMenu();
@@ -2361,15 +1574,13 @@ db.patients.insertOne({
         // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             initializeAccordion();
-            initializeAnimations();
             initializeCardEffects();
             initializeKeyboardNavigation();
             initializeOutsideClickHandler();
             initializeNavLinkHandlers();
             
-            console.log('MongoDB vs PostgreSQL Technical Presentation Loaded - Enhanced Version');
+            console.log('MongoDB vs PostgreSQL Balanced Technical Presentation Loaded');
             console.log('Slide count:', document.querySelectorAll('.slide').length);
-            console.log('Use Alt+M to toggle menu, ESC to close menu, Alt+T to scroll to top');
         });
 
         // Handle window resize for responsive design
@@ -2377,20 +1588,6 @@ db.patients.insertOne({
             if (window.innerWidth > 1024) {
                 closeMobileMenu();
             }
-        });
-
-        // Smooth scroll behavior for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
         });
 
         // Add loading state management
