@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCV5KGB8ES"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YCV5KGB8ES');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive MongoDB vs PostgreSQL playground - Experience hands-on database comparisons through live demos, simulations, and code examples.">
+    <title>MongoDB vs PostgreSQL - Interactive Playground</title>
+    
+    <style>
+        :root {
+            --primary-color: #001e2b;
+            --secondary-color: #00ed64;
+            --accent-color: #006cfa;
+            --text-primary: #1c2d38;
+            --text-secondary: #5d6c74;
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --border: #e8ecef;
+            --shadow: rgba(28, 45, 56, 0.08);
+            --shadow-hover: rgba(28, 45, 56, 0.12);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 400;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--secondary-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .header-nav a:hover,
+        .header-nav a.active {
+            color: var(--primary-color);
+            background: var(--surface);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 64px;
+            padding: 48px 0;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Interactive Sections */
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Playground Grid */
+        .playground-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .playground-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playground-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--secondary-color);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .playground-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .playground-card:hover {
+            box-shadow: 0 8px 32px var(--shadow-hover);
+            transform: translateY(-4px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .card-icon.scaling { background: linear-gradient(135deg, #00ed64, #00b84d); }
+        .card-icon.queries { background: linear-gradient(135deg, #006cfa, #0056d6); }
+        .card-icon.architecture { background: linear-gradient(135deg, #ff6b35, #f7931e); }
+        .card-icon.development { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .card-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .card-features li::before {
+            content: '✓';
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .demo-button {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .demo-button:hover {
+            background: #00b84d;
+            transform: translateY(-1px);
+        }
+
+        .interactive-badge {
+            background: var(--surface);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+        }
+
+        /* Quick Start Section */
+        .quick-start {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .quick-start h3 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .quick-start p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quick-start-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .start-button {
+            background: var(--primary-color);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .start-button:hover {
+            background: #002a3a;
+            transform: translateY(-2px);
+        }
+
+        .start-button.secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .start-button.secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .main-container {
+                padding: 24px 16px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                gap: 24px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .playground-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .playground-card {
+                padding: 24px;
+            }
+
+            .quick-start {
+                padding: 32px 24px;
+            }
+
+            .quick-start-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .playground-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .playground-card:nth-child(1) { animation-delay: 0.1s; }
+        .playground-card:nth-child(2) { animation-delay: 0.2s; }
+        .playground-card:nth-child(3) { animation-delay: 0.3s; }
+        .playground-card:nth-child(4) { animation-delay: 0.4s; }
+        .playground-card:nth-child(5) { animation-delay: 0.5s; }
+        .playground-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">M</div>
+                <span>MongoDB Playground</span>
+            </div>
+            <nav class="header-nav">
+                <a href="#playground" class="active">Playground</a>
+                <a href="#tutorials">Tutorials</a>
+                <a href="#examples">Examples</a>
+                <a href="#docs">Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="hero">
+            <h1>Experience MongoDB vs PostgreSQL</h1>
+            <p class="hero-subtitle">
+                Interactive playground with hands-on demos, real-time simulations, and side-by-side comparisons
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">20+</span>
+                    <span class="stat-label">Interactive Demos</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Code Examples</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">10+</span>
+                    <span class="stat-label">Architecture Patterns</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Comparisons Section -->
+        <section id="playground" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Core Comparisons</h2>
+                <p class="section-description">
+                    Direct MongoDB vs PostgreSQL comparisons with interactive demos
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon queries">🚀</div>
+                        <div>
+                            <h3 class="card-title">MongoDB vs PostgreSQL</h3>
+                            <p class="card-subtitle">Complete Comparison</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Comprehensive slide presentation comparing databases across all dimensions.
+                    </p>
+                    <ul class="card-features">
+                        <li>Performance benchmarks</li>
+                        <li>Schema flexibility comparison</li>
+                        <li>Query complexity analysis</li>
+                        <li>Use case recommendations</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_vs_postgres_presentation.html" class="demo-button">
+                            Start Comparison →
+                        </a>
+                        <span class="interactive-badge">Slides</span>
+                    </div>
+                </div>
+
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">📋</div>
+                        <div>
+                            <h3 class="card-title">Technical Deep Dive</h3>
+                            <p class="card-subtitle">Architecture Analysis</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Technical presentation covering internal architecture, query engines, and performance characteristics.
+                    </p>
+                    <ul class="card-features">
+                        <li>Internal architecture comparison</li>
+                        <li>Storage engine analysis</li>
+                        <li>Query optimization details</li>
+                        <li>Concurrency models</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_postgres_technical_presentation.html" class="demo-button">
+                            Deep Dive →
+                        </a>
+                        <span class="interactive-badge">Technical</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scaling & Performance Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Scaling & Performance</h2>
+                <p class="section-description">
+                    Experience MongoDB's horizontal scaling advantages through interactive simulations
+                </p>
+            </div>
+
+            <div class="playground-grid">
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">📈</div>
+                        <div>
+                            <h3 class="card-title">Horizontal Scaling</h3>
+                            <p class="card-subtitle">Sharding vs Partitioning</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Compare MongoDB's automatic sharding with PostgreSQL's manual partitioning approaches.
+                    </p>
+                    <ul class="card-features">
+                        <li>Automatic vs manual scaling</li>
+                        <li>Performance impact analysis</li>
+                        <li>Operational complexity</li>
+                        <li>High availability patterns</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="horizontal_scaling_presentation.html" class="demo-button">
+                            Compare Scaling →
+                        </a>
+                        <span class="interactive-badge">Analysis</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">🔄</div>
+                        <div>
+                            <h3 class="card-title">Replica Sets</h3>
+                            <p class="card-subtitle">High Availability</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        MongoDB's replica set configuration and failover mechanisms for high availability.
+                    </p>
+                    <ul class="card-features">
+                        <li>Replica set topology</li>
+                        <li>Automatic failover demo</li>
+                        <li>Read preference strategies</li>
+                        <li>Disaster recovery</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_replica_set_demo.html" class="demo-button">
+                            Explore HA →
+                        </a>
+                        <span class="interactive-badge">Demo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Patterns Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Architecture Patterns</h2>
+                <p class="section-description">
+                    Modern application architectures powered by MongoDB's flexibility
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">🏗️</div>
+                        <div>
+                            <h3 class="card-title">Architecture Overview</h3>
+                            <p class="card-subtitle">Modern Patterns</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Overview of modern architecture patterns where MongoDB excels.
+                    </p>
+                    <ul class="card-features">
+                        <li>Microservices architecture</li>
+                        <li>Event-driven systems</li>
+                        <li>CQRS pattern implementation</li>
+                        <li>Domain-driven design</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_architecture_overview.html" class="demo-button">
+                            Explore Patterns →
+                        </a>
+                        <span class="interactive-badge">Overview</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">⚙️</div>
+                        <div>
+                            <h3 class="card-title">CQRS Pattern</h3>
+                            <p class="card-subtitle">Command Query Separation</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Implement CQRS pattern with MongoDB's flexible schema and aggregation capabilities.
+                    </p>
+                    <ul class="card-features">
+                        <li>Command/Query separation</li>
+                        <li>Event sourcing integration</li>
+                        <li>Read model optimization</li>
+                        <li>Scalability benefits</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_cqrs.html" class="demo-button">
+                            Learn CQRS →
+                        </a>
+                        <span class="interactive-badge">Pattern</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">🚀</div>
+                        <div>
+                            <h3 class="card-title">Event-Driven Architecture</h3>
+                            <p class="card-subtitle">Reactive Systems</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Build reactive systems with MongoDB's Change Streams and event-driven patterns.
+                    </p>
+                    <ul class="card-features">
+                        <li>Change Streams integration</li>
+                        <li>Event sourcing patterns</li>
+                        <li>Microservices communication</li>
+                        <li>Real-time processing</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_event_driven.html" class="demo-button">
+                            Build Reactive →
+                        </a>
+                        <span class="interactive-badge">Architecture</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">🔧</div>
+                        <div>
+                            <h3 class="card-title">Microservices</h3>
+                            <p class="card-subtitle">Service Autonomy</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Enable true microservices autonomy with MongoDB's schema flexibility and horizontal scaling.
+                    </p>
+                    <ul class="card-features">
+                        <li>Service data independence</li>
+                        <li>Schema evolution freedom</li>
+                        <li>Cross-service communication</li>
+                        <li>Deployment independence</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_microservices.html" class="demo-button">
+                            Design Services →
+                        </a>
+                        <span class="interactive-badge">Microservices</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Features Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Advanced Features</h2>
+                <p class="section-description">
+                    Advanced MongoDB capabilities for complex use cases
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon queries">🔍</div>
+                        <div>
+                            <h3 class="card-title">Aggregation Pipelines</h3>
+                            <p class="card-subtitle">Complex Analytics</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Build sophisticated data processing pipelines with MongoDB's aggregation framework.
+                    </p>
+                    <ul class="card-features">
+                        <li>Pipeline stage composition</li>
+                        <li>Real-time analytics</li>
+                        <li>Complex transformations</li>
+                        <li>Performance optimization</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="aggregation_pipeline_presentation.html" class="demo-button">
+                            Build Pipelines →
+                        </a>
+                        <span class="interactive-badge">Analytics</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon development">📊</div>
+                        <div>
+                            <h3 class="card-title">Arrays & Embedded Documents</h3>
+                            <p class="card-subtitle">Data Modeling</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Interactive demo showing MongoDB's natural object handling vs SQL's relational approach.
+                    </p>
+                    <ul class="card-features">
+                        <li>Live blog post modeling</li>
+                        <li>Array handling comparison</li>
+                        <li>Query complexity differences</li>
+                        <li>Performance implications</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="arrays_embedded_docs_presentation.html" class="demo-button">
+                            Try Demo →
+                        </a>
+                        <span class="interactive-badge">Interactive</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon development">📋</div>
+                        <div>
+                            <h3 class="card-title">Schema Evolution</h3>
+                            <p class="card-subtitle">Zero-Downtime Changes</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Experience MongoDB's schema-less flexibility enabling zero-downtime schema evolution.
+                    </p>
+                    <ul class="card-features">
+                        <li>Dynamic schema changes</li>
+                        <li>Backward compatibility</li>
+                        <li>Migration strategies</li>
+                        <li>Version coexistence</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="schema_evolution_presentation.html" class="demo-button">
+                            Evolve Schema →
+                        </a>
+                        <span class="interactive-badge">Evolution</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon development">⚙️</div>
+                        <div>
+                            <h3 class="card-title">ORM vs Natural Objects</h3>
+                            <p class="card-subtitle">Developer Productivity</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Compare development velocity with MongoDB's natural object mapping vs complex ORMs.
+                    </p>
+                    <ul class="card-features">
+                        <li>Object-relational impedance</li>
+                        <li>Natural document mapping</li>
+                        <li>Development time analysis</li>
+                        <li>Code complexity metrics</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="orm_vs_natural_objects_presentation.html" class="demo-button">
+                            Compare Development →
+                        </a>
+                        <span class="interactive-badge">Productivity</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">🔄</div>
+                        <div>
+                            <h3 class="card-title">Change Data Capture</h3>
+                            <p class="card-subtitle">Data Streaming</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Stream data changes with MongoDB's Change Streams vs PostgreSQL's complex CDC setup.
+                    </p>
+                    <ul class="card-features">
+                        <li>Native change streams</li>
+                        <li>Event-driven workflows</li>
+                        <li>Real-time synchronization</li>
+                        <li>Stream processing integration</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongo_postgres_cdc_presentation.html" class="demo-button">
+                            Stream Changes →
+                        </a>
+                        <span class="interactive-badge">Streaming</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases & Applications Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Use Cases & Applications</h2>
+                <p class="section-description">
+                    Real-world applications where MongoDB provides unique advantages
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">🌐</div>
+                        <div>
+                            <h3 class="card-title">IoT Applications</h3>
+                            <p class="card-subtitle">Sensor Data Management</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Handle massive IoT data streams with MongoDB's time-series collections and horizontal scaling.
+                    </p>
+                    <ul class="card-features">
+                        <li>Time-series data handling</li>
+                        <li>Sensor data aggregation</li>
+                        <li>Real-time monitoring</li>
+                        <li>Edge computing integration</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_iot.html" class="demo-button">
+                            Explore IoT →
+                        </a>
+                        <span class="interactive-badge">IoT</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon queries">🤖</div>
+                        <div>
+                            <h3 class="card-title">RAG Applications</h3>
+                            <p class="card-subtitle">AI & Vector Search</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Build RAG applications with MongoDB's vector search capabilities and flexible document storage.
+                    </p>
+                    <ul class="card-features">
+                        <li>Vector similarity search</li>
+                        <li>Document embeddings</li>
+                        <li>AI model integration</li>
+                        <li>Context retrieval optimization</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_rag.html" class="demo-button">
+                            Build RAG →
+                        </a>
+                        <span class="interactive-badge">AI/ML</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">📊</div>
+                        <div>
+                            <h3 class="card-title">Real-time Analytics</h3>
+                            <p class="card-subtitle">Live Dashboards</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Power real-time analytics dashboards with MongoDB's aggregation pipelines and Change Streams.
+                    </p>
+                    <ul class="card-features">
+                        <li>Real-time aggregation</li>
+                        <li>Dashboard data feeds</li>
+                        <li>Streaming analytics</li>
+                        <li>Performance monitoring</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_realtime_analytics.html" class="demo-button">
+                            Analyze Real-time →
+                        </a>
+                        <span class="interactive-badge">Analytics</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="quick-start">
+            <h3>Start Your MongoDB Journey</h3>
+            <p>
+                Jump into hands-on learning with guided tutorials or explore advanced architecture patterns for modern applications.
+            </p>
+            <div class="quick-start-buttons">
+                <a href="mongodb_vs_postgres_presentation.html" class="start-button">
+                    🚀 Start Comparison Tour
+                </a>
+                <a href="mongodb_scaling_demo (2).html" class="start-button secondary">
+                    ⚡ Try Interactive Scaling
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Interactive functionality
+        function openDemo(category) {
+            const demos = {
+                scaling: 'horizontal_scaling_presentation.html',
+                queries: 'aggregation_pipeline_presentation.html', 
+                architecture: 'mongodb_architecture_overview.html',
+                development: 'orm_vs_natural_objects_presentation.html',
+                cdc: 'mongo_postgres_cdc_presentation.html',
+                schema: 'schema_evolution_presentation.html'
+            };
+            
+            if (demos[category]) {
+                window.location.href = demos[category];
+            }
+        }
+
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Analytics tracking for demo interactions
+        function trackDemoInteraction(demoName) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'demo_interaction', {
+                    'event_category': 'playground',
+                    'event_label': demoName,
+                    'value': 1
+                });
+            }
+        }
+
+        // Track clicks on demo cards
+        document.querySelectorAll('.playground-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.card-title').textContent;
+                trackDemoInteraction(title);
+            });
+        });
+
+        // Add loading states for demo navigation
+        document.querySelectorAll('.demo-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                this.style.opacity = '0.6';
+                this.innerHTML = 'Loading...';
+            });
+        });
+
+        // Initialize playground
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('MongoDB vs PostgreSQL Playground - Ready!');
+            
+            // Add intersection observer for animation triggers
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.playground-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
