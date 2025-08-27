@@ -4,240 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB: Strategic Technology Investment for Executive Leadership</title>
+    <link rel="stylesheet" href="shared-theme.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        /* Presentation-specific styles */
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0a1628 0%, #1a2942 50%, #2d4a6b 100%);
-            color: #ffffff;
+            background: var(--background);
+            color: var(--text-primary);
             overflow-x: hidden;
             line-height: 1.6;
         }
-
-        /* Navigation Menu */
-        .nav-menu {
-            position: fixed;
-            left: -320px;
-            top: 0;
-            width: 320px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 25px;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 104, 74, 0.2);
-            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
-        }
-
-        .nav-menu.open {
-            left: 0;
-        }
-
-        .nav-menu h2 {
-            color: #00684A;
-            margin-bottom: 30px;
-            font-size: 1.6rem;
-            font-weight: 700;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #00ED64;
-            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-menu ul {
-            list-style: none;
-        }
-
-        .nav-menu li {
-            margin-bottom: 8px;
-        }
-
-        .nav-menu > ul > li > a {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 4px solid transparent;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .nav-menu > ul > li > a:hover,
-        .nav-menu > ul > li > a.active {
-            border-left: 4px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
-        }
-
-        .nav-accordion {
-            margin-bottom: 10px;
-        }
-
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(0, 104, 74, 0.15);
-        }
-
-        .nav-category-header:hover {
-            transform: translateX(6px);
-            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
-        }
-
-        .accordion-icon {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.9rem;
-            color: #00684A;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 400px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 6px;
-            margin-left: 20px;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInLeft 0.3s ease forwards;
-        }
-
-        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
-        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
-
-        @keyframes slideInLeft {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .nav-accordion-content a {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .nav-accordion-content a:hover,
-        .nav-accordion-content a.active {
-            border-left: 3px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
-        }
-
-        /* Menu Toggle Button */
-        .menu-toggle {
-            position: fixed;
-            top: 25px;
-            left: 25px;
-            z-index: 1001;
-            background: rgba(74, 222, 128, 0.9);
-            border: none;
-            color: #0a1628;
-            padding: 14px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.3rem;
-            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-toggle:hover {
-            background: #4ade80;
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 30px rgba(74, 222, 128, 0.4);
-        }
-
-        /* Backdrop */
-        .nav-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 30, 43, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-backdrop.active {
-            opacity: 1;
-            visibility: visible;
-        }
         
         .presentation-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            padding-left: 100px; /* Space for menu button */
+            max-width: none;
+            margin: 0;
+            padding: 0;
         }
         
         .slide {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            margin: var(--space-xl) 0;
+            box-shadow: 0 1px 3px var(--shadow-sm);
             opacity: 0;
-            transform: translateY(50px);
+            transform: translateY(30px);
             animation: slideIn 0.8s ease-out forwards;
             position: relative;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .slide-content {
+            flex: 1;
         }
         
         @keyframes slideIn {
@@ -256,41 +61,42 @@
         }
         
         h1 {
-            font-size: 3.2rem;
+            font-size: 3.8rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: var(--space-lg);
             background: linear-gradient(45deg, #4ade80, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            line-height: 1.2;
         }
         
         h2 {
             font-size: 2.6rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin-bottom: var(--space-2xl);
             color: #4ade80;
         }
         
         h3 {
             font-size: 1.8rem;
             font-weight: 500;
-            margin-bottom: 1rem;
+            margin-bottom: var(--space-lg);
             color: #06b6d4;
         }
 
         h4 {
             font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 0.8rem;
+            margin-bottom: var(--space-md);
             color: #4ade80;
         }
         
         .subtitle {
             font-size: 1.3rem;
-            color: #94a3b8;
-            margin-bottom: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2xl);
             max-width: 900px;
             line-height: 1.7;
         }
@@ -305,11 +111,11 @@
         }
         
         .db-column {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface-soft);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--border);
             transition: all 0.3s ease;
             position: relative;
         }
@@ -326,8 +132,8 @@
         }
         
         .postgres-column {
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid var(--border-dark);
+            background: var(--surface-soft);
         }
         
         .feature-list {
@@ -338,10 +144,11 @@
         
         .feature-list li {
             padding: 1rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--border-light);
             position: relative;
             padding-left: 2.5rem;
             font-size: 1.1rem;
+            color: var(--text-primary);
         }
         
         .feature-list li:before {
@@ -367,56 +174,63 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
-            margin: 3rem 0;
+            margin: var(--space-xl) 0;
             width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+                max-width: 400px;
+            }
         }
         
         .stat-card {
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+            background: var(--surface);
             border-radius: 15px;
             padding: 2.5rem;
             text-align: center;
-            border: 1px solid rgba(74, 222, 128, 0.3);
-            transition: transform 0.3s ease;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            word-wrap: break-word;
+            hyphens: auto;
+            box-shadow: 0 1px 3px var(--shadow-sm);
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
         .stat-card:hover {
-            transform: scale(1.05);
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+            border-color: rgba(74, 222, 128, 0.2);
         }
         
         .stat-number {
             font-size: 3.2rem;
             font-weight: 700;
-            color: #4ade80;
+            color: var(--primary-color);
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: var(--space-sm);
             position: relative;
-            z-index: 1;
+            line-height: 1.1;
         }
         
         .stat-label {
             font-size: 1.2rem;
-            color: #e2e8f0;
+            color: var(--text-secondary);
             position: relative;
-            z-index: 1;
+            line-height: 1.4;
+            font-weight: 500;
+            max-width: 100%;
+            word-break: break-word;
+            hyphens: none;
         }
         
         .advantage-grid {
@@ -428,7 +242,7 @@
         }
         
         .advantage-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface-soft);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 2.5rem;
@@ -465,7 +279,7 @@
             border-radius: 25px;
             padding: 4rem;
             margin: 4rem 0;
-            color: #0a1628;
+            color: var(--primary-color);
             position: relative;
             overflow: hidden;
         }
@@ -488,7 +302,7 @@
         }
         
         .cta-button {
-            background: #0a1628;
+            background: var(--primary-color);
             color: #4ade80;
             padding: 1.2rem 2.5rem;
             border: none;
@@ -503,7 +317,7 @@
         }
         
         .cta-button:hover {
-            background: #1e293b;
+            background: var(--primary-light);
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
         }
@@ -531,21 +345,36 @@
         
         .nav-btn:hover {
             background: #4ade80;
-            color: #0a1628;
+            color: var(--primary-color);
             transform: translateY(-2px);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: rgba(128, 128, 128, 0.2);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            color: rgba(128, 128, 128, 0.6);
+        }
+        
+        .nav-btn:disabled:hover {
+            background: rgba(128, 128, 128, 0.2);
+            color: rgba(128, 128, 128, 0.6);
+            transform: none;
         }
         
         .slide-indicator {
             position: fixed;
             top: 2rem;
             right: 2rem;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface-soft);
             backdrop-filter: blur(10px);
             padding: 1.2rem;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--border);
             z-index: 1000;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         /* Business Impact Cards */
@@ -557,7 +386,7 @@
         }
 
         .metric-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface-soft);
             padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid rgba(74, 222, 128, 0.3);
@@ -569,14 +398,17 @@
             color: #4ade80;
         }
 
-        .context-note {
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            color: #f59e0b;
-            font-size: 0.95rem;
+        .slide-footer {
+            margin-top: auto;
+            padding: var(--space-md) 0 0 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            line-height: 1.2;
+            font-style: italic;
+            text-align: center;
+            opacity: 0.5;
+            font-weight: 400;
         }
 
         /* Case Study Cards */
@@ -615,7 +447,7 @@
 
         .case-metric-label {
             font-size: 0.9rem;
-            color: #94a3b8;
+            color: var(--text-secondary);
         }
 
         /* Timeline */
@@ -626,7 +458,7 @@
         }
 
         .timeline-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface-soft);
             border-radius: 12px;
             padding: 1.5rem;
             margin: 1rem 0;
@@ -641,7 +473,7 @@
         }
 
         .timeline-duration {
-            color: #94a3b8;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         
@@ -663,466 +495,444 @@
             }
 
             .presentation-container {
-                padding-left: 80px;
-            }
-
-            .menu-toggle {
-                top: 20px;
-                left: 20px;
-                padding: 12px;
-                font-size: 1.2rem;
+                padding: var(--space-md);
             }
         }
 
         @media (max-width: 480px) {
             .presentation-container {
-                padding: 1rem;
-                padding-left: 70px;
-            }
-
-            .nav-menu {
-                width: 280px;
-                left: -280px;
+                padding: var(--space-md);
             }
         }
     </style>
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
-        ☰
-    </button>
-    
-    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
-    
-    <nav class="nav-menu" id="navMenu" role="navigation">
-        <h2>MongoDB vs SQL</h2>
-        <ul>
-            <li><a href="index.html">🏠 Home</a></li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Comparative Analysis</span>
-                    <span class="accordion-icon" id="competition-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="competition-content" role="region">
-                    <li><a href="mongodb_vs_postgres_presentation.html" class="active">🍃 MongoDB vs PostgreSQL</a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">🔬 Postgres Technical Comparison</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
-                    <span>High Availability and Scalability</span>
-                    <span class="accordion-icon" id="architecture-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="architecture-content" role="region">
-                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
-                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Architecture Patterns</span>
-                    <span class="accordion-icon" id="patterns-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="patterns-content" role="region">
-                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
-                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
-                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
-                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
-                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
-                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
-                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="development-content" role="region">
-                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
-                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
-                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
-                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
-                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="presentation-container">
-        <div class="slide-indicator">
-            <span id="slide-counter">1 / 8</span>
-        </div>
-        
-        <!-- Slide 1: Executive Summary -->
-        <div class="slide" id="slide1">
-            <h1>MongoDB: Strategic Database Investment</h1>
-            <p class="subtitle">Accelerating digital transformation through modern data architecture while mitigating operational risk and improving competitive positioning</p>
-            <div class="stats-container">
-                <div class="stat-card">
-                    <span class="stat-number">54,500+</span>
-                    <span class="stat-label">global customers including major enterprises</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">99.995%</span>
-                    <span class="stat-label">Atlas uptime SLA for mission-critical workloads</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">40-60%</span>
-                    <span class="stat-label">reduction in development cycles*</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">Linear</span>
-                    <span class="stat-label">horizontal scaling to global scale</span>
-                </div>
+    <header class="unified-header">
+        <div class="header-content">
+            <a href="playground.html" class="header-logo">
+                <div class="logo-icon">M</div>
+                <span>MongoDB Playground</span>
+            </a>
+            <div class="breadcrumb">
+                <a href="playground.html">Playground</a>
+                <span class="breadcrumb-separator">></span>
+                <span>MongoDB vs PostgreSQL</span>
             </div>
-            <div class="context-note">
-                * Results vary by application complexity and team experience. Based on customer-reported development velocity improvements for document-centric applications.
-            </div>
+            <a href="playground.html" class="back-to-playground">← Back to Playground</a>
         </div>
+    </header>
 
-        <!-- Slide 2: Business Drivers -->
-        <div class="slide" id="slide2">
-            <h2>Market Forces Driving Database Strategy</h2>
-            <div class="advantage-grid">
-                <div class="advantage-card">
-                    <span class="advantage-icon">🚀</span>
-                    <h4>Speed to Market Pressure</h4>
-                    <p><strong>Reality:</strong> Digital-first competitors launch features in weeks, not quarters</p>
-                    <p>• Rapid prototyping and iteration requirements</p>
-                    <p>• Schema evolution without downtime</p>
-                    <p>• Developer velocity as competitive advantage</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🌍</span>
-                    <h4>Global Scale Requirements</h4>
-                    <p><strong>Challenge:</strong> Traditional databases struggle with multi-region, multi-cloud deployment</p>
-                    <p>• Data sovereignty and compliance across regions</p>
-                    <p>• Sub-100ms response times globally</p>
-                    <p>• Elastic scaling during traffic spikes</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🧠</span>
-                    <h4>AI Integration Imperative</h4>
-                    <p><strong>Opportunity:</strong> AI-powered applications require flexible data models</p>
-                    <p>• Vector search for semantic analysis</p>
-                    <p>• Real-time data for ML model training</p>
-                    <p>• Unstructured data from IoT and sensors</p>
-                </div>
-                <div class="advantage-card balanced-card">
-                    <span class="advantage-icon">⚖️</span>
-                    <h4>Operational Complexity</h4>
-                    <p><strong>Trade-off:</strong> Choose between innovation speed and operational simplicity</p>
-                    <p>• Database administrator skill scarcity</p>
-                    <p>• Multi-technology stack complexity</p>
-                    <p>• Infrastructure management overhead</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: Strategic Comparison -->
-        <div class="slide" id="slide3">
-            <h2>MongoDB vs PostgreSQL: Strategic Analysis</h2>
-            <div class="comparison-grid">
-                <div class="db-column mongodb-highlight">
-                    <h3>🍃 MongoDB Advantages</h3>
-                    <ul class="feature-list">
-                        <li><strong>Native horizontal scaling</strong> - no sharding complexity</li>
-                        <li><strong>Document model alignment</strong> with modern app development</li>
-                        <li><strong>Schema flexibility</strong> for rapid iteration</li>
-                        <li><strong>Atlas managed service</strong> reduces operational overhead</li>
-                        <li><strong>Built-in vector search</strong> for AI applications</li>
-                        <li><strong>Global clusters</strong> with automatic data distribution</li>
-                    </ul>
-                </div>
-                <div class="db-column postgres-column">
-                    <h3>🐘 PostgreSQL Considerations</h3>
-                    <ul class="feature-list">
-                        <li class="consideration">Strong for complex relational queries and analytics</li>
-                        <li class="consideration">Mature ecosystem with extensive tooling</li>
-                        <li class="consideration">Open source with no licensing costs</li>
-                        <li class="trade-off">Horizontal scaling requires significant engineering effort</li>
-                        <li class="trade-off">Schema changes can require application downtime</li>
-                        <li class="trade-off">ORM complexity increases development time</li>
-                    </ul>
-                </div>
+    <div class="page-container">
+        <div class="presentation-container">
+            <div class="slide-indicator">
+                <span id="slide-counter">1 / 8</span>
             </div>
             
-            <div class="context-note">
-                <strong>Strategic Context:</strong> Both are excellent databases. PostgreSQL excels for analytical workloads and applications with stable, well-defined schemas. MongoDB provides advantages for applications requiring rapid development, global scale, and flexible data models.
-            </div>
-        </div>
-
-        <!-- Slide 4: Innovation Advantage -->
-        <div class="slide" id="slide4">
-            <h2>Accelerating Innovation Cycles</h2>
-            <div class="advantage-grid">
-                <div class="advantage-card">
-                    <span class="advantage-icon">⚡</span>
-                    <h4>Development Velocity</h4>
-                    <p><strong>Business Impact:</strong> Faster feature delivery and market response</p>
-                    <p>• Natural object-document mapping reduces code</p>
-                    <p>• No ORM impedance mismatch</p>
-                    <p>• Zero-downtime schema evolution</p>
-                    <p>• Rich aggregation pipeline for analytics</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🔄</span>
-                    <h4>Operational Agility</h4>
-                    <p><strong>Benefit:</strong> Reduced infrastructure management burden</p>
-                    <p>• Atlas automates 95% of database operations</p>
-                    <p>• Automatic scaling based on workload</p>
-                    <p>• Built-in monitoring and performance optimization</p>
-                    <p>• Multi-cloud deployment flexibility</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🎯</span>
-                    <h4>Time-to-Value</h4>
-                    <p><strong>Outcome:</strong> Faster proof-of-concepts and market validation</p>
-                    <p>• Rapid prototyping without upfront schema design</p>
-                    <p>• Easy integration with modern development stacks</p>
-                    <p>• Comprehensive APIs and drivers</p>
-                    <p>• Cloud-native architecture from day one</p>
-                </div>
-                <div class="advantage-card balanced-card">
-                    <span class="advantage-icon">📚</span>
-                    <h4>Learning Curve Consideration</h4>
-                    <p><strong>Trade-off:</strong> New query language vs SQL familiarity</p>
-                    <p>• MQL learning curve for SQL-experienced teams</p>
-                    <p>• Document thinking vs relational modeling</p>
-                    <p>• MongoDB University provides training resources</p>
-                    <p>• Generally shorter ramp-up for new developers</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 5: Business Impact -->
-        <div class="slide" id="slide5">
-            <h2>Total Business Impact Analysis</h2>
-            <p class="subtitle">Based on customer-reported outcomes and third-party studies for mid-to-large enterprise deployments</p>
-            
-            <div class="business-metric">
-                <div class="metric-item">
-                    <h4>Development Efficiency</h4>
-                    <div class="metric-value">30-50%</div>
-                    <div>reduction in application development time for document-centric applications</div>
-                </div>
-                <div class="metric-item">
-                    <h4>Operational Overhead</h4>
-                    <div class="metric-value">60-80%</div>
-                    <div>reduction in database administration effort with Atlas managed service</div>
-                </div>
-                <div class="metric-item">
-                    <h4>Infrastructure Flexibility</h4>
-                    <div class="metric-value">Linear</div>
-                    <div>scaling performance without architectural rewrites</div>
-                </div>
-                <div class="metric-item">
-                    <h4>Time to Scale</h4>
-                    <div class="metric-value">Minutes</div>
-                    <div>to add capacity vs weeks for traditional database scaling</div>
-                </div>
-            </div>
-
-            <div class="advantage-grid">
-                <div class="advantage-card">
-                    <span class="advantage-icon">💰</span>
-                    <h4>Cost Structure Comparison</h4>
-                    <p><strong>MongoDB:</strong> Higher per-unit database cost, lower total application cost</p>
-                    <p>• Reduced development team size requirements</p>
-                    <p>• Lower operational overhead</p>
-                    <p>• Faster time-to-market revenue</p>
-                </div>
-                <div class="advantage-card balanced-card">
-                    <span class="advantage-icon">⚖️</span>
-                    <h4>PostgreSQL Cost Profile</h4>
-                    <p><strong>PostgreSQL:</strong> Lower licensing cost, higher operational investment</p>
-                    <p>• No database licensing fees</p>
-                    <p>• Higher DBA and infrastructure management costs</p>
-                    <p>• Potentially longer development cycles</p>
-                </div>
-            </div>
-
-            <div class="context-note">
-                <strong>Important:</strong> Total cost of ownership depends heavily on application type, team expertise, and scale requirements. For applications with complex relational queries, PostgreSQL may offer better economics. For modern, rapidly-evolving applications, MongoDB typically provides better ROI.
-            </div>
-        </div>
-
-        <!-- Slide 6: Enterprise Success Stories -->
-        <div class="slide" id="slide6">
-            <h2>Proven Enterprise Outcomes</h2>
-            <p class="subtitle">Real customer results from strategic database modernization initiatives</p>
-            
-            <div class="case-study">
-                <div class="company-logo">🏦 Major Financial Services Institution</div>
-                <p><strong>Challenge:</strong> Legacy systems couldn't support real-time fraud detection and customer personalization</p>
-                <p><strong>Solution:</strong> Migrated critical workloads to MongoDB Atlas with vector search capabilities</p>
-                <div class="case-metrics">
-                    <div class="case-metric">
-                        <div class="case-metric-value">85%</div>
-                        <div class="case-metric-label">faster fraud detection</div>
+            <!-- Slide 1: Executive Summary -->
+            <div class="slide" id="slide1">
+                <div class="slide-content">
+                    <h1>MongoDB: Strategic Database Investment</h1>
+                    <p class="subtitle">Accelerating digital transformation through modern data architecture while mitigating operational risk and improving competitive positioning</p>
+                    <div class="advantage-grid">
+                        <div class="advantage-card">
+                            <span class="advantage-icon">🏢</span>
+                            <h4>54,500+ Global Customers</h4>
+                            <p><strong>Scale:</strong> Including major enterprises across all industries</p>
+                            <p>• Fortune 500 companies trust MongoDB</p>
+                            <p>• Proven in mission-critical applications</p>
+                            <p>• Global deployment experience</p>
+                        </div>
+                        <div class="advantage-card">
+                            <span class="advantage-icon">⚡</span>
+                            <h4>99.995% Uptime SLA</h4>
+                            <p><strong>Reliability:</strong> Atlas provides enterprise-grade availability</p>
+                            <p>• Mission-critical workload support</p>
+                            <p>• Multi-region redundancy</p>
+                            <p>• 24/7 monitoring and support</p>
+                        </div>
+                        <div class="advantage-card">
+                            <span class="advantage-icon">🚀</span>
+                            <h4>40-60% Faster Development</h4>
+                            <p><strong>Velocity:</strong> Significant reduction in development cycles*</p>
+                            <p>• Natural object mapping</p>
+                            <p>• No complex ORM required</p>
+                            <p>• Rapid prototyping capability</p>
+                        </div>
+                        <div class="advantage-card">
+                            <span class="advantage-icon">📈</span>
+                            <h4>Linear Horizontal Scaling</h4>
+                            <p><strong>Growth:</strong> Scale seamlessly to global requirements</p>
+                            <p>• Automatic sharding</p>
+                            <p>• No manual partitioning</p>
+                            <p>• Built-in load balancing</p>
+                        </div>
                     </div>
-                    <div class="case-metric">
-                        <div class="case-metric-value">40%</div>
-                        <div class="case-metric-label">reduction in false positives</div>
+                </div>
+                <div class="slide-footer">
+                    * Results vary by application complexity and team experience. Based on customer-reported development velocity improvements for document-centric applications.
+                </div>
+            </div>
+
+            <!-- Slide 2: Business Drivers -->
+            <div class="slide" id="slide2">
+                <h2>Market Forces Driving Database Strategy</h2>
+                <div class="advantage-grid">
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🚀</span>
+                        <h4>Speed to Market Pressure</h4>
+                        <p><strong>Reality:</strong> Digital-first competitors launch features in weeks, not quarters</p>
+                        <p>• Rapid prototyping and iteration requirements</p>
+                        <p>• Schema evolution without downtime</p>
+                        <p>• Developer velocity as competitive advantage</p>
                     </div>
-                    <div class="case-metric">
-                        <div class="case-metric-value">12 months</div>
-                        <div class="case-metric-label">full ROI payback</div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🌍</span>
+                        <h4>Global Scale Requirements</h4>
+                        <p><strong>Challenge:</strong> Traditional databases struggle with multi-region, multi-cloud deployment</p>
+                        <p>• Data sovereignty and compliance across regions</p>
+                        <p>• Sub-100ms response times globally</p>
+                        <p>• Elastic scaling during traffic spikes</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🧠</span>
+                        <h4>AI Integration Imperative</h4>
+                        <p><strong>Opportunity:</strong> AI-powered applications require flexible data models</p>
+                        <p>• Vector search for semantic analysis</p>
+                        <p>• Real-time data for ML model training</p>
+                        <p>• Unstructured data from IoT and sensors</p>
+                    </div>
+                    <div class="advantage-card balanced-card">
+                        <span class="advantage-icon">⚖️</span>
+                        <h4>Operational Complexity</h4>
+                        <p><strong>Trade-off:</strong> Choose between innovation speed and operational simplicity</p>
+                        <p>• Database administrator skill scarcity</p>
+                        <p>• Multi-technology stack complexity</p>
+                        <p>• Infrastructure management overhead</p>
                     </div>
                 </div>
             </div>
 
-            <div class="case-study">
-                <div class="company-logo">🛒 Global Retail Platform</div>
-                <p><strong>Challenge:</strong> Traditional database architecture couldn't handle seasonal traffic spikes and global expansion</p>
-                <p><strong>Solution:</strong> Implemented MongoDB global clusters for inventory and customer management</p>
-                <div class="case-metrics">
-                    <div class="case-metric">
-                        <div class="case-metric-value">5x</div>
-                        <div class="case-metric-label">peak traffic handling</div>
+            <!-- Slide 3: Strategic Comparison -->
+            <div class="slide" id="slide3">
+                <h2>MongoDB vs PostgreSQL: Strategic Analysis</h2>
+                <div class="comparison-grid">
+                    <div class="db-column mongodb-highlight">
+                        <h3>🍃 MongoDB Advantages</h3>
+                        <ul class="feature-list">
+                            <li><strong>Native horizontal scaling</strong> - no sharding complexity</li>
+                            <li><strong>Document model alignment</strong> with modern app development</li>
+                            <li><strong>Schema flexibility</strong> for rapid iteration</li>
+                            <li><strong>Atlas managed service</strong> reduces operational overhead</li>
+                            <li><strong>Built-in vector search</strong> for AI applications</li>
+                            <li><strong>Global clusters</strong> with automatic data distribution</li>
+                        </ul>
                     </div>
-                    <div class="case-metric">
-                        <div class="case-metric-value">65%</div>
-                        <div class="case-metric-label">faster page loads</div>
+                    <div class="db-column postgres-column">
+                        <h3>🐘 PostgreSQL Considerations</h3>
+                        <ul class="feature-list">
+                            <li class="consideration">Strong for complex relational queries and analytics</li>
+                            <li class="consideration">Mature ecosystem with extensive tooling</li>
+                            <li class="consideration">Open source with no licensing costs</li>
+                            <li class="trade-off">Horizontal scaling requires significant engineering effort</li>
+                            <li class="trade-off">Schema changes can require application downtime</li>
+                            <li class="trade-off">ORM complexity increases development time</li>
+                        </ul>
                     </div>
-                    <div class="case-metric">
-                        <div class="case-metric-value">8 regions</div>
-                        <div class="case-metric-label">simultaneous deployment</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="case-study">
-                <div class="company-logo">🏥 Healthcare Technology Company</div>
-                <p><strong>Challenge:</strong> Complex compliance requirements and need for real-time patient data access</p>
-                <p><strong>Solution:</strong> MongoDB Enterprise with field-level encryption and audit capabilities</p>
-                <div class="case-metrics">
-                    <div class="case-metric">
-                        <div class="case-metric-value">99.99%</div>
-                        <div class="case-metric-label">system availability</div>
-                    </div>
-                    <div class="case-metric">
-                        <div class="case-metric-value">50%</div>
-                        <div class="case-metric-label">compliance effort reduction</div>
-                    </div>
-                    <div class="case-metric">
-                        <div class="case-metric-value">3x</div>
-                        <div class="case-metric-label">faster feature releases</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 7: Future Readiness -->
-        <div class="slide" id="slide7">
-            <h2>Future-Proofing Your Data Architecture</h2>
-            <div class="advantage-grid">
-                <div class="advantage-card">
-                    <span class="advantage-icon">🤖</span>
-                    <h4>AI-Ready Architecture</h4>
-                    <p><strong>Strategic Value:</strong> Built-in capabilities for next-generation applications</p>
-                    <p>• Native vector search for semantic queries</p>
-                    <p>• Integration with major AI/ML platforms</p>
-                    <p>• Real-time data processing for model training</p>
-                    <p>• Support for unstructured data from IoT and sensors</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🌐</span>
-                    <h4>Multi-Cloud Strategy</h4>
-                    <p><strong>Risk Mitigation:</strong> Avoid vendor lock-in with portable architecture</p>
-                    <p>• Consistent experience across AWS, Azure, GCP</p>
-                    <p>• Cross-cloud disaster recovery</p>
-                    <p>• Hybrid deployment flexibility</p>
-                    <p>• Easy migration between cloud providers</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">📊</span>
-                    <h4>Modern Analytics</h4>
-                    <p><strong>Business Intelligence:</strong> Operational and analytical workloads unified</p>
-                    <p>• Real-time aggregation and reporting</p>
-                    <p>• Integration with BI tools and data lakes</p>
-                    <p>• Time-series data optimization</p>
-                    <p>• Streaming analytics capabilities</p>
-                </div>
-                <div class="advantage-card">
-                    <span class="advantage-icon">🛡️</span>
-                    <h4>Enterprise Security</h4>
-                    <p><strong>Compliance Ready:</strong> Advanced security for regulated industries</p>
-                    <p>• Client-side field-level encryption</p>
-                    <p>• Queryable encryption (industry-first)</p>
-                    <p>• RBAC with fine-grained permissions</p>
-                    <p>• Comprehensive audit trails</p>
-                </div>
-            </div>
-
-            <div class="context-note">
-                <strong>Technology Evolution:</strong> MongoDB continues to invest heavily in AI integration, with recent acquisition of Voyage AI for advanced embedding models. PostgreSQL also has strong AI capabilities through extensions like pgvector.
-            </div>
-        </div>
-
-        <!-- Slide 8: Decision Framework -->
-        <div class="slide" id="slide8">
-            <div class="cta-section">
-                <h2 style="color: #0a1628; margin-bottom: 1.5rem;">Strategic Decision Framework</h2>
-                <p style="font-size: 1.3rem; margin-bottom: 2.5rem; color: #1e293b;">
-                    Choose the database architecture that aligns with your business strategy and competitive requirements
-                </p>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0; text-align: left;">
-                    <div style="background: rgba(10, 22, 40, 0.3); padding: 1.8rem; border-radius: 12px;">
-                        <h4 style="color: #0a1628; margin-bottom: 1rem;">✅ Choose MongoDB When:</h4>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Rapid development cycles are critical</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Global scale and multi-region deployment needed</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• AI/ML integration is a strategic priority</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Data models evolve frequently</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Developer productivity drives competitive advantage</p>
-                        <p style="color: #334155;">• Operational simplicity reduces risk</p>
-                    </div>
-                    <div style="background: rgba(10, 22, 40, 0.3); padding: 1.8rem; border-radius: 12px;">
-                        <h4 style="color: #0a1628; margin-bottom: 1rem;">⚖️ Consider PostgreSQL When:</h4>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Complex relational queries dominate workload</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Data model is stable and well-defined</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Strong SQL expertise on team</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Budget constraints prioritize low licensing costs</p>
-                        <p style="color: #334155; margin-bottom: 0.5rem;">• Analytical workloads are primary use case</p>
-                        <p style="color: #334155;">• Existing PostgreSQL infrastructure investment</p>
-                    </div>
-                </div>
-
-                <div style="background: rgba(10, 22, 40, 0.2); padding: 1.5rem; border-radius: 12px; margin: 2rem 0;">
-                    <h4 style="color: #0a1628; margin-bottom: 0.8rem;">🎯 Expected MongoDB Outcomes:</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <p style="color: #334155; font-size: 0.95rem;">40-60% faster development cycles</p>
-                        <p style="color: #334155; font-size: 0.95rem;">60-80% operational overhead reduction</p>
-                        <p style="color: #334155; font-size: 0.95rem;">Linear scaling to global requirements</p>
-                        <p style="color: #334155; font-size: 0.95rem;">Future-ready for AI integration</p>
-                    </div>
-                </div>
-
-                <div style="margin: 3rem 0;">
-                    <button class="cta-button" onclick="window.open('https://www.mongodb.com/atlas/database', '_blank')">
-                        Start 30-Day Atlas Trial
-                    </button>
-                    <button class="cta-button" onclick="window.open('https://www.mongodb.com/contact', '_blank')">
-                        Request Architecture Consultation
-                    </button>
                 </div>
                 
-                <p style="margin-top: 2rem; font-size: 1.1rem; color: #475569; position: relative; z-index: 1;">
-                    <strong>Recommended Next Steps:</strong> Technical proof-of-concept • Architecture review • Migration planning • Team training assessment
-                </p>
+                <div class="context-note">
+                    <strong>Strategic Context:</strong> Both are excellent databases. PostgreSQL excels for analytical workloads and applications with stable, well-defined schemas. MongoDB provides advantages for applications requiring rapid development, global scale, and flexible data models.
+                </div>
+            </div>
+
+            <!-- Slide 4: Innovation Advantage -->
+            <div class="slide" id="slide4">
+                <h2>Accelerating Innovation Cycles</h2>
+                <div class="advantage-grid">
+                    <div class="advantage-card">
+                        <span class="advantage-icon">⚡</span>
+                        <h4>Development Velocity</h4>
+                        <p><strong>Business Impact:</strong> Faster feature delivery and market response</p>
+                        <p>• Natural object-document mapping reduces code</p>
+                        <p>• No ORM impedance mismatch</p>
+                        <p>• Zero-downtime schema evolution</p>
+                        <p>• Rich aggregation pipeline for analytics</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🔄</span>
+                        <h4>Operational Agility</h4>
+                        <p><strong>Benefit:</strong> Reduced infrastructure management burden</p>
+                        <p>• Atlas automates 95% of database operations</p>
+                        <p>• Automatic scaling based on workload</p>
+                        <p>• Built-in monitoring and performance optimization</p>
+                        <p>• Multi-cloud deployment flexibility</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🎯</span>
+                        <h4>Time-to-Value</h4>
+                        <p><strong>Outcome:</strong> Faster proof-of-concepts and market validation</p>
+                        <p>• Rapid prototyping without upfront schema design</p>
+                        <p>• Easy integration with modern development stacks</p>
+                        <p>• Comprehensive APIs and drivers</p>
+                        <p>• Cloud-native architecture from day one</p>
+                    </div>
+                    <div class="advantage-card balanced-card">
+                        <span class="advantage-icon">📚</span>
+                        <h4>Learning Curve Consideration</h4>
+                        <p><strong>Trade-off:</strong> New query language vs SQL familiarity</p>
+                        <p>• MQL learning curve for SQL-experienced teams</p>
+                        <p>• Document thinking vs relational modeling</p>
+                        <p>• MongoDB University provides training resources</p>
+                        <p>• Generally shorter ramp-up for new developers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Business Impact -->
+            <div class="slide" id="slide5">
+                <h2>Total Business Impact Analysis</h2>
+                <p class="subtitle">Based on customer-reported outcomes and third-party studies for mid-to-large enterprise deployments</p>
+                
+                <div class="advantage-grid">
+                    <div class="advantage-card">
+                        <span class="advantage-icon">⚡</span>
+                        <h4>Development Efficiency</h4>
+                        <p><strong>Impact:</strong> 30-50% reduction in application development time</p>
+                        <p>• Document-centric applications</p>
+                        <p>• Natural object mapping</p>
+                        <p>• Reduced boilerplate code</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🛠️</span>
+                        <h4>Operational Overhead</h4>
+                        <p><strong>Impact:</strong> 60-80% reduction in database administration effort</p>
+                        <p>• Atlas managed service</p>
+                        <p>• Automated scaling</p>
+                        <p>• Built-in monitoring</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">📈</span>
+                        <h4>Infrastructure Flexibility</h4>
+                        <p><strong>Impact:</strong> Linear scaling performance</p>
+                        <p>• No architectural rewrites</p>
+                        <p>• Automatic sharding</p>
+                        <p>• Global distribution</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">⏱️</span>
+                        <h4>Time to Scale</h4>
+                        <p><strong>Impact:</strong> Minutes to add capacity</p>
+                        <p>• vs weeks for traditional databases</p>
+                        <p>• On-demand provisioning</p>
+                        <p>• Zero-downtime scaling</p>
+                    </div>
+                </div>
+
+                <div class="advantage-grid">
+                    <div class="advantage-card">
+                        <span class="advantage-icon">💰</span>
+                        <h4>Cost Structure Comparison</h4>
+                        <p><strong>MongoDB:</strong> Higher per-unit database cost, lower total application cost</p>
+                        <p>• Reduced development team size requirements</p>
+                        <p>• Lower operational overhead</p>
+                        <p>• Faster time-to-market revenue</p>
+                    </div>
+                    <div class="advantage-card balanced-card">
+                        <span class="advantage-icon">⚖️</span>
+                        <h4>PostgreSQL Cost Profile</h4>
+                        <p><strong>PostgreSQL:</strong> Lower licensing cost, higher operational investment</p>
+                        <p>• No database licensing fees</p>
+                        <p>• Higher DBA and infrastructure management costs</p>
+                        <p>• Potentially longer development cycles</p>
+                    </div>
+                </div>
+
+                <div class="context-note">
+                    <strong>Important:</strong> Total cost of ownership depends heavily on application type, team expertise, and scale requirements. For applications with complex relational queries, PostgreSQL may offer better economics. For modern, rapidly-evolving applications, MongoDB typically provides better ROI.
+                </div>
+            </div>
+
+            <!-- Slide 6: Enterprise Success Stories -->
+            <div class="slide" id="slide6">
+                <h2>Proven Enterprise Outcomes</h2>
+                <p class="subtitle">Real customer results from strategic database modernization initiatives</p>
+                
+                <div class="case-study">
+                    <div class="company-logo">🏦 Major Financial Services Institution</div>
+                    <p><strong>Challenge:</strong> Legacy systems couldn't support real-time fraud detection and customer personalization</p>
+                    <p><strong>Solution:</strong> Migrated critical workloads to MongoDB Atlas with vector search capabilities</p>
+                    <div class="case-metrics">
+                        <div class="case-metric">
+                            <div class="case-metric-value">85%</div>
+                            <div class="case-metric-label">faster fraud detection</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">40%</div>
+                            <div class="case-metric-label">reduction in false positives</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">12 months</div>
+                            <div class="case-metric-label">full ROI payback</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="company-logo">🛒 Global Retail Platform</div>
+                    <p><strong>Challenge:</strong> Traditional database architecture couldn't handle seasonal traffic spikes and global expansion</p>
+                    <p><strong>Solution:</strong> Implemented MongoDB global clusters for inventory and customer management</p>
+                    <div class="case-metrics">
+                        <div class="case-metric">
+                            <div class="case-metric-value">5x</div>
+                            <div class="case-metric-label">peak traffic handling</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">65%</div>
+                            <div class="case-metric-label">faster page loads</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">8 regions</div>
+                            <div class="case-metric-label">simultaneous deployment</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="company-logo">🏥 Healthcare Technology Company</div>
+                    <p><strong>Challenge:</strong> Complex compliance requirements and need for real-time patient data access</p>
+                    <p><strong>Solution:</strong> MongoDB Enterprise with field-level encryption and audit capabilities</p>
+                    <div class="case-metrics">
+                        <div class="case-metric">
+                            <div class="case-metric-value">99.99%</div>
+                            <div class="case-metric-label">system availability</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">50%</div>
+                            <div class="case-metric-label">compliance effort reduction</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">3x</div>
+                            <div class="case-metric-label">faster feature releases</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Future Readiness -->
+            <div class="slide" id="slide7">
+                <h2>Future-Proofing Your Data Architecture</h2>
+                <div class="advantage-grid">
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🤖</span>
+                        <h4>AI-Ready Architecture</h4>
+                        <p><strong>Strategic Value:</strong> Built-in capabilities for next-generation applications</p>
+                        <p>• Native vector search for semantic queries</p>
+                        <p>• Integration with major AI/ML platforms</p>
+                        <p>• Real-time data processing for model training</p>
+                        <p>• Support for unstructured data from IoT and sensors</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🌐</span>
+                        <h4>Multi-Cloud Strategy</h4>
+                        <p><strong>Risk Mitigation:</strong> Avoid vendor lock-in with portable architecture</p>
+                        <p>• Consistent experience across AWS, Azure, GCP</p>
+                        <p>• Cross-cloud disaster recovery</p>
+                        <p>• Hybrid deployment flexibility</p>
+                        <p>• Easy migration between cloud providers</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">📊</span>
+                        <h4>Modern Analytics</h4>
+                        <p><strong>Business Intelligence:</strong> Operational and analytical workloads unified</p>
+                        <p>• Real-time aggregation and reporting</p>
+                        <p>• Integration with BI tools and data lakes</p>
+                        <p>• Time-series data optimization</p>
+                        <p>• Streaming analytics capabilities</p>
+                    </div>
+                    <div class="advantage-card">
+                        <span class="advantage-icon">🛡️</span>
+                        <h4>Enterprise Security</h4>
+                        <p><strong>Compliance Ready:</strong> Advanced security for regulated industries</p>
+                        <p>• Client-side field-level encryption</p>
+                        <p>• Queryable encryption (industry-first)</p>
+                        <p>• RBAC with fine-grained permissions</p>
+                        <p>• Comprehensive audit trails</p>
+                    </div>
+                </div>
+
+                <div class="context-note">
+                    <strong>Technology Evolution:</strong> MongoDB continues to invest heavily in AI integration, with recent acquisition of Voyage AI for advanced embedding models. PostgreSQL also has strong AI capabilities through extensions like pgvector.
+                </div>
+            </div>
+
+            <!-- Slide 8: Decision Framework -->
+            <div class="slide" id="slide8">
+                <div class="slide-content">
+                    <h2>Strategic Decision Framework</h2>
+                    <p class="subtitle">
+                        Choose the database architecture that aligns with your business strategy and competitive requirements
+                    </p>
+                    
+                    <div class="advantage-grid">
+                        <div class="advantage-card">
+                            <span class="advantage-icon">✅</span>
+                            <h4>Choose MongoDB When</h4>
+                            <p><strong>Best For:</strong> Modern, rapidly-evolving applications</p>
+                            <p>• Rapid development cycles are critical</p>
+                            <p>• Global scale and multi-region deployment needed</p>
+                            <p>• AI/ML integration is a strategic priority</p>
+                            <p>• Data models evolve frequently</p>
+                            <p>• Developer productivity drives competitive advantage</p>
+                        </div>
+                        <div class="advantage-card">
+                            <span class="advantage-icon">⚖️</span>
+                            <h4>Consider PostgreSQL When</h4>
+                            <p><strong>Best For:</strong> Stable, query-heavy applications</p>
+                            <p>• Complex relational queries dominate workload</p>
+                            <p>• Data model is stable and well-defined</p>
+                            <p>• Strong SQL expertise on team</p>
+                            <p>• Budget constraints prioritize low licensing costs</p>
+                            <p>• Analytical workloads are primary use case</p>
+                        </div>
+                    </div>
+
+                    <div class="advantage-grid">
+                        <div class="advantage-card">
+                            <span class="advantage-icon">🎯</span>
+                            <h4>Expected MongoDB Outcomes</h4>
+                            <p><strong>Performance Impact:</strong> Measurable business benefits</p>
+                            <p>• 40-60% faster development cycles</p>
+                            <p>• 60-80% operational overhead reduction</p>
+                            <p>• Linear scaling to global requirements</p>
+                            <p>• Future-ready for AI integration</p>
+                        </div>
+                        <div class="advantage-card">
+                            <span class="advantage-icon">🚀</span>
+                            <h4>Next Steps</h4>
+                            <p><strong>Get Started:</strong> Experience MongoDB's advantages</p>
+                            <p>• Start with Atlas free tier</p>
+                            <p>• Request architecture consultation</p>
+                            <p>• Join MongoDB University training</p>
+                            <p>• Connect with MongoDB experts</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: var(--space-3xl); text-align: center;">
+                        <button class="cta-button" onclick="window.open('https://www.mongodb.com/atlas/database', '_blank')">
+                            Start 30-Day Atlas Trial
+                        </button>
+                        <button class="cta-button" onclick="window.open('https://www.mongodb.com/contact', '_blank')">
+                            Request Architecture Consultation
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="navigation">
-        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
-        <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="previousSlide()">← Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+        </div>
     </div>
 
     <script>
@@ -1143,73 +953,40 @@
             currentSlide = n;
             document.getElementById(`slide${currentSlide}`).style.display = 'flex';
             updateSlideCounter();
+            updateNavigationButtons();
         }
-
-        function nextSlide() {
-            currentSlide++;
-            showSlide(currentSlide);
-        }
-
-        function previousSlide() {
-            currentSlide--;
-            showSlide(currentSlide);
-        }
-
-        // Navigation Functions
-        function toggleMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const backdrop = document.getElementById('navBackdrop');
-            const toggleBtn = document.getElementById('menuToggle');
+        
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
             
-            navMenu.classList.toggle('open');
-            backdrop.classList.toggle('active');
-            toggleBtn.classList.toggle('menu-open');
-        }
-
-        function closeMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const backdrop = document.getElementById('navBackdrop');
-            const toggleBtn = document.getElementById('menuToggle');
-            
-            navMenu.classList.remove('open');
-            backdrop.classList.remove('active');
-            toggleBtn.classList.remove('menu-open');
-        }
-
-        // Accordion Functions
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            const header = content.previousElementSibling;
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-                header.setAttribute('aria-expanded', 'false');
+            // Disable previous button on first slide
+            if (currentSlide === 1) {
+                prevBtn.disabled = true;
             } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                header.setAttribute('aria-expanded', 'true');
+                prevBtn.disabled = false;
+            }
+            
+            // Disable next button on last slide
+            if (currentSlide === totalSlides) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
             }
         }
 
-        // Initialize accordion states
-        function initializeAccordion() {
-            const categories = ['competition', 'architecture', 'patterns', 'development'];
-            categories.forEach(categoryId => {
-                const content = document.getElementById(categoryId + '-content');
-                const icon = document.getElementById(categoryId + '-icon');
-                const header = content ? content.previousElementSibling : null;
-                
-                if (content && icon && header) {
-                    // Expand competition section by default since we're in comparative analysis
-                    if (categoryId === 'competition') {
-                        content.classList.add('expanded');
-                        icon.classList.add('rotated');
-                        header.setAttribute('aria-expanded', 'true');
-                    }
-                }
-            });
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
         }
 
         // Keyboard navigation
@@ -1220,32 +997,13 @@
             } else if (e.key === 'ArrowLeft') {
                 e.preventDefault();
                 previousSlide();
-            } else if (e.key === 'Escape') {
-                closeMobileMenu();
-            }
-        });
-
-        // Outside click handler
-        document.addEventListener('click', (e) => {
-            const navMenu = document.getElementById('navMenu');
-            const menuToggle = document.getElementById('menuToggle');
-            
-            if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-                closeMobileMenu();
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 1024) {
-                closeMobileMenu();
             }
         });
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             showSlide(1);
-            initializeAccordion();
+            updateNavigationButtons();
         });
     </script>
 </body>

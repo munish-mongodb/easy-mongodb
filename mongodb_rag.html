@@ -4,52 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB RAG Architecture</title>
+    <link rel="stylesheet" href="shared-theme.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
-            color: white;
-            overflow: hidden;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         .presentation-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: rgba(0, 30, 43, 0.8);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid #00ED64;
-            backdrop-filter: blur(20px);
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #00ED64, #00B84D);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+            min-height: auto;
+            display: block;
         }
 
         .slide {
             display: none;
-            flex: 1;
-            padding: 20px;
+            padding: var(--space-lg);
             position: relative;
         }
 
@@ -60,61 +29,63 @@
 
         .slide-content {
             display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 30px;
-            height: 100%;
+            grid-template-columns: 320px 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+            min-height: calc(100vh - 200px);
         }
 
         .text-content {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            padding: 30px;
-            border-radius: 15px;
-            border-left: 4px solid #00ED64;
-            color: #001E2B;
-            border: 1px solid rgba(0, 104, 74, 0.1);
+            background: var(--surface);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--secondary-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px var(--shadow-md);
         }
 
         .slide h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: #00684A;
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-lg);
+            color: var(--primary-color);
+            font-weight: var(--font-weight-semibold);
         }
 
         .architecture-description {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 3px solid #00ED64;
+            background: var(--background-soft);
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-lg);
+            border-left: 3px solid var(--secondary-color);
         }
 
         .architecture-description h3 {
-            color: #00684A;
-            font-size: 1.1em;
-            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-sm);
+            font-weight: var(--font-weight-semibold);
         }
 
         .architecture-description p {
-            font-size: 0.9em;
-            line-height: 1.4;
-            color: #001E2B;
-            opacity: 0.8;
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-normal);
+            color: var(--text-secondary);
         }
 
         .benefits-list {
             list-style: none;
-            margin: 20px 0;
+            margin: var(--space-lg) 0;
         }
 
         .benefits-list li {
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
-            margin: 12px 0;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 3px solid #00ED64;
-            font-size: 14px;
-            color: #001E2B;
+            background: var(--background-soft);
+            margin: var(--space-md) 0;
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--secondary-color);
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
             transform: translateX(-20px);
             opacity: 0;
             animation: slideInBenefit 0.6s ease-out forwards;
@@ -133,368 +104,80 @@
         }
 
         .diagram-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 15px;
-            padding: 20px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            border: 1px solid rgba(0, 104, 74, 0.1);
-            height: 100%;
-            min-height: 500px;
+            border: 1px solid var(--border);
+            height: auto;
+            box-shadow: 0 4px 12px var(--shadow-md);
         }
 
         .architecture-diagram {
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: contain;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 30, 43, 0.3);
-            transition: all 0.3s ease;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 12px var(--shadow-md);
+            max-width: 100%;
             cursor: pointer;
-            max-height: 80vh;
+            transition: var(--transition);
+        }
+
+        .architecture-diagram:hover {
+            box-shadow: 0 6px 20px var(--shadow-lg);
+            opacity: 0.9;
         }
 
         .architecture-diagram:hover {
             transform: scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.4);
+            box-shadow: 0 6px 20px var(--shadow-lg);
         }
 
         .diagram-overlay {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 104, 74, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
+            top: var(--space-md);
+            right: var(--space-md);
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
         }
 
         .postgresql-comparison {
-            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 3px solid #FF9800;
+            background: rgba(255, 152, 0, 0.1);
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            margin-top: var(--space-lg);
+            border-left: 3px solid var(--accent-orange);
         }
 
         .postgresql-comparison h4 {
-            color: #E65100;
-            font-size: 1em;
-            margin-bottom: 8px;
+            color: var(--accent-orange);
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-sm);
+            font-weight: var(--font-weight-semibold);
         }
 
         .postgresql-comparison p {
-            font-size: 0.85em;
-            line-height: 1.4;
-            color: #001E2B;
-            opacity: 0.8;
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-normal);
+            color: var(--text-secondary);
         }
 
         .mongodb-highlight {
-            color: #00684A;
-            font-weight: bold;
+            color: var(--primary-color);
+            font-weight: var(--font-weight-semibold);
         }
 
         .slide-counter {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 30, 43, 0.8);
-            backdrop-filter: blur(20px);
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: white;
-        }
-
-        /* Navigation Menu */
-        .nav-menu {
-            position: fixed;
-            left: -320px;
-            top: 0;
-            width: 320px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 25px;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 104, 74, 0.2);
-            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
-        }
-
-        .nav-menu.open {
-            left: 0;
-        }
-
-        .nav-menu h2 {
-            color: #00684A;
-            margin-bottom: 30px;
-            font-size: 1.6rem;
-            font-weight: 700;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #00ED64;
-            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-menu ul {
-            list-style: none;
-        }
-
-        .nav-menu li {
-            margin-bottom: 8px;
-        }
-
-        .nav-menu > ul > li > a {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 4px solid transparent;
-            font-weight: 600;
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-menu > ul > li > a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-menu > ul > li > a:hover::before,
-        .nav-menu > ul > li > a.active::before {
-            opacity: 1;
-        }
-
-        .nav-menu > ul > li > a:hover,
-        .nav-menu > ul > li > a.active {
-            border-left: 4px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
-        }
-
-        /* Accordion Styles */
-        .nav-accordion {
-            margin-bottom: 10px;
-        }
-
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(0, 104, 74, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-category-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-category-header:hover::before {
-            opacity: 1;
-        }
-
-        .nav-category-header:hover {
-            transform: translateX(6px);
-            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
-        }
-
-        .accordion-icon {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.9rem;
-            color: #00684A;
-            z-index: 1;
-            position: relative;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 400px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 6px;
-            margin-left: 20px;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInLeft 0.3s ease forwards;
-        }
-
-        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
-        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
-        .nav-accordion-content.expanded li:nth-child(3) { animation-delay: 0.3s; }
-        .nav-accordion-content.expanded li:nth-child(4) { animation-delay: 0.4s; }
-        .nav-accordion-content.expanded li:nth-child(5) { animation-delay: 0.5s; }
-        .nav-accordion-content.expanded li:nth-child(6) { animation-delay: 0.6s; }
-        .nav-accordion-content.expanded li:nth-child(7) { animation-delay: 0.7s; }
-        .nav-accordion-content.expanded li:nth-child(8) { animation-delay: 0.8s; }
-        .nav-accordion-content.expanded li:nth-child(9) { animation-delay: 0.9s; }
-
-        @keyframes slideInLeft {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .nav-accordion-content a {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-accordion-content a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-accordion-content a:hover::before,
-        .nav-accordion-content a.active::before {
-            opacity: 1;
-        }
-
-        .nav-accordion-content a:hover,
-        .nav-accordion-content a.active {
-            border-left: 3px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
-        }
-
-        .mongodb-logo-icon {
-            width: 20px;
-            height: 20px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C8.5 2 5.7 4.8 5.7 8.3c0 2.5 1.5 5.2 3.8 7.8c1.2 1.3 2.5 2.6 2.5 4.9v1h0v-1c0-2.3 1.3-3.6 2.5-4.9c2.3-2.6 3.8-5.3 3.8-7.8C18.3 4.8 15.5 2 12 2z"/></svg>') no-repeat center;
-            background-size: contain;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        .postgresql-logo-icon {
-            width: 20px;
-            height: 20px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.6 0 3.1-.4 4.4-1.1-.2-.1-.4-.3-.6-.4-1 .5-2.1.8-3.3.8-4.1 0-7.5-3.4-7.5-7.5S7.9 6.3 12 6.3s7.5 3.4 7.5 7.5c0 1.2-.3 2.3-.8 3.3.1.2.3.4.4.6.7-1.3 1.1-2.8 1.1-4.4C22 6.5 17.5 2 12 2z"/></svg>') no-repeat center;
-            background-size: contain;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        .menu-toggle {
-            position: fixed;
-            top: 25px;
-            left: 25px;
-            z-index: 1001;
-            background: rgba(0, 104, 74, 0.95);
-            border: none;
-            color: white;
-            padding: 14px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.3rem;
-            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-toggle:hover {
-            background: #00ED64;
-            color: #001E2B;
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
-        }
-
-        .nav-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 30, 43, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-backdrop.active {
-            opacity: 1;
-            visibility: visible;
+            display: none;
         }
 
         /* Zoom modal for diagrams */
@@ -520,25 +203,25 @@
             max-width: 95%;
             max-height: 95%;
             object-fit: contain;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
         }
 
         .zoom-close {
             position: absolute;
-            top: 30px;
-            right: 30px;
-            background: rgba(0, 237, 100, 0.8);
+            top: var(--space-2xl);
+            right: var(--space-2xl);
+            background: var(--secondary-color);
             border: none;
-            color: #001E2B;
-            font-size: 24px;
-            padding: 10px 15px;
+            color: var(--primary-color);
+            font-size: var(--font-size-2xl);
+            padding: var(--space-md) var(--space-lg);
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .zoom-close:hover {
-            background: #00ED64;
+            background: var(--secondary-hover);
             transform: scale(1.1);
         }
 
@@ -551,22 +234,101 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Scroll hint indicator */
+        .scroll-hint {
+            position: fixed;
+            bottom: var(--space-2xl);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            z-index: 100;
+            animation: fadeInUp 2s ease-out 1s both;
+        }
+
+        .scroll-hint.hidden {
+            opacity: 0 !important;
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        .scroll-arrow {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xl);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow-md);
+            transition: var(--transition);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-arrow:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px) scale(1.1);
+            box-shadow: 0 6px 20px var(--shadow-lg);
+        }
+
+        .scroll-text {
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            box-shadow: 0 2px 8px var(--shadow-sm);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
         /* Responsive design */
         @media (max-width: 1200px) {
             .slide-content {
                 grid-template-columns: 300px 1fr;
-                gap: 20px;
+                gap: var(--space-lg);
             }
             
             .text-content {
-                padding: 20px;
+                padding: var(--space-lg);
             }
         }
 
         @media (max-width: 900px) {
             .slide-content {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: var(--space-lg);
             }
             
             .text-content {
@@ -577,111 +339,61 @@
     </style>
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle">
-        ☰
-    </button>
-    
-    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
-    
-    <nav class="nav-menu" id="navMenu">
-        <h2>MongoDB vs SQL</h2>
-        <ul>
-            <li><a href="index.html">🏠 Home</a></li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Comparative Analysis</span>
-                    <span class="accordion-icon" id="competition-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="competition-content" role="region">
-                    <li><a href="mongodb_vs_postgres_presentation.html">
-                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
-                    </a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">
-                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
-                    </a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
-                    <span>High Availability and Scalability</span>
-                    <span class="accordion-icon" id="architecture-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="architecture-content" role="region">
-                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
-                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="true">
-                    <span>Architecture Patterns</span>
-                    <span class="accordion-icon" id="patterns-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content expanded" id="patterns-content" role="region">
-                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
-                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
-                    <li><a href="mongodb_rag.html" class="active">🤖 RAG Architecture</a></li>
-                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
-                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
-                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
-                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="development-content" role="region">
-                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
-                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
-                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
-                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
-                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="presentation-container">
-        <div class="header">
-            <h1>RAG Architecture</h1>
-            <p>Retrieval-Augmented Generation with MongoDB Vector Search</p>
+    <header class="unified-header">
+        <div class="header-content">
+            <a href="playground.html" class="header-logo">
+                <div class="logo-icon">M</div>
+                <span>MongoDB Playground</span>
+            </a>
+            <div class="breadcrumb">
+                <a href="playground.html">Playground</a>
+                <span class="breadcrumb-separator">></span>
+                <span>RAG Architecture</span>
+            </div>
+            <a href="playground.html" class="back-to-playground">← Back to Playground</a>
         </div>
+    </header>
 
-        <!-- RAG Slide -->
-        <div class="slide active">
-            <div class="slide-content">
-                <div class="text-content fade-in">
-                    <h2>RAG (Retrieval-Augmented Generation)</h2>
-                    <div class="architecture-description">
-                        <h3>AI-Powered Search with <span class="mongodb-highlight">MongoDB Vector Search</span></h3>
-                        <p>Combine retrieval-based and generative AI using MongoDB's native vector search capabilities for semantic similarity and context retrieval.</p>
+    <div class="page-container">
+
+        <div class="presentation-container">
+            <!-- RAG Slide -->
+            <div class="slide active">
+                <div class="slide-content">
+                    <div class="text-content fade-in">
+                        <h2>RAG (Retrieval-Augmented Generation)</h2>
+                        <div class="architecture-description">
+                            <h3>AI-Powered Search with <span class="mongodb-highlight">MongoDB Vector Search</span></h3>
+                            <p>Combine retrieval-based and generative AI using MongoDB's native vector search capabilities for semantic similarity and context retrieval.</p>
+                        </div>
+                        <ul class="benefits-list">
+                            <li><strong>Vector Search:</strong> Native vector indexing enables semantic search without additional infrastructure</li>
+                            <li><strong>Unified Platform:</strong> Store vectors, metadata, and application data in one database</li>
+                            <li><strong>Real-time Updates:</strong> Update knowledge base without retraining models</li>
+                            <li><strong>Rich Filtering:</strong> Combine vector search with traditional MongoDB queries</li>
+                        </ul>
+                        <div class="postgresql-comparison">
+                            <h4>PostgreSQL with pgvector Considerations:</h4>
+                            <p>While pgvector provides a straightforward one-time setup for native vector search in PostgreSQL, there are architectural trade-offs to consider. The relational model requires complex joins for metadata filtering, and performance optimization at scale often needs careful index tuning. MongoDB's document model naturally handles unstructured content and metadata together, simplifying RAG application development.</p>
+                        </div>
                     </div>
-                    <ul class="benefits-list">
-                        <li><strong>Vector Search:</strong> Native vector indexing enables semantic search without additional infrastructure</li>
-                        <li><strong>Unified Platform:</strong> Store vectors, metadata, and application data in one database</li>
-                        <li><strong>Real-time Updates:</strong> Update knowledge base without retraining models</li>
-                        <li><strong>Rich Filtering:</strong> Combine vector search with traditional MongoDB queries</li>
-                    </ul>
-                    <div class="postgresql-comparison">
-                        <h4>Why PostgreSQL Falls Short:</h4>
-                        <p>PostgreSQL requires separate vector extensions (pgvector) with limited performance at scale. You need additional infrastructure for vector search, complex joins for metadata filtering, and the relational model doesn't handle unstructured document content efficiently for RAG applications.</p>
+                    <div class="diagram-container">
+                        <div class="diagram-overlay">Vector Search Flow</div>
+                        <img src="assets/mongodb_rag.png" alt="MongoDB RAG Architecture" class="architecture-diagram" onclick="openZoom(this.src)">
                     </div>
-                </div>
-                <div class="diagram-container">
-                    <div class="diagram-overlay">Vector Search Flow</div>
-                    <img src="assets/mongodb_rag.png" alt="MongoDB RAG Architecture" class="architecture-diagram" onclick="openZoom(this.src)">
                 </div>
             </div>
         </div>
+
+        <div class="slide-counter">
+            RAG Architecture
+        </div>
     </div>
 
-    <div class="slide-counter">
-        RAG Architecture
+    <!-- Scroll Hint -->
+    <div class="scroll-hint" id="scrollHint">
+        <div class="scroll-text">See PostgreSQL Comparison</div>
+        <div class="scroll-arrow" onclick="scrollToComparison()" title="Scroll to see PostgreSQL comparison">↓</div>
     </div>
 
     <!-- Zoom Modal -->
@@ -691,74 +403,95 @@
     </div>
 
     <script>
-        // Navigation Functions
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            const header = content.previousElementSibling;
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-                header.setAttribute('aria-expanded', 'false');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                header.setAttribute('aria-expanded', 'true');
-            }
-        }
-
-        function initializeAccordion() {
-            // Auto-expand patterns section since this is an architecture pattern demo
-            const patternsContent = document.getElementById('patterns-content');
-            const patternsIcon = document.getElementById('patterns-icon');
-            const patternsHeader = patternsContent.previousElementSibling;
-            
-            if (patternsContent && patternsIcon && patternsHeader) {
-                patternsContent.classList.add('expanded');
-                patternsIcon.classList.add('rotated');
-                patternsHeader.setAttribute('aria-expanded', 'true');
-            }
-        }
-
-        function toggleMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const backdrop = document.getElementById('navBackdrop');
-            if (navMenu) navMenu.classList.toggle('open');
-            if (backdrop) backdrop.classList.toggle('active');
-        }
-
-        function closeMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const backdrop = document.getElementById('navBackdrop');
-            if (navMenu) navMenu.classList.remove('open');
-            if (backdrop) backdrop.classList.remove('active');
-        }
-
         function openZoom(imageSrc) {
-            // Create zoom overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'zoom-overlay';
-            overlay.innerHTML = `
-                <div class="zoom-content">
-                    <img src="${imageSrc}" alt="Zoomed diagram">
-                    <button class="zoom-close" onclick="closeZoom()">&times;</button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById('zoomModal');
+            const zoomImage = document.getElementById('zoomImage');
+            zoomImage.src = imageSrc;
+            modal.classList.add('active');
         }
 
         function closeZoom() {
-            const overlay = document.querySelector('.zoom-overlay');
-            if (overlay) {
-                overlay.remove();
-                document.body.style.overflow = '';
+            const modal = document.getElementById('zoomModal');
+            modal.classList.remove('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeZoom();
+            }
+        });
+
+        // Scroll to PostgreSQL comparison section
+        function scrollToComparison() {
+            const postgresSection = document.querySelector('.postgresql-comparison');
+            if (postgresSection) {
+                postgresSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
             }
         }
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initializeAccordion);
+        // Hide scroll hint when user scrolls
+        function handleScroll() {
+            const scrollHint = document.getElementById('scrollHint');
+            const postgresSection = document.querySelector('.postgresql-comparison');
+            
+            if (scrollHint) {
+                // Check if user scrolled down significantly
+                const hasScrolled = window.scrollY > 100;
+                
+                // Check if user is near the bottom of the page
+                const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 50);
+                
+                // Check if PostgreSQL section is FULLY visible (more than 50% in view)
+                let postgresFullyVisible = false;
+                if (postgresSection) {
+                    const rect = postgresSection.getBoundingClientRect();
+                    const sectionHeight = rect.height;
+                    const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+                    postgresFullyVisible = visibleHeight > sectionHeight * 0.5; // More than 50% visible
+                }
+                
+                // Show hint only if PostgreSQL section is NOT fully visible AND user hasn't scrolled much
+                if (hasScrolled || isAtBottom || postgresFullyVisible) {
+                    scrollHint.classList.add('hidden');
+                } else {
+                    scrollHint.classList.remove('hidden');
+                }
+            }
+        }
+
+        // Initialize scroll hint behavior
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(handleScroll, 10); // Debounce for better performance
+        });
+        
+        window.addEventListener('load', () => {
+            // Check if PostgreSQL section is initially hidden
+            setTimeout(() => {
+                const scrollHint = document.getElementById('scrollHint');
+                const postgresSection = document.querySelector('.postgresql-comparison');
+                
+                if (postgresSection && scrollHint) {
+                    const rect = postgresSection.getBoundingClientRect();
+                    const isInitiallyHidden = rect.top > window.innerHeight;
+                    
+                    if (isInitiallyHidden) {
+                        // PostgreSQL section is below the fold, show hint
+                        scrollHint.classList.remove('hidden');
+                    } else {
+                        // PostgreSQL section is already visible, no hint needed
+                        scrollHint.classList.add('hidden');
+                    }
+                }
+                
+                handleScroll();
+            }, 1000);
+        });
 
         // Handle image load errors
         document.querySelectorAll('.architecture-diagram').forEach(img => {

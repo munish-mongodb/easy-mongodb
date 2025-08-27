@@ -13,6 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB Replica Set High Availability</title>
+    <link rel="stylesheet" href="shared-theme.css">
     <style>
         /* Reset and Base Styles */
         * {
@@ -22,30 +23,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #001E2B 0%, #00684A 50%, #00ED64 100%);
-            color: #001E2B;
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background: var(--background);
         }
 
-        /* Navigation Menu - Matching index.html style */
-        .nav-menu {
-            position: fixed;
-            left: -320px;
-            top: 0;
-            width: 320px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 25px;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 104, 74, 0.2);
-            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
-        }
+        /* Page-specific styles for replica set demo */
 
         .nav-menu.open {
             left: 0;
@@ -313,8 +294,7 @@
 
         /* Main Content Container */
         .container {
-            padding: 40px;
-            padding-left: 100px; /* Space for menu button */
+            padding: var(--space-lg);
             max-width: 1400px;
             margin: 0 auto;
             position: relative;
@@ -521,6 +501,269 @@
             color: #001E2B;
             font-size: 0.95em;
             opacity: 0.8;
+        }
+
+        /* Technical Section Styles */
+        .technical-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 4px 12px var(--shadow-md);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: var(--space-sm);
+        }
+
+        .priority-explanation, .postgresql-comparison {
+            margin-top: var(--space-lg);
+            color: #001E2B;
+        }
+
+        .priority-config-box {
+            background: var(--background-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-top: var(--space-md);
+            color: #001E2B;
+        }
+
+        .config-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-lg) 0;
+        }
+
+        .scenario-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            box-shadow: 0 2px 6px var(--shadow-sm);
+            color: #001E2B;
+        }
+
+        .scenario-card.mongodb-priority {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .scenario-card.postgresql-wal {
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .scenario-card.mongodb-advantage {
+            border-left: 4px solid var(--secondary-color);
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.05) 0%, rgba(0, 184, 77, 0.02) 100%);
+        }
+
+        .node-config {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: var(--space-md) 0;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .config-node {
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            text-align: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            min-width: 100px;
+        }
+
+        .config-node.primary-node {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .config-node.secondary-node {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-hover) 100%);
+            color: #001E2B;
+        }
+
+
+        .priority-benefits {
+            list-style: none;
+            padding: 0;
+            margin: var(--space-md) 0;
+        }
+
+        .priority-benefits li {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--secondary-color);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            border-radius: var(--radius);
+            color: #001E2B;
+        }
+
+        .two-node-scenario {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid var(--accent-orange);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-top: var(--space-lg);
+            color: #001E2B;
+        }
+
+        .wal-scenarios {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-lg);
+        }
+
+        .wal-architecture, .mongodb-flow {
+            background: var(--background-soft);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin: var(--space-md) 0;
+        }
+
+        .wal-flow, .auto-process {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .wal-node, .auto-step {
+            background: var(--surface);
+            border: 2px solid var(--accent-blue);
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            text-align: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            min-width: 120px;
+        }
+
+        .auto-step {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
+        }
+
+        .wal-node.primary-wal {
+            border-color: var(--accent-orange);
+        }
+
+        .wal-arrow, .auto-arrow {
+            font-size: var(--font-size-lg);
+            font-weight: bold;
+            color: var(--text-secondary);
+        }
+
+        .failure-steps {
+            margin-top: var(--space-md);
+        }
+
+        .step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            color: #001E2B;
+        }
+
+        .step p {
+            margin: var(--space-xs) 0;
+            font-size: var(--font-size-sm);
+            color: #001E2B;
+        }
+
+        .wal-limitations ul, .mongodb-benefits ul {
+            list-style: none;
+            padding: 0;
+            margin: var(--space-md) 0;
+        }
+
+        .wal-limitations li, .mongodb-benefits li {
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: var(--space-xs);
+            border-radius: var(--radius);
+            font-size: var(--font-size-sm);
+            color: #001E2B;
+        }
+
+        .wal-limitations li {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .mongodb-benefits li {
+            background: rgba(0, 237, 100, 0.1);
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .reality-comparison {
+            margin-top: var(--space-xl);
+        }
+
+        .impact-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 2px 6px var(--shadow-sm);
+        }
+
+        .impact-table th, .impact-table td {
+            padding: var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            color: #001E2B;
+        }
+
+        .impact-table th {
+            background: var(--background-soft);
+            font-weight: var(--font-weight-semibold);
+            color: #001E2B;
+        }
+
+        .impact-table td.advantage {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .impact-table td.disadvantage {
+            color: var(--accent-orange);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* Responsive Design for Technical Sections */
+        @media (max-width: 768px) {
+            .wal-scenarios {
+                grid-template-columns: 1fr;
+            }
+            
+            .config-scenarios {
+                grid-template-columns: 1fr;
+            }
+            
+            .node-config, .wal-flow, .auto-process {
+                flex-direction: column;
+            }
+            
+            .wal-arrow, .auto-arrow {
+                transform: rotate(90deg);
+            }
         }
 
         .controls {
@@ -886,15 +1129,13 @@
         /* Responsive Design */
         @media (max-width: 1200px) {
             .container {
-                padding: 30px;
-                padding-left: 100px;
+                padding: var(--space-md);
             }
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
-                padding-left: 80px;
+                padding: var(--space-md);
             }
             
             .header h1 {
@@ -942,8 +1183,7 @@
 
         @media (max-width: 480px) {
             .container {
-                padding: 15px;
-                padding-left: 70px;
+                padding: var(--space-md);
             }
 
             .stats {
@@ -1008,76 +1248,26 @@
     </style>
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
-        ☰
-    </button>
-    
-    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
-    
-    <nav class="nav-menu" id="navMenu" role="navigation">
-        <h2>MongoDB vs SQL</h2>
-        <ul>
-            <li><a href="index.html">🏠 Home</a></li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Comparative Analysis</span>
-                    <span class="accordion-icon" id="competition-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="competition-content" role="region">
-                    <li><a href="mongodb_vs_postgres_presentation.html">
-                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
-                    </a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">
-                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
-                    </a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="true">
-                    <span>High Availability and Scalability</span>
-                    <span class="accordion-icon" id="architecture-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content expanded" id="architecture-content" role="region">
-                    <li><a href="mongodb_replica_set_demo.html" class="active">🔄 High Availability</a></li>
-                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Architecture Patterns</span>
-                    <span class="accordion-icon" id="patterns-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="patterns-content" role="region">
-                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
-                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
-                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
-                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
-                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
-                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
-                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="development-content" role="region">
-                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
-                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
-                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
-                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
-                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
+    <header class="unified-header">
+        <div class="header-content">
+            <a href="playground.html" class="header-logo">
+                <div class="logo-icon">M</div>
+                <span>MongoDB Playground</span>
+            </a>
+            <nav class="header-nav">
+                <a href="playground.html" class="back-to-playground">← Back to Playground</a>
+            </nav>
+        </div>
+    </header>
 
-    <div class="container">
+    <div class="page-container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="playground.html">Playground</a>
+            <span class="breadcrumb-separator">></span>
+            <span>High Availability</span>
+        </nav>
+        
+        <div class="container">
         <div class="header">
             <h1>🔄 MongoDB Replica Set High Availability</h1>
             <p>Interactive Demo: Automatic Failover & Data Protection</p>
@@ -1170,6 +1360,181 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Node Priority Configuration Section -->
+                <div class="technical-section">
+                    <h3 class="section-title">⚙️ MongoDB Node Priority Configuration for 2-Node Quorum Scenarios</h3>
+                    
+                    <div class="priority-explanation">
+                        <p><strong>Customer Concern:</strong> "What happens when a primary fails and only 2 nodes remain? Won't MongoDB become read-only?"</p>
+                        
+                        <div class="priority-config-box">
+                            <h4>🔧 Priority-Based Election Configuration</h4>
+                            <p>MongoDB maintains write availability through strategic priority settings and proper replica set sizing with data-bearing nodes:</p>
+                            
+                            <div class="config-scenarios">
+                                <div class="scenario-card mongodb-priority">
+                                    <h5>Scenario 1: 3-Node Standard Replica Set</h5>
+                                    <div class="node-config">
+                                        <div class="config-node primary-node">Node A (Primary)<br>Priority: 2</div>
+                                        <div class="config-node secondary-node">Node B (Secondary)<br>Priority: 1</div>
+                                        <div class="config-node secondary-node">Node C (Secondary)<br>Priority: 1</div>
+                                    </div>
+                                    <p><strong>Result:</strong> If primary fails, Node B or C can become primary with majority vote (2/3 majority maintained)</p>
+                                </div>
+                                
+                                <div class="scenario-card mongodb-priority">
+                                    <h5>Scenario 2: Data-Bearing Priority Config</h5>
+                                    <div class="node-config">
+                                        <div class="config-node primary-node">Node A (Primary)<br>Priority: 3</div>
+                                        <div class="config-node secondary-node">Node B (Secondary)<br>Priority: 2</div>
+                                        <div class="config-node secondary-node">Node C (Secondary)<br>Priority: 1</div>
+                                    </div>
+                                    <p><strong>Configuration Command:</strong></p>
+                                    <code>rs.reconfig({..., members: [{..., priority: 3}, {..., priority: 2}, {..., priority: 1}]})</code>
+                                    <p><strong>Result:</strong> Node A preferred as primary, but B can take over if A fails and majority exists</p>
+                                </div>
+                            </div>
+                            
+                            <div class="priority-reality-check">
+                                <h4>🎯 Reality Check: When MongoDB Stays Available</h4>
+                                <ul class="priority-benefits">
+                                    <li><strong>Majority Rule:</strong> With proper configuration, 2 out of 3 nodes can maintain write availability</li>
+                                    <li><strong>Data-Bearing Nodes:</strong> All nodes store data and can serve reads, providing better resource utilization</li>
+                                    <li><strong>Priority Weighting:</strong> Higher priority nodes become primary when available, ensuring predictable failover</li>
+                                    <li><strong>No Single Points:</strong> Multiple nodes can serve as primary, unlike single-master systems</li>
+                                </ul>
+                                
+                                <div class="two-node-scenario">
+                                    <h5>⚠️ True 2-Node Limitation</h5>
+                                    <p>MongoDB <em>intentionally</em> becomes read-only in true 2-node scenarios to prevent split-brain. This is a feature, not a limitation - it ensures data consistency over availability when network partitions occur.</p>
+                                    <p><strong>Best Practice:</strong> Deploy with 3+ data-bearing nodes for optimal availability and resource utilization.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PostgreSQL WAL Comparison Section -->
+                <div class="technical-section">
+                    <h3 class="section-title">🐘 PostgreSQL WAL-Based High Availability Comparison</h3>
+                    
+                    <div class="postgresql-comparison">
+                        <p>PostgreSQL achieves high availability through Write-Ahead Logging (WAL) replication, similar to systems like Aurora and AlloyDB:</p>
+                        
+                        <div class="wal-scenarios">
+                            <div class="scenario-card postgresql-wal">
+                                <h5>PostgreSQL Streaming Replication</h5>
+                                <div class="wal-architecture">
+                                    <div class="wal-flow">
+                                        <div class="wal-node primary-wal">Primary Server<br>WAL Writer</div>
+                                        <div class="wal-arrow">→ WAL Stream →</div>
+                                        <div class="wal-node standby-wal">Standby Server<br>WAL Receiver</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="wal-failure-demo">
+                                    <h6>Failure Scenario Walkthrough:</h6>
+                                    <div class="failure-steps">
+                                        <div class="step">
+                                            <strong>1. Primary Failure Detection:</strong>
+                                            <p>• Connection manager (pgpool/HAProxy) detects primary failure</p>
+                                            <p>• Application connections start failing</p>
+                                        </div>
+                                        <div class="step">
+                                            <strong>2. Manual Failover Process:</strong>
+                                            <p>• DBA manually promotes standby: <code>pg_promote()</code></p>
+                                            <p>• Or automatic with tools like Patroni/repmgr</p>
+                                        </div>
+                                        <div class="step">
+                                            <strong>3. Application Reconnection:</strong>
+                                            <p>• Connection string updates required</p>
+                                            <p>• Load balancer reconfiguration</p>
+                                            <p>• Application restart may be needed</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="wal-limitations">
+                                    <h6>⚠️ PostgreSQL HA Limitations:</h6>
+                                    <ul>
+                                        <li><strong>Manual Intervention:</strong> Requires DBA action or complex orchestration tools</li>
+                                        <li><strong>Single Point of Failure:</strong> Only one primary can accept writes</li>
+                                        <li><strong>Application Awareness:</strong> Apps must handle connection failures and reconnects</li>
+                                        <li><strong>Split-Brain Risk:</strong> Without proper fencing, multiple primaries possible</li>
+                                        <li><strong>Failover Time:</strong> Typically 30-60 seconds minimum for detection + promotion</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="scenario-card mongodb-advantage">
+                                <h5>MongoDB Automatic Failover Advantage</h5>
+                                <div class="mongodb-flow">
+                                    <div class="auto-process">
+                                        <div class="auto-step">
+                                            <strong>Automatic Detection:</strong><br>
+                                            Heartbeat failure (10s)
+                                        </div>
+                                        <div class="auto-arrow">↓</div>
+                                        <div class="auto-step">
+                                            <strong>Automatic Election:</strong><br>
+                                            Priority-based voting (2-3s)
+                                        </div>
+                                        <div class="auto-arrow">↓</div>
+                                        <div class="auto-step">
+                                            <strong>Automatic Recovery:</strong><br>
+                                            New primary ready (~15s total)
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mongodb-benefits">
+                                    <h6>✅ MongoDB HA Advantages:</h6>
+                                    <ul>
+                                        <li><strong>Zero Manual Intervention:</strong> Fully automated failover process</li>
+                                        <li><strong>Driver Intelligence:</strong> Applications automatically discover new primary</li>
+                                        <li><strong>Sub-15 Second Recovery:</strong> Typical failover in under 15 seconds</li>
+                                        <li><strong>Built-in Split-Brain Prevention:</strong> Majority voting prevents dual primaries</li>
+                                        <li><strong>Transparent to Apps:</strong> Retryable writes handle transient failures</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="reality-comparison">
+                            <h4>🏆 Real-World Impact Comparison</h4>
+                            <div class="impact-table">
+                                <table>
+                                    <tr>
+                                        <th>Aspect</th>
+                                        <th>MongoDB Replica Sets</th>
+                                        <th>PostgreSQL + WAL</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Failover Time</strong></td>
+                                        <td class="advantage">10-15 seconds (automatic)</td>
+                                        <td class="disadvantage">30-60+ seconds (manual/scripted)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DBA Intervention</strong></td>
+                                        <td class="advantage">None required</td>
+                                        <td class="disadvantage">Manual promotion or complex tooling</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Application Changes</strong></td>
+                                        <td class="advantage">None (driver handles automatically)</td>
+                                        <td class="disadvantage">Connection handling, retries</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Split-Brain Prevention</strong></td>
+                                        <td class="advantage">Built-in majority consensus</td>
+                                        <td class="disadvantage">Requires fencing mechanisms</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1253,6 +1618,7 @@
         <div class="log-container">
             <h3>📊 Replica Set Activity Log</h3>
             <div class="log-content" id="logContainer"></div>
+        </div>
         </div>
     </div>
 
@@ -1957,7 +2323,8 @@
             // Add debounced resize handler
             window.addEventListener('resize', debounce(handleResize, 150));
             
-            // Initialize demo
+            // Initialize demo - ensure initial render
+            updateStats();
             renderReplicaSet();
             logMessage('🎉 MongoDB Replica Set demo initialized', 'success');
             logMessage('🔧 3-member replica set active with automatic failover', 'info');
@@ -1967,6 +2334,16 @@
             
             console.log('MongoDB Replica Set Demo - Loaded Successfully');
             console.log('Use Alt+M to toggle menu, ESC to close menu');
+        });
+        
+        // Also initialize on window load as fallback
+        window.addEventListener('load', function() {
+            // Ensure rendering happens even if DOMContentLoaded missed
+            if (document.getElementById('replicaMembers').children.length === 0) {
+                console.log('Fallback initialization triggered');
+                updateStats();
+                renderReplicaSet();
+            }
         });
 
         // Handle page visibility for performance

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB Architecture Patterns</title>
+    <link rel="stylesheet" href="shared-theme.css">
     <style>
         * {
             margin: 0;
@@ -12,37 +13,36 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            font-family: var(--font-family);
+            background: var(--background);
+            color: var(--text-primary);
             overflow: hidden;
         }
 
         .presentation-container {
-            height: 100vh;
+            min-height: calc(100vh - 64px);
             display: flex;
             flex-direction: column;
+            margin-top: 64px;
         }
 
-        .header {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
+        .presentation-header {
+            background: var(--surface);
+            padding: var(--space-xl);
             text-align: center;
-            border-bottom: 2px solid #4CAF50;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: var(--space-xl);
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .presentation-header h1 {
+            font-size: var(--font-size-4xl);
+            margin-bottom: var(--space-md);
+            color: var(--primary-color);
         }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        .presentation-header p {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
         }
 
         .slide {
@@ -65,29 +65,28 @@
         }
 
         .text-content {
-            background: rgba(0,0,0,0.3);
+            background: var(--surface);
             padding: 30px;
             border-radius: 15px;
-            border-left: 4px solid #4CAF50;
-            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--primary);
         }
 
         .slide h2 {
             font-size: 1.8em;
             margin-bottom: 20px;
-            color: #4CAF50;
+            color: var(--primary);
         }
 
         .architecture-description {
-            background: rgba(76, 175, 80, 0.1);
+            background: rgba(0, 104, 116, 0.1);
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 3px solid #4CAF50;
+            border-left: 3px solid var(--primary);
         }
 
         .architecture-description h3 {
-            color: #8BC34A;
+            color: var(--primary);
             font-size: 1.1em;
             margin-bottom: 8px;
         }
@@ -206,20 +205,21 @@
         }
 
         .btn {
-            padding: 12px 25px;
+            padding: var(--space-md) var(--space-lg);
             border: none;
-            border-radius: 25px;
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
+            border-radius: var(--radius);
+            background: var(--secondary-color);
+            color: var(--primary-color);
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            font-weight: var(--font-weight-semibold);
+            transition: var(--transition);
+            box-shadow: 0 2px 8px var(--shadow-md);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            transform: translateY(-1px);
+            background: var(--secondary-hover);
+            box-shadow: 0 4px 12px var(--shadow-lg);
         }
 
         .btn:disabled {
@@ -356,8 +356,77 @@
     </style>
 </head>
 <body>
+    <header class="unified-header">
+        <div class="header-content">
+            <a href="playground.html" class="header-logo">
+                <div class="logo-icon">M</div>
+                <span>MongoDB Playground</span>
+            </a>
+            <div class="breadcrumb">
+                <a href="playground.html">Playground</a>
+                <span class="breadcrumb-separator">></span>
+                <span>Architecture Patterns</span>
+            </div>
+            <a href="playground.html" class="back-to-playground">← Back to Playground</a>
+        </div>
+    </header>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('competition')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Comparative Analysis</span>
+                    <span class="accordion-icon" id="competition-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="competition-content" role="region">
+                    <li><a href="mongodb_vs_postgres_presentation.html">🍃 MongoDB vs PostgreSQL</a></li>
+                    <li><a href="mongodb_postgres_technical_presentation.html">🔬 Postgres Technical Comparison</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
+                    <span>High Availability and Scalability</span>
+                    <span class="accordion-icon" id="architecture-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="architecture-content" role="region">
+                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
+                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="true">
+                    <span>Architecture Patterns</span>
+                    <span class="accordion-icon rotated" id="patterns-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content expanded" id="patterns-content" role="region">
+                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
+                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
+                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
+                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
+                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
+                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
+                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-accordion">
+                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
+                    <span>Application Development</span>
+                    <span class="accordion-icon" id="development-icon">▼</span>
+                </div>
+                <ul class="nav-accordion-content" id="development-content" role="region">
+                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>  
+                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
+                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
+                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
+                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
     <div class="presentation-container">
-        <div class="header">
+        <div class="presentation-header">
             <h1>MongoDB Architecture Patterns</h1>
             <p>Interactive Technical Presentation with Professional Diagrams</p>
         </div>

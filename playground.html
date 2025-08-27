@@ -505,164 +505,466 @@
             </div>
         </section>
 
+        <!-- Core Comparisons Section -->
         <section id="playground" class="section">
             <div class="section-header">
-                <h2 class="section-title">Interactive Playground</h2>
+                <h2 class="section-title">Core Comparisons</h2>
                 <p class="section-description">
-                    Explore MongoDB's advantages through hands-on simulations and real-world scenarios
+                    Direct MongoDB vs PostgreSQL comparisons with interactive demos
                 </p>
             </div>
 
             <div class="playground-grid">
-                <div class="playground-card" onclick="openDemo('scaling')">
+                <div class="playground-card">
                     <div class="card-header">
-                        <div class="card-icon scaling">⚡</div>
+                        <div class="card-icon queries">🚀</div>
                         <div>
-                            <h3 class="card-title">Scaling & Performance</h3>
-                            <p class="card-subtitle">Horizontal Scaling</p>
+                            <h3 class="card-title">MongoDB vs PostgreSQL</h3>
+                            <p class="card-subtitle">Complete Comparison</p>
                         </div>
                     </div>
                     <p class="card-description">
-                        Experience MongoDB's automatic sharding vs PostgreSQL's manual partitioning through live simulations.
+                        Comprehensive slide presentation comparing databases across all dimensions.
                     </p>
                     <ul class="card-features">
-                        <li>Interactive sharding simulator</li>
-                        <li>Real-time rebalancing visualization</li>
-                        <li>Performance comparison metrics</li>
-                        <li>High availability failover demos</li>
+                        <li>Performance benchmarks</li>
+                        <li>Schema flexibility comparison</li>
+                        <li>Query complexity analysis</li>
+                        <li>Use case recommendations</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_vs_postgres_presentation.html" class="demo-button">
+                            Start Comparison →
+                        </a>
+                        <span class="interactive-badge">Slides</span>
+                    </div>
+                </div>
+
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">📋</div>
+                        <div>
+                            <h3 class="card-title">Technical Deep Dive</h3>
+                            <p class="card-subtitle">Architecture Analysis</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Technical presentation covering internal architecture, query engines, and performance characteristics.
+                    </p>
+                    <ul class="card-features">
+                        <li>Internal architecture comparison</li>
+                        <li>Storage engine analysis</li>
+                        <li>Query optimization details</li>
+                        <li>Concurrency models</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_postgres_technical_presentation.html" class="demo-button">
+                            Deep Dive →
+                        </a>
+                        <span class="interactive-badge">Technical</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scaling & Performance Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Scaling & Performance</h2>
+                <p class="section-description">
+                    Experience MongoDB's horizontal scaling advantages through interactive simulations
+                </p>
+            </div>
+
+            <div class="playground-grid">
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">📈</div>
+                        <div>
+                            <h3 class="card-title">Horizontal Scaling</h3>
+                            <p class="card-subtitle">Sharding vs Partitioning</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Compare MongoDB's automatic sharding with PostgreSQL's manual partitioning approaches.
+                    </p>
+                    <ul class="card-features">
+                        <li>Automatic vs manual scaling</li>
+                        <li>Performance impact analysis</li>
+                        <li>Operational complexity</li>
+                        <li>High availability patterns</li>
                     </ul>
                     <div class="card-footer">
                         <a href="horizontal_scaling_presentation.html" class="demo-button">
+                            Compare Scaling →
+                        </a>
+                        <span class="interactive-badge">Analysis</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">🔄</div>
+                        <div>
+                            <h3 class="card-title">Replica Sets</h3>
+                            <p class="card-subtitle">High Availability</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        MongoDB's replica set configuration and failover mechanisms for high availability.
+                    </p>
+                    <ul class="card-features">
+                        <li>Replica set topology</li>
+                        <li>Automatic failover demo</li>
+                        <li>Read preference strategies</li>
+                        <li>Disaster recovery</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_replica_set_demo.html" class="demo-button">
+                            Explore HA →
+                        </a>
+                        <span class="interactive-badge">Demo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Patterns Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Architecture Patterns</h2>
+                <p class="section-description">
+                    Modern application architectures powered by MongoDB's flexibility
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">🏗️</div>
+                        <div>
+                            <h3 class="card-title">Architecture Overview</h3>
+                            <p class="card-subtitle">Modern Patterns</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Overview of modern architecture patterns where MongoDB excels.
+                    </p>
+                    <ul class="card-features">
+                        <li>Microservices architecture</li>
+                        <li>Event-driven systems</li>
+                        <li>CQRS pattern implementation</li>
+                        <li>Domain-driven design</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_architecture_overview.html" class="demo-button">
+                            Explore Patterns →
+                        </a>
+                        <span class="interactive-badge">Overview</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">⚙️</div>
+                        <div>
+                            <h3 class="card-title">CQRS Pattern</h3>
+                            <p class="card-subtitle">Command Query Separation</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Implement CQRS pattern with MongoDB's flexible schema and aggregation capabilities.
+                    </p>
+                    <ul class="card-features">
+                        <li>Command/Query separation</li>
+                        <li>Event sourcing integration</li>
+                        <li>Read model optimization</li>
+                        <li>Scalability benefits</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_cqrs.html" class="demo-button">
+                            Learn CQRS →
+                        </a>
+                        <span class="interactive-badge">Pattern</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">🚀</div>
+                        <div>
+                            <h3 class="card-title">Event-Driven Architecture</h3>
+                            <p class="card-subtitle">Reactive Systems</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Build reactive systems with MongoDB's Change Streams and event-driven patterns.
+                    </p>
+                    <ul class="card-features">
+                        <li>Change Streams integration</li>
+                        <li>Event sourcing patterns</li>
+                        <li>Microservices communication</li>
+                        <li>Real-time processing</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_event_driven.html" class="demo-button">
+                            Build Reactive →
+                        </a>
+                        <span class="interactive-badge">Architecture</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon architecture">🔧</div>
+                        <div>
+                            <h3 class="card-title">Microservices</h3>
+                            <p class="card-subtitle">Service Autonomy</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Enable true microservices autonomy with MongoDB's schema flexibility and horizontal scaling.
+                    </p>
+                    <ul class="card-features">
+                        <li>Service data independence</li>
+                        <li>Schema evolution freedom</li>
+                        <li>Cross-service communication</li>
+                        <li>Deployment independence</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_microservices.html" class="demo-button">
+                            Design Services →
+                        </a>
+                        <span class="interactive-badge">Microservices</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Features Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Advanced Features</h2>
+                <p class="section-description">
+                    Advanced MongoDB capabilities for complex use cases
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon queries">🔍</div>
+                        <div>
+                            <h3 class="card-title">Aggregation Pipelines</h3>
+                            <p class="card-subtitle">Complex Analytics</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Build sophisticated data processing pipelines with MongoDB's aggregation framework.
+                    </p>
+                    <ul class="card-features">
+                        <li>Pipeline stage composition</li>
+                        <li>Real-time analytics</li>
+                        <li>Complex transformations</li>
+                        <li>Performance optimization</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="aggregation_pipeline_presentation.html" class="demo-button">
+                            Build Pipelines →
+                        </a>
+                        <span class="interactive-badge">Analytics</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon development">📊</div>
+                        <div>
+                            <h3 class="card-title">Arrays & Embedded Documents</h3>
+                            <p class="card-subtitle">Data Modeling</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Interactive demo showing MongoDB's natural object handling vs SQL's relational approach.
+                    </p>
+                    <ul class="card-features">
+                        <li>Live blog post modeling</li>
+                        <li>Array handling comparison</li>
+                        <li>Query complexity differences</li>
+                        <li>Performance implications</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="arrays_embedded_docs_presentation.html" class="demo-button">
                             Try Demo →
                         </a>
                         <span class="interactive-badge">Interactive</span>
                     </div>
                 </div>
 
-                <div class="playground-card" onclick="openDemo('queries')">
+                <div class="playground-card">
                     <div class="card-header">
-                        <div class="card-icon queries">🔍</div>
+                        <div class="card-icon development">📋</div>
                         <div>
-                            <h3 class="card-title">Query Building</h3>
-                            <p class="card-subtitle">Aggregation & Analysis</p>
+                            <h3 class="card-title">Schema Evolution</h3>
+                            <p class="card-subtitle">Zero-Downtime Changes</p>
                         </div>
                     </div>
                     <p class="card-description">
-                        Build complex aggregation pipelines and compare with SQL queries in real-time.
+                        Experience MongoDB's schema-less flexibility enabling zero-downtime schema evolution.
                     </p>
                     <ul class="card-features">
-                        <li>Live aggregation pipeline builder</li>
-                        <li>SQL vs MongoDB query comparison</li>
-                        <li>Performance impact visualization</li>
-                        <li>Arrays & embedded document handling</li>
+                        <li>Dynamic schema changes</li>
+                        <li>Backward compatibility</li>
+                        <li>Migration strategies</li>
+                        <li>Version coexistence</li>
                     </ul>
                     <div class="card-footer">
-                        <a href="aggregation_pipeline_presentation.html" class="demo-button">
-                            Build Queries →
+                        <a href="schema_evolution_presentation.html" class="demo-button">
+                            Evolve Schema →
                         </a>
-                        <span class="interactive-badge">Live Coding</span>
+                        <span class="interactive-badge">Evolution</span>
                     </div>
                 </div>
 
-                <div class="playground-card" onclick="openDemo('architecture')">
-                    <div class="card-header">
-                        <div class="card-icon architecture">🏗️</div>
-                        <div>
-                            <h3 class="card-title">Architecture Patterns</h3>
-                            <p class="card-subtitle">Modern Applications</p>
-                        </div>
-                    </div>
-                    <p class="card-description">
-                        Explore microservices, event-driven, CQRS, IoT, and RAG architecture patterns.
-                    </p>
-                    <ul class="card-features">
-                        <li>Microservices autonomy simulation</li>
-                        <li>Event-driven architecture demos</li>
-                        <li>Real-time analytics visualization</li>
-                        <li>AI/ML integration patterns</li>
-                    </ul>
-                    <div class="card-footer">
-                        <a href="mongodb_architecture_overview.html" class="demo-button">
-                            Explore Patterns →
-                        </a>
-                        <span class="interactive-badge">Simulations</span>
-                    </div>
-                </div>
-
-                <div class="playground-card" onclick="openDemo('development')">
+                <div class="playground-card">
                     <div class="card-header">
                         <div class="card-icon development">⚙️</div>
                         <div>
-                            <h3 class="card-title">Developer Experience</h3>
-                            <p class="card-subtitle">Schema & ORM</p>
+                            <h3 class="card-title">ORM vs Natural Objects</h3>
+                            <p class="card-subtitle">Developer Productivity</p>
                         </div>
                     </div>
                     <p class="card-description">
-                        Compare development velocity with natural objects vs ORM complexity and schema evolution.
+                        Compare development velocity with MongoDB's natural object mapping vs complex ORMs.
                     </p>
                     <ul class="card-features">
-                        <li>ORM complexity simulator</li>
-                        <li>Schema evolution without downtime</li>
-                        <li>Object mapping comparisons</li>
-                        <li>Development time calculations</li>
+                        <li>Object-relational impedance</li>
+                        <li>Natural document mapping</li>
+                        <li>Development time analysis</li>
+                        <li>Code complexity metrics</li>
                     </ul>
                     <div class="card-footer">
                         <a href="orm_vs_natural_objects_presentation.html" class="demo-button">
                             Compare Development →
                         </a>
-                        <span class="interactive-badge">Code Gen</span>
+                        <span class="interactive-badge">Productivity</span>
                     </div>
                 </div>
 
-                <div class="playground-card" onclick="openDemo('cdc')">
+                <div class="playground-card">
                     <div class="card-header">
                         <div class="card-icon scaling">🔄</div>
                         <div>
                             <h3 class="card-title">Change Data Capture</h3>
-                            <p class="card-subtitle">Real-time Streaming</p>
+                            <p class="card-subtitle">Data Streaming</p>
                         </div>
                     </div>
                     <p class="card-description">
-                        Experience MongoDB's Change Streams vs PostgreSQL's complex CDC implementations.
+                        Stream data changes with MongoDB's Change Streams vs PostgreSQL's complex CDC setup.
                     </p>
                     <ul class="card-features">
-                        <li>Live change stream monitoring</li>
-                        <li>Event processing simulation</li>
-                        <li>CDC approach comparisons</li>
-                        <li>Real-time data synchronization</li>
+                        <li>Native change streams</li>
+                        <li>Event-driven workflows</li>
+                        <li>Real-time synchronization</li>
+                        <li>Stream processing integration</li>
                     </ul>
                     <div class="card-footer">
                         <a href="mongo_postgres_cdc_presentation.html" class="demo-button">
                             Stream Changes →
                         </a>
-                        <span class="interactive-badge">Real-time</span>
+                        <span class="interactive-badge">Streaming</span>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="playground-card" onclick="openDemo('schema')">
+        <!-- Use Cases & Applications Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Use Cases & Applications</h2>
+                <p class="section-description">
+                    Real-world applications where MongoDB provides unique advantages
+                </p>
+            </div>
+
+            <div class="playground-grid">
+                <div class="playground-card">
                     <div class="card-header">
-                        <div class="card-icon development">📋</div>
+                        <div class="card-icon scaling">🌐</div>
                         <div>
-                            <h3 class="card-title">Schema Flexibility</h3>
-                            <p class="card-subtitle">Data Modeling</p>
+                            <h3 class="card-title">IoT Applications</h3>
+                            <p class="card-subtitle">Sensor Data Management</p>
                         </div>
                     </div>
                     <p class="card-description">
-                        Discover how MongoDB handles schema evolution and data modeling compared to rigid SQL schemas.
+                        Handle massive IoT data streams with MongoDB's time-series collections and horizontal scaling.
                     </p>
                     <ul class="card-features">
-                        <li>Interactive schema modification</li>
-                        <li>Migration complexity comparison</li>
-                        <li>Field addition/removal demos</li>
-                        <li>Embedded vs normalized data</li>
+                        <li>Time-series data handling</li>
+                        <li>Sensor data aggregation</li>
+                        <li>Real-time monitoring</li>
+                        <li>Edge computing integration</li>
                     </ul>
                     <div class="card-footer">
-                        <a href="schema_evolution_presentation.html" class="demo-button">
-                            Model Data →
+                        <a href="mongodb_iot.html" class="demo-button">
+                            Explore IoT →
                         </a>
-                        <span class="interactive-badge">Live Demo</span>
+                        <span class="interactive-badge">IoT</span>
                     </div>
                 </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon queries">🤖</div>
+                        <div>
+                            <h3 class="card-title">RAG Applications</h3>
+                            <p class="card-subtitle">AI & Vector Search</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Build RAG applications with MongoDB's vector search capabilities and flexible document storage.
+                    </p>
+                    <ul class="card-features">
+                        <li>Vector similarity search</li>
+                        <li>Document embeddings</li>
+                        <li>AI model integration</li>
+                        <li>Context retrieval optimization</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_rag.html" class="demo-button">
+                            Build RAG →
+                        </a>
+                        <span class="interactive-badge">AI/ML</span>
+                    </div>
+                </div>
+
+                <div class="playground-card">
+                    <div class="card-header">
+                        <div class="card-icon scaling">📊</div>
+                        <div>
+                            <h3 class="card-title">Real-time Analytics</h3>
+                            <p class="card-subtitle">Live Dashboards</p>
+                        </div>
+                    </div>
+                    <p class="card-description">
+                        Power real-time analytics dashboards with MongoDB's aggregation pipelines and Change Streams.
+                    </p>
+                    <ul class="card-features">
+                        <li>Real-time aggregation</li>
+                        <li>Dashboard data feeds</li>
+                        <li>Streaming analytics</li>
+                        <li>Performance monitoring</li>
+                    </ul>
+                    <div class="card-footer">
+                        <a href="mongodb_realtime_analytics.html" class="demo-button">
+                            Analyze Real-time →
+                        </a>
+                        <span class="interactive-badge">Analytics</span>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -675,8 +977,8 @@
                 <a href="mongodb_vs_postgres_presentation.html" class="start-button">
                     🚀 Start Comparison Tour
                 </a>
-                <a href="horizontal_scaling_presentation.html" class="start-button secondary">
-                    ⚡ Try Scaling Demo
+                <a href="mongodb_scaling_demo (2).html" class="start-button secondary">
+                    ⚡ Try Interactive Scaling
                 </a>
             </div>
         </section>

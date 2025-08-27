@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MongoDB vs PostgreSQL: Technical Architecture Deep Dive</title>
+    <link rel="stylesheet" href="shared-theme.css">
     <style>
         /* Reset and Base Styles */
         * {
@@ -14,301 +15,19 @@
 
         body {
             font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #001E2B 0%, #00684A 100%);
+            background: var(--background);
             color: #333;
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Navigation Menu */
-        .nav-menu {
-            position: fixed;
-            left: -320px;
-            top: 0;
-            width: 320px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 25px;
-            overflow-y: auto;
-            border-right: 1px solid rgba(0, 104, 74, 0.2);
-            box-shadow: 4px 0 30px rgba(0, 30, 43, 0.15);
-        }
-
-        .nav-menu.open {
-            left: 0;
-        }
-
-        .nav-menu h2 {
-            color: #00684A;
-            margin-bottom: 30px;
-            font-size: 1.6rem;
-            font-weight: 700;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #00ED64;
-            background: linear-gradient(135deg, #00ED64 0%, #00B84D 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-
-        .nav-menu h2::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, #00ED64, #00B84D);
-            border-radius: 2px;
-        }
-
-        .nav-menu ul {
-            list-style: none;
-        }
-
-        .nav-menu li {
-            margin-bottom: 8px;
-        }
-
-        .nav-menu > ul > li > a {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 4px solid transparent;
-            font-weight: 600;
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-menu > ul > li > a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-menu > ul > li > a:hover::before,
-        .nav-menu > ul > li > a.active::before {
-            opacity: 1;
-        }
-
-        .nav-menu > ul > li > a:hover,
-        .nav-menu > ul > li > a.active {
-            border-left: 4px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 8px 25px rgba(0, 237, 100, 0.2);
-        }
-
-        /* Accordion Styles */
-        .nav-accordion {
-            margin-bottom: 10px;
-        }
-
-        .nav-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, rgba(0, 104, 74, 0.1) 0%, rgba(0, 30, 43, 0.05) 100%);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 700;
-            color: #00684A;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(0, 104, 74, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-category-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.15) 0%, rgba(0, 184, 77, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-category-header:hover::before {
-            opacity: 1;
-        }
-
-        .nav-category-header:hover {
-            transform: translateX(6px);
-            box-shadow: 0 4px 15px rgba(0, 104, 74, 0.2);
-        }
-
-        .accordion-icon {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.9rem;
-            color: #00684A;
-            z-index: 1;
-            position: relative;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .nav-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-accordion-content.expanded {
-            max-height: 400px;
-        }
-
-        .nav-accordion-content li {
-            margin-bottom: 6px;
-            margin-left: 20px;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInLeft 0.3s ease forwards;
-        }
-
-        .nav-accordion-content.expanded li:nth-child(1) { animation-delay: 0.1s; }
-        .nav-accordion-content.expanded li:nth-child(2) { animation-delay: 0.2s; }
-        .nav-accordion-content.expanded li:nth-child(3) { animation-delay: 0.3s; }
-        .nav-accordion-content.expanded li:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes slideInLeft {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .nav-accordion-content a {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #001E2B;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 0.9rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-accordion-content a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 237, 100, 0.1) 0%, rgba(0, 184, 77, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-accordion-content a:hover::before,
-        .nav-accordion-content a.active::before {
-            opacity: 1;
-        }
-
-        .nav-accordion-content a:hover,
-        .nav-accordion-content a.active {
-            border-left: 3px solid #00ED64;
-            transform: translateX(8px);
-            color: #00684A;
-            box-shadow: 0 4px 15px rgba(0, 237, 100, 0.2);
-        }
-
-        /* Section dividers in navigation */
-        .nav-accordion-content li strong {
-            color: #00684A !important;
-            font-size: 0.8rem !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            opacity: 0.8;
-        }
-
-        /* Menu Toggle Button */
-        .menu-toggle {
-            position: fixed;
-            top: 25px;
-            left: 25px;
-            z-index: 1001;
-            background: rgba(0, 104, 74, 0.95);
-            border: none;
-            color: white;
-            padding: 14px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.3rem;
-            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-toggle:hover {
-            background: #00ED64;
-            color: #001E2B;
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 30px rgba(0, 237, 100, 0.4);
-        }
-
-        /* Backdrop */
-        .nav-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 30, 43, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-backdrop.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        /* Page-specific styles for technical presentation */
 
         /* Main Container */
         .presentation-container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px;
-            padding-left: 100px;
         }
 
         /* Slide Styles */
@@ -347,8 +66,8 @@
         /* Title Slide */
         .title-slide {
             text-align: center;
-            background: linear-gradient(135deg, #00684A 0%, #13AA52 100%);
-            color: white;
+            background: var(--surface);
+            color: var(--text-primary);
             position: relative;
             overflow: hidden;
             min-height: 400px;
@@ -356,18 +75,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px var(--shadow-sm);
         }
 
         .title-slide::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 100%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0L60.5 35H100L72.5 57L82.5 92L50 70L17.5 92L27.5 57L0 35H39.5L50 0Z" fill="rgba(255,255,255,0.05)"/></svg>') repeat;
-            animation: float 20s linear infinite;
-            opacity: 0.3;
+            display: none;
         }
 
         @keyframes float {
@@ -378,7 +92,7 @@
         .title-slide h1 {
             font-size: 3rem;
             margin: 20px 0;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
             z-index: 1;
             position: relative;
         }
@@ -386,7 +100,8 @@
         .subtitle {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            opacity: 0.9;
+            color: var(--text-secondary);
+            font-weight: 500;
             z-index: 1;
             position: relative;
         }
@@ -553,13 +268,31 @@
         }
 
         .postgres-feature {
-            border-left: 4px solid #336791;
-            background: linear-gradient(135deg, rgba(232, 244, 248, 0.3) 0%, rgba(240, 248, 255, 0.1) 100%);
+            border-left: 6px solid #336791;
+            border-right: 3px solid #336791;
+            background: linear-gradient(135deg, rgba(51, 103, 145, 0.15) 0%, rgba(51, 103, 145, 0.05) 100%);
+            position: relative;
+        }
+
+        .postgres-feature::before {
+            content: "PostgreSQL";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #336791;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .postgres-feature h4,
         .postgres-feature h5 {
             color: #336791;
+            font-weight: 700;
         }
 
         /* Code Blocks */
@@ -769,7 +502,6 @@
         @media (max-width: 768px) {
             .presentation-container {
                 padding: 20px;
-                padding-left: 80px;
             }
 
             .slide {
@@ -806,29 +538,16 @@
                 padding: 10px;
             }
 
-            .nav-menu {
-                width: 280px;
-                left: -280px;
-            }
-
             .navigation {
                 bottom: 10px;
                 right: 10px;
                 flex-direction: column;
-            }
-
-            .menu-toggle {
-                top: 20px;
-                left: 20px;
-                padding: 12px;
-                font-size: 1.2rem;
             }
         }
 
         @media (max-width: 480px) {
             .presentation-container {
                 padding: 15px;
-                padding-left: 70px;
             }
 
             .metric-row {
@@ -845,97 +564,27 @@
                 padding: 16px;
             }
 
-            .nav-menu {
-                width: 250px;
-                left: -250px;
-            }
         }
     </style>
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle Navigation Menu">
-        ☰
-    </button>
-    
-    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileMenu()"></div>
+    <header class="unified-header">
+        <div class="header-content">
+            <a href="playground.html" class="header-logo">
+                <div class="logo-icon">M</div>
+                <span>MongoDB Playground</span>
+            </a>
+            <div class="breadcrumb">
+                <a href="playground.html">Playground</a>
+                <span class="breadcrumb-separator">></span>
+                <span>Technical Comparison</span>
+            </div>
+            <a href="playground.html" class="back-to-playground">← Back to Playground</a>
+        </div>
+    </header>
 
-    <nav class="nav-menu" id="navMenu" role="navigation">
-        <h2>MongoDB vs SQL</h2>
-        <ul>
-            <li><a href="index.html">🏠 Home</a></li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('comparison')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Comparative Analysis</span>
-                    <span class="accordion-icon" id="comparison-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="comparison-content" role="region">
-                    <li><a href="mongodb_vs_postgres_presentation.html">
-                        <span class="mongodb-logo-icon" aria-hidden="true"></span>MongoDB vs PostgreSQL
-                    </a></li>
-                    <li><a href="mongodb_postgres_technical_presentation.html">
-                        <span class="postgresql-logo-icon" aria-hidden="true"></span>Postgres Technical Comparison
-                    </a></li>
-                    <li style="margin-top: 10px; border-top: 1px solid rgba(0,104,74,0.2); padding-top: 10px;"><strong style="color: #00684A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 16px;">Current Page Sections:</strong></li>
-                    <li><a href="#executive-overview" class="active">🎯 Executive Overview</a></li>
-                    <li><a href="#use-case-matrix">📊 Use Case Decision Matrix</a></li>
-                    <li><a href="#acid-compliance">🔒 ACID Compliance</a></li>
-                    <li><a href="#core-architecture">🏗️ Core Architecture</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('architecture')" role="button" tabindex="0" aria-expanded="false">
-                    <span>High Availability and Scalability</span>
-                    <span class="accordion-icon" id="architecture-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="architecture-content" role="region">
-                    <li><a href="mongodb_replica_set_demo.html">🔄 High Availability</a></li>
-                    <li><a href="horizontal_scaling_presentation.html">📈 Horizontal Scaling</a></li>
-                    <li style="margin-top: 10px; border-top: 1px solid rgba(0,104,74,0.2); padding-top: 10px;"><strong style="color: #00684A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 16px;">Current Page Sections:</strong></li>
-                    <li><a href="#performance-analysis">⚡ Performance Analysis</a></li>
-                    <li><a href="#horizontal-scaling">📈 Horizontal Scaling Deep Dive</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('patterns')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Architecture Patterns</span>
-                    <span class="accordion-icon" id="patterns-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="patterns-content" role="region">
-                    <li><a href="mongodb_architecture_overview.html">📋 Overview</a></li>
-                    <li><a href="mongodb_microservices.html">🏗️ Microservices</a></li>
-                    <li><a href="mongodb_rag.html">🤖 RAG Architecture</a></li>
-                    <li><a href="mongodb_event_driven.html">⚡ Event-Driven</a></li>
-                    <li><a href="mongodb_cqrs.html">🔄 CQRS + Event Sourcing</a></li>
-                    <li><a href="mongodb_iot.html">🌐 IoT Pipeline</a></li>
-                    <li><a href="mongodb_realtime_analytics.html">📊 Real-time Analytics</a></li>
-                </ul>
-            </li>
-            
-            <li class="nav-accordion">
-                <div class="nav-category-header" onclick="toggleAccordion('development')" role="button" tabindex="0" aria-expanded="false">
-                    <span>Application Development</span>
-                    <span class="accordion-icon" id="development-icon">▼</span>
-                </div>
-                <ul class="nav-accordion-content" id="development-content" role="region">
-                    <li><a href="orm_vs_natural_objects_presentation.html">🔧 ORM vs Natural Objects</a></li>
-                    <li><a href="schema_evolution_presentation.html">🚀 Schema Evolution</a></li>
-                    <li><a href="arrays_embedded_docs_presentation.html">📊 Arrays & Embedded Docs</a></li>
-                    <li><a href="aggregation_pipeline_presentation.html">⚡ Aggregation Pipeline</a></li>
-                    <li><a href="mongo_postgres_cdc_presentation.html">🔄 Change Data Capture</a></li>
-                    <li style="margin-top: 10px; border-top: 1px solid rgba(0,104,74,0.2); padding-top: 10px;"><strong style="color: #00684A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 16px;">Current Page Sections:</strong></li>
-                    <li><a href="#ai-integration">🤖 AI Integration</a></li>
-                    <li><a href="#tco-framework">💰 TCO Framework</a></li>
-                    <li><a href="#executive-summary">🎯 Executive Summary</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-
-    <main class="presentation-container">
-        
+    <div class="page-container">
+        <main class="presentation-container">
         <!-- Title Slide -->
         <section class="slide title-slide">
             <div class="mongodb-logo logo-large">
@@ -1417,6 +1066,7 @@ docs = vector_store.similarity_search_with_score(
         </section>
 
     </main>
+    </div>
 
     <nav class="navigation" aria-label="Presentation navigation">
         <button class="nav-button" onclick="scrollToTop()" aria-label="Scroll to top">↑ Top</button>
@@ -1424,34 +1074,7 @@ docs = vector_store.similarity_search_with_score(
     </nav>
 
     <script>
-        // Navigation Functions
-        function toggleMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const backdrop = document.getElementById('navBackdrop');
-            const toggleBtn = document.getElementById('menuToggle');
-            
-            if (navMenu && backdrop && toggleBtn) {
-                navMenu.classList.toggle('open');
-                backdrop.classList.toggle('active');
-                toggleBtn.classList.toggle('menu-open');
-                
-                const isOpen = navMenu.classList.contains('open');
-                toggleBtn.setAttribute('aria-expanded', isOpen);
-            }
-        }
-
-        function closeMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const backdrop = document.getElementById('navBackdrop');
-            const toggleBtn = document.getElementById('menuToggle');
-            
-            if (navMenu && backdrop && toggleBtn) {
-                navMenu.classList.remove('open');
-                backdrop.classList.remove('active');
-                toggleBtn.classList.remove('menu-open');
-                toggleBtn.setAttribute('aria-expanded', 'false');
-            }
-        }
+        // Page-specific functions
 
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1467,38 +1090,7 @@ docs = vector_store.similarity_search_with_score(
             }
         }
 
-        // Accordion Functions
-        function toggleAccordion(categoryId) {
-            const content = document.getElementById(categoryId + '-content');
-            const icon = document.getElementById(categoryId + '-icon');
-            const header = content ? content.previousElementSibling : null;
-            
-            if (content && icon) {
-                if (content.classList.contains('expanded')) {
-                    content.classList.remove('expanded');
-                    icon.classList.remove('rotated');
-                    if (header) header.setAttribute('aria-expanded', 'false');
-                } else {
-                    content.classList.add('expanded');
-                    icon.classList.add('rotated');
-                    if (header) header.setAttribute('aria-expanded', 'true');
-                }
-            }
-        }
-
         // Initialize Functions
-        function initializeAccordion() {
-            // Open the "Comparative Analysis" section by default since this is a comparison page
-            const content = document.getElementById('comparison-content');
-            const icon = document.getElementById('comparison-icon');
-            const header = content ? content.previousElementSibling : null;
-            
-            if (content && icon && header) {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                header.setAttribute('aria-expanded', 'true');
-            }
-        }
 
         // Card Interaction Effects
         function initializeCardEffects() {
@@ -1515,79 +1107,19 @@ docs = vector_store.similarity_search_with_score(
         // Keyboard Navigation
         function initializeKeyboardNavigation() {
             document.addEventListener('keydown', (e) => {
-                if (e.altKey && e.key === 'm') {
-                    e.preventDefault();
-                    toggleMobileMenu();
-                }
-                
-                if (e.key === 'Escape') {
-                    closeMobileMenu();
-                }
-                
                 if (e.altKey && e.key === 't') {
                     e.preventDefault();
                     scrollToTop();
                 }
-                
-                // Enter and Space for accordion headers
-                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('nav-category-header')) {
-                    e.preventDefault();
-                    const categoryId = e.target.onclick.toString().match(/'([^']+)'/)[1];
-                    toggleAccordion(categoryId);
-                }
             });
         }
 
-        // Close nav menu when clicking outside
-        function initializeOutsideClickHandler() {
-            document.addEventListener('click', (e) => {
-                const navMenu = document.getElementById('navMenu');
-                const menuToggle = document.getElementById('menuToggle');
-                
-                // Close menu if clicking outside
-                if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-                    closeMobileMenu();
-                }
-            });
-        }
-
-        // Navigation link click handler for mobile
-        function initializeNavLinkHandlers() {
-            const navLinks = document.querySelectorAll('.nav-menu a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    if (this.getAttribute('href').startsWith('#')) {
-                        e.preventDefault();
-                        const targetId = this.getAttribute('href').substring(1);
-                        scrollToSection(targetId);
-                    }
-                    
-                    if (window.innerWidth <= 1024) {
-                        setTimeout(() => {
-                            closeMobileMenu();
-                        }, 100);
-                    }
-                });
-            });
-        }
 
         // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            initializeAccordion();
             initializeCardEffects();
             initializeKeyboardNavigation();
-            initializeOutsideClickHandler();
-            initializeNavLinkHandlers();
-            
-            console.log('MongoDB vs PostgreSQL Balanced Technical Presentation Loaded');
-            console.log('Slide count:', document.querySelectorAll('.slide').length);
-        });
-
-        // Handle window resize for responsive design
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 1024) {
-                closeMobileMenu();
-            }
+            console.log('MongoDB vs PostgreSQL Technical Presentation - Enhanced');
         });
 
         // Add loading state management
