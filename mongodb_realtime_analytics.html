@@ -29,10 +29,120 @@
 
         .slide-content {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 1fr;
             gap: var(--space-xl);
             align-items: start;
             min-height: calc(100vh - 200px);
+        }
+
+        .architecture-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .architecture-side {
+            background: var(--surface);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .architecture-side.mongodb {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .architecture-side.postgresql {
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .architecture-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .architecture-title.mongodb {
+            color: var(--primary-color);
+        }
+
+        .architecture-title.postgresql {
+            color: var(--accent-orange);
+        }
+
+        .arch-description {
+            background: var(--background-soft);
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-lg);
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-normal);
+            color: var(--text-secondary);
+            flex-grow: 1;
+        }
+
+        .arch-features {
+            list-style: none;
+            margin: var(--space-md) 0;
+        }
+
+        .arch-features li {
+            padding: var(--space-sm) 0;
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+        }
+
+        .arch-features li::before {
+            content: "✓";
+            color: var(--secondary-color);
+            font-weight: bold;
+            min-width: 16px;
+        }
+
+        .postgresql .arch-features li::before {
+            color: var(--accent-orange);
+        }
+
+        .complexity-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: auto;
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border);
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .complexity-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .complexity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .complexity-dot.filled.mongodb {
+            background: var(--primary-color);
+        }
+
+        .complexity-dot.filled.postgresql {
+            background: var(--accent-orange);
         }
 
         .text-content {
@@ -326,14 +436,13 @@
         }
 
         @media (max-width: 900px) {
-            .slide-content {
+            .architecture-comparison {
                 grid-template-columns: 1fr;
                 gap: var(--space-lg);
             }
             
-            .text-content {
-                max-height: 40vh;
-                overflow-y: auto;
+            .architecture-side {
+                min-height: auto;
             }
         }
     </style>
@@ -360,21 +469,59 @@
             <!-- Real-time Analytics Slide -->
             <div class="slide active">
                 <div class="slide-content">
-                    <div class="text-content fade-in">
-                        <h2>Real-time Analytics</h2>
-                        <div class="architecture-description">
-                            <h3>Instant Insights with <span class="mongodb-highlight">MongoDB Change Streams</span></h3>
-                            <p>Enable real-time analytics with sub-second latency using MongoDB Change Streams to trigger instant processing of data changes.</p>
+                    <h2>Real-time Analytics</h2>
+                    
+                    <div class="architecture-comparison fade-in">
+                        <div class="architecture-side mongodb">
+                            <h3 class="architecture-title mongodb">🍃 MongoDB Real-time Analytics</h3>
+                            <div class="arch-description">
+                                <strong>Native Change Streams:</strong> MongoDB's built-in change detection enables sub-second analytics by streaming data changes directly to your analytics pipeline. No external infrastructure required for real-time processing.
+                                <br><br>
+                                <strong>Implementation:</strong> Use Change Streams to trigger instant analytics on data modifications, combined with the Aggregation Framework for complex real-time computations without ETL overhead.
+                            </div>
+                            <ul class="arch-features">
+                                <li>Built-in Change Streams for instant notifications</li>
+                                <li>Aggregation Framework for complex analytics</li>
+                                <li>Sub-second latency for real-time dashboards</li>
+                                <li>Single platform for OLTP and OLAP workloads</li>
+                                <li>Dynamic schema handles evolving analytics needs</li>
+                                <li>No external ETL or streaming infrastructure</li>
+                            </ul>
+                            <div class="complexity-indicator">
+                                <span>Setup Complexity:</span>
+                                <div class="complexity-dots">
+                                    <div class="complexity-dot filled mongodb"></div>
+                                    <div class="complexity-dot"></div>
+                                    <div class="complexity-dot"></div>
+                                </div>
+                                <span>Low</span>
+                            </div>
                         </div>
-                        <ul class="benefits-list">
-                            <li><strong>Change Streams:</strong> Real-time triggers for instant analytics on data changes</li>
-                            <li><strong>Aggregation Framework:</strong> Complex analytics without external ETL processes</li>
-                            <li><strong>Low Latency:</strong> Sub-second data availability for real-time dashboards</li>
-                            <li><strong>Unified Platform:</strong> Combine real-time and historical analytics in one system</li>
-                        </ul>
-                        <div class="postgresql-comparison">
-                            <h4>Why PostgreSQL Falls Short:</h4>
-                            <p>PostgreSQL needs external tools like Kafka for real-time streaming. Complex analytics require expensive ETL processes and separate OLAP systems. The relational model struggles with dynamic schema analytics workloads, and you can't achieve MongoDB's sub-second change detection without significant infrastructure overhead.</p>
+                        
+                        <div class="architecture-side postgresql">
+                            <h3 class="architecture-title postgresql">🐘 PostgreSQL Real-time Analytics</h3>
+                            <div class="arch-description">
+                                <strong>External Streaming Required:</strong> PostgreSQL requires external tools like Kafka or Debezium for change detection and streaming. Analytics workloads often need separate OLAP systems like Clickhouse or external data warehouses.
+                                <br><br>
+                                <strong>Implementation:</strong> Set up logical replication, configure external streaming infrastructure, design ETL processes, and manage separate analytics databases for complex real-time workloads.
+                            </div>
+                            <ul class="arch-features">
+                                <li>Logical replication for change capture</li>
+                                <li>External tools required (Kafka, Debezium)</li>
+                                <li>Separate OLAP systems for complex analytics</li>
+                                <li>ETL processes increase latency</li>
+                                <li>Schema changes require pipeline updates</li>
+                                <li>Multiple systems to maintain and monitor</li>
+                            </ul>
+                            <div class="complexity-indicator">
+                                <span>Setup Complexity:</span>
+                                <div class="complexity-dots">
+                                    <div class="complexity-dot filled postgresql"></div>
+                                    <div class="complexity-dot filled postgresql"></div>
+                                    <div class="complexity-dot filled postgresql"></div>
+                                </div>
+                                <span>High</span>
+                            </div>
                         </div>
                     </div>
                     <div class="diagram-container">

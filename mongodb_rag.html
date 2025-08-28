@@ -29,10 +29,120 @@
 
         .slide-content {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 1fr;
             gap: var(--space-xl);
             align-items: start;
             min-height: calc(100vh - 200px);
+        }
+
+        .architecture-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .architecture-side {
+            background: var(--surface);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .architecture-side.mongodb {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .architecture-side.postgresql {
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .architecture-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .architecture-title.mongodb {
+            color: var(--primary-color);
+        }
+
+        .architecture-title.postgresql {
+            color: var(--accent-orange);
+        }
+
+        .arch-description {
+            background: var(--background-soft);
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-lg);
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-normal);
+            color: var(--text-secondary);
+            flex-grow: 1;
+        }
+
+        .arch-features {
+            list-style: none;
+            margin: var(--space-md) 0;
+        }
+
+        .arch-features li {
+            padding: var(--space-sm) 0;
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+        }
+
+        .arch-features li::before {
+            content: "✓";
+            color: var(--secondary-color);
+            font-weight: bold;
+            min-width: 16px;
+        }
+
+        .postgresql .arch-features li::before {
+            color: var(--accent-orange);
+        }
+
+        .complexity-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: auto;
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border);
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .complexity-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .complexity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .complexity-dot.filled.mongodb {
+            background: var(--primary-color);
+        }
+
+        .complexity-dot.filled.postgresql {
+            background: var(--accent-orange);
         }
 
         .text-content {
@@ -326,14 +436,13 @@
         }
 
         @media (max-width: 900px) {
-            .slide-content {
+            .architecture-comparison {
                 grid-template-columns: 1fr;
                 gap: var(--space-lg);
             }
             
-            .text-content {
-                max-height: 40vh;
-                overflow-y: auto;
+            .architecture-side {
+                min-height: auto;
             }
         }
     </style>
@@ -360,21 +469,59 @@
             <!-- RAG Slide -->
             <div class="slide active">
                 <div class="slide-content">
-                    <div class="text-content fade-in">
-                        <h2>RAG (Retrieval-Augmented Generation)</h2>
-                        <div class="architecture-description">
-                            <h3>AI-Powered Search with <span class="mongodb-highlight">MongoDB Vector Search</span></h3>
-                            <p>Combine retrieval-based and generative AI using MongoDB's native vector search capabilities for semantic similarity and context retrieval.</p>
+                    <h2>RAG (Retrieval-Augmented Generation)</h2>
+                    
+                    <div class="architecture-comparison fade-in">
+                        <div class="architecture-side mongodb">
+                            <h3 class="architecture-title mongodb">🍃 MongoDB RAG Architecture</h3>
+                            <div class="arch-description">
+                                <strong>Native Vector Search:</strong> MongoDB's built-in vector search capabilities enable semantic similarity matching without requiring separate vector databases. Store embeddings, metadata, and application data together in a unified document model.
+                                <br><br>
+                                <strong>Implementation:</strong> Use Atlas Search with vector indexing to create embeddings directly in your MongoDB collections, enabling rich filtering and hybrid search patterns.
+                            </div>
+                            <ul class="arch-features">
+                                <li>Native vector indexing with automatic scaling</li>
+                                <li>Document model stores vectors with rich metadata</li>
+                                <li>Real-time updates without retraining models</li>
+                                <li>Hybrid search combining vector and text queries</li>
+                                <li>Single platform for all RAG components</li>
+                                <li>Rich filtering with traditional MongoDB queries</li>
+                            </ul>
+                            <div class="complexity-indicator">
+                                <span>Setup Complexity:</span>
+                                <div class="complexity-dots">
+                                    <div class="complexity-dot filled mongodb"></div>
+                                    <div class="complexity-dot"></div>
+                                    <div class="complexity-dot"></div>
+                                </div>
+                                <span>Low</span>
+                            </div>
                         </div>
-                        <ul class="benefits-list">
-                            <li><strong>Vector Search:</strong> Native vector indexing enables semantic search without additional infrastructure</li>
-                            <li><strong>Unified Platform:</strong> Store vectors, metadata, and application data in one database</li>
-                            <li><strong>Real-time Updates:</strong> Update knowledge base without retraining models</li>
-                            <li><strong>Rich Filtering:</strong> Combine vector search with traditional MongoDB queries</li>
-                        </ul>
-                        <div class="postgresql-comparison">
-                            <h4>PostgreSQL with pgvector Considerations:</h4>
-                            <p>While pgvector provides a straightforward one-time setup for native vector search in PostgreSQL, there are architectural trade-offs to consider. The relational model requires complex joins for metadata filtering, and performance optimization at scale often needs careful index tuning. MongoDB's document model naturally handles unstructured content and metadata together, simplifying RAG application development.</p>
+                        
+                        <div class="architecture-side postgresql">
+                            <h3 class="architecture-title postgresql">🐘 PostgreSQL RAG Architecture</h3>
+                            <div class="arch-description">
+                                <strong>pgvector Extension:</strong> PostgreSQL with pgvector provides vector search capabilities through an extension. Requires careful schema design to handle vectors alongside relational data, often needing complex joins for metadata filtering.
+                                <br><br>
+                                <strong>Implementation:</strong> Install pgvector extension, create vector columns, and design normalized schemas. Performance optimization requires careful index tuning and query planning for vector operations.
+                            </div>
+                            <ul class="arch-features">
+                                <li>pgvector extension for vector operations</li>
+                                <li>Relational model requires normalized schemas</li>
+                                <li>Complex joins for metadata filtering</li>
+                                <li>Separate vector and text search systems</li>
+                                <li>Manual index optimization for performance</li>
+                                <li>Additional infrastructure for full-text search</li>
+                            </ul>
+                            <div class="complexity-indicator">
+                                <span>Setup Complexity:</span>
+                                <div class="complexity-dots">
+                                    <div class="complexity-dot filled postgresql"></div>
+                                    <div class="complexity-dot filled postgresql"></div>
+                                    <div class="complexity-dot filled postgresql"></div>
+                                </div>
+                                <span>High</span>
+                            </div>
                         </div>
                     </div>
                     <div class="diagram-container">
